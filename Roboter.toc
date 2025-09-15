@@ -1,0 +1,25 @@
+\babel@toc {ngerman}{}\relax 
+\contentsline {section}{\numberline {1}Modellierung}{1}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Euler-Lagrange-Gleichung}{1}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Two Link Revolute Manipulator}{3}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1}Herleitung der kinetischen Energie}{4}{subsubsection.1.2.1}%
+\contentsline {subsubsection}{\numberline {1.2.2}Aufstellen der Coriolis-Matrix}{5}{subsubsection.1.2.2}%
+\contentsline {subsubsection}{\numberline {1.2.3}Gravitationsterme}{7}{subsubsection.1.2.3}%
+\contentsline {subsubsection}{\numberline {1.2.4}Simulation gegebener Steuerung}{8}{subsubsection.1.2.4}%
+\contentsline {section}{\numberline {2}Optimale Steuerungsprobleme}{9}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Linear-Quadratische Probleme}{12}{subsection.2.1}%
+\contentsline {section}{\numberline {3}Numerische Lösungsverfahren}{17}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Gradientenverfahren}{17}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Sensitivity Approach}{18}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Praktische Implementierung}{19}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Shooting Methods}{21}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Riccati Regler}{23}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Implementierung}{25}{subsubsection.3.3.1}%
+\contentsline {section}{\numberline {4}Hamilton-Jacobi-Bellmann Gleichung}{26}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Herleitung des Minimumprinzips}{27}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Anwendung auf Linear-Quadratische Probleme}{28}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Finite time problem}{28}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}infinite time problem}{29}{subsubsection.4.2.2}%
+\contentsline {section}{\numberline {5}Paper Lin}{30}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Mein Ansatz auf Lin}{31}{subsection.5.1}%
+\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

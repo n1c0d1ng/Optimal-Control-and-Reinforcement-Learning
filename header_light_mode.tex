@@ -1,0 +1,132 @@
+% !TeX root = ./Roboter.tex
+\documentclass[a4paper,12pt, oneside]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\setlength{\parindent}{0em}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{polynom}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{tikz}
+\usepackage[a4paper,left=2.0cm,right=2.0cm,top=3cm,bottom=3cm]{geometry}
+\usepackage{pgf} % Zur Einbindung der PGF Files
+
+% Light Mode Customization
+\usepackage{xcolor}
+%\definecolor{backgroundgray}{RGB}{255,255,255}  % Weiß als Seitenhintergrund
+\definecolor{textwhite}{RGB}{0,0,0}            % Schwarz als globale Schriftfarbe
+\definecolor{boxgray}{RGB}{245,245,245}        % Sehr helles Grau für Box-Hintergründe
+\definecolor{boxframe}{RGB}{200,200,200}       % Helles Grau für Box-Rahmen
+\pagecolor{boxgray}  % Hintergrund auf Weiß
+\color{textwhite}           % Text auf Schwarz
+
+% Eigene Farben definiert (nun optimiert für hellen Hintergrund)
+\definecolor{rot}{RGB}{204,0,0}
+\definecolor{blau}{RGB}{0,102,204}
+\definecolor{orange}{RGB}{204,85,0}
+\definecolor{gruen}{RGB}{0,153,0}
+\definecolor{dunkelgruen}{RGB}{0,153,0}
+\definecolor{dunkelblau}{RGB}{0,128,128}
+\definecolor{backcolor}{RGB}{235,245,255}
+\definecolor{frontcolor}{RGB}{0,153,0}
+\definecolor{hellblau}{RGB}{180,210,235}
+\definecolor{lila}{RGB}{153,0,153}
+\definecolor{gelb}{RGB}{204,153,0}
+\definecolor{dunkelrot}{RGB}{153,0,51}
+\definecolor{dunkelgelb}{RGB}{153,153,0}
+
+% Section colors (Headings)
+%\usepackage{sectsty}
+%\sectionfont{\color{textwhite}}
+%\subsectionfont{\color{textwhite}}
+%\subsubsectionfont{\color{textwhite}}
+
+% Box customization mit mdframed
+\usepackage{mdframed}
+\mdfdefinestyle{mystyle}{
+    leftmargin=0pt,
+    linecolor=boxframe,
+    linewidth=1pt,
+    backgroundcolor=boxgray,
+    fontcolor=textwhite,
+    %frametitlefont={\color{gruen}\bfseries}
+}
+
+% Custom theorem environments
+\newmdtheoremenv[style=mystyle]{satz}{\color{rot}Satz}[section] % linecolor=rot
+\newmdtheoremenv[style=mystyle]{definition}[satz]{\color{gelb}Definition}
+\newmdtheoremenv[style=mystyle,leftmargin=-10pt]{beispiel}[satz]{\color{lila}Beispiel}
+\newmdtheoremenv[style=mystyle,leftmargin=-10pt]{bem}[satz]{Anmerkung}
+\newmdtheoremenv[style=mystyle,leftmargin=-10pt]{ex}{Aufgabe} % \color{gruen}
+
+% Proof- und Lösungs-Kommandos
+\newcommand{\proof}[1]{
+    \begingroup
+    \textit{\hfill \\ \gruen{\textbf{Beweis:}} }#1 \hfill $\Box$
+    \endgroup
+}
+\newcommand{\loesung}[1]{
+    \begingroup
+    \renewcommand{\textsc}[1]{{\rmfamily\scshape##1}}
+    \renewcommand{\emph}[1]{{\normalfont##1}}
+    \addtokomafont{subsection}{\color{gruen}}
+    \addtokomafont{subsubsection}{\color{gruen}}
+    \addtokomafont{caption}{\color{gruen}}
+    \addtokomafont{captionlabel}{\color{gruen}}
+    \sffamily\slshape\color{textwhite}
+    \textbf{\hfill \\ Lösung: }#1 
+    \endgroup
+}
+
+% Listings für Python
+\usepackage[german,tworuled]{algorithm2e}
+\usepackage{listings}
+\lstset{
+    commentstyle=\color{gruen},
+    keywordstyle=\color{blau},
+    language=Python,
+    backgroundcolor=\color{boxgray},
+    basicstyle=\ttfamily\color{textwhite},
+    stringstyle=\color{rot},
+    tabsize=2,
+    literate={@}{{@}}1,
+    title=\lstname
+}
+
+% Hyperref Settings
+\usepackage[pdfstartview=Fit,plainpages=false,colorlinks=true,linkcolor=gruen,linktocpage=true,hyperfootnotes=false,bookmarksopen=false]{hyperref}
+
+% Eigene Kommandos
+\newcommand{\e}[1]{\text{e}^{#1}}
+\newcommand{\rot}[2][rot]{\textcolor{#1}{#2}}
+\newcommand{\gruen}[2][gruen]{\textcolor{#1}{#2}}
+\newcommand{\frontcolor}[2][frontcolor]{\textcolor{#1}{#2}}
+\newcommand{\gelb}[2][gelb]{\textcolor{#1}{#2}}
+\newcommand{\orange}[2][orange]{\textcolor{#1}{#2}}
+\newcommand{\blau}[2][blau]{\textcolor{#1}{#2}}
+\newcommand{\hellblau}[2][hellblau]{\textcolor{#1}{#2}}
+\newcommand{\lila}[2][lila]{\textcolor{#1}{#2}}
+\newcommand{\dunkelrot}[2][dunkelrot]{\textcolor{#1}{#2}}
+\newcommand{\dunkelgelb}[2][dunkelgelb]{\textcolor{#1}{#2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\norm}[1]{\left\lVert#1\right\lVert}
+\newcommand{\dv}{\thinspace \mathrm{d}v}
+\newcommand{\dw}{\thinspace \mathrm{d}w}
+\newcommand{\dx}{\thinspace \mathrm{d}x}
+\newcommand{\dy}{\thinspace \mathrm{d}y}
+\newcommand{\dt}{\thinspace \mathrm{d}t}
+\newcommand{\dr}{\thinspace \mathrm{d}r}
+\newcommand{\ds}{\thinspace \mathrm{d}s}
+\newcommand{\du}{\thinspace \mathrm{d}u}
+\newcommand{\dz}{\thinspace \mathrm{d}z}
+\newcommand{\dW}{\thinspace \mathrm{d}W}
+\newcommand{\dX}{\thinspace \mathrm{d}X}
+\newcommand{\dP}{\thinspace \mathrm{d}P}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\argmin}{arg\,min}
+%% adjust title page to be centered
+\typearea[18mm]{11}

@@ -1,0 +1,1963 @@
+\input{header_light_mode}
+
+\usepackage{listings}
+
+\definecolor{codebg}{rgb}{0.92,0.92,0.92}
+\definecolor{keywordcolor}{rgb}{0.2,0.2,0.7}
+\definecolor{stringcolor}{rgb}{0.8,0.1,0.1}
+\definecolor{commentcolor}{rgb}{0.4,0.4,0.4}
+
+
+\lstset{
+  backgroundcolor=\color{codebg},
+  %frame=single,
+  %numbers=left,
+  %numberstyle=\tiny\color{gray},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{keywordcolor}\bfseries,
+  stringstyle=\color{stringcolor},
+  commentstyle=\color{gruen}\itshape,
+  language=Python,
+  tabsize=2,
+  showstringspaces=false
+}
+
+
+
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\TitleLineI}{Modellierung eines Roboters} 
+\newcommand{\Author}{Nicolas Schäfer}
+\newcommand{\SubmissionDate}{Saarbrücken, \today}
+
+\thispagestyle{empty}
+
+
+
+%\begin{center}
+	%\includegraphics[scale=0.3]{cover.jpg}
+%	\includegraphics[scale=0.3]{cover2.jpg}
+%\end{center}
+
+
+\rule{\textwidth}{0.4pt}
+
+\begin{center}
+	\begin{Large}
+		Modellierung eines Roboters
+	\end{Large}
+\end{center}
+
+\vspace{2.0cm}
+\begin{center}
+		\begin{tabular}{c}
+			\Author \\
+			 \SubmissionDate 
+			%%Uncomment the following line for a third title line 
+%			\TitleLineIII \\
+		\end{tabular}
+\end{center}
+\vspace{1.5cm}
+
+\end{titlepage}
+
+
+\pagenumbering{roman}
+
+\tableofcontents
+
+\newpage
+
+\pagenumbering{arabic}
+
+\raggedbottom
+
+\section{Modellierung}
+
+
+\begin{align*}
+\underbrace{f - mg}_{\textsf{Kräftebilanz}} = \underbrace{m x''}_{\textsf{Newtons 2nd Law}} &= \frac{\mathrm{d}}{\dt} \left[m \rot{x'(t)} \right] \\
+f - \frac{\mathrm{\partial}}{\partial x} \underbrace{\left[ mg x(t) \right]}_{\textsf{Potenzielle Energie }V} &= \frac{\mathrm{d}}{\dt} \rot{\frac{\partial}{\partial x'}} \underbrace{\left[m \rot{ \frac{1}{2} x'(t)^2} \right]}_{\textsf{kinetische Energie } T} \\
+f \dunkelgelb{- \frac{\partial V}{\partial x}} = \frac{\mathrm{d}}{\dt} \rot{\frac{\partial T}{\partial x'}}
+&\Rightarrow
+f = \frac{\mathrm{d}}{\dt} \rot{\frac{\partial L}{\partial x'}} - \dunkelgelb{\frac{\partial L}{\partial x}} 
+\end{align*}
+
+Wobei $L = T - V = \frac{1}{2}m x'(t)^2 -mg x(t)$ gilt.
+Für generalisierte Koordinaten $\textbf{q} = \theta \in \mathbb{R}^n$
+%
+\begin{align*}
+\frac{d}{dt} \left( \frac{\partial T}{\partial \theta_{i}'}  \right) - \frac{\partial T}{\partial \theta_i}  + \frac{\partial V}{\partial \theta_i} = \tau_i \quad i=1, \cdots , n
+\end{align*}
+
+
+\subsection{Euler-Lagrange-Gleichung}
+%---------------------------------------------------------------------------------------------------
+
+
+\begin{definition}[Richtungsableitung]
+Die Richtungsableitung des Funktionals $J$ an der Stelle $x$ in Richtung $h$ ist definiert als 
+%
+\begin{align*}
+\delta J(x(t), h(t)) = \lim_{\epsilon \to 0} \frac{J[x(t)+ \epsilon \cdot h(t)] - J[x(t)]}{\epsilon} =
+\gruen{\frac{d}{d\epsilon} J[x + \epsilon h] \bigg|_{\epsilon = 0}}
+\end{align*}
+\end{definition}
+
+Wir definieren $f:\mathbb{R} \to \mathbb{R}$ mit $f(\epsilon) := J[x+ \epsilon \cdot h]$, dann gilt
+%
+\begin{align*}
+\gruen{f'(0)} = \lim_{\epsilon \to 0} \frac{f(\epsilon) -f(0)}{\epsilon} = \delta J(x(t), h(t))
+\end{align*}
+
+%
+%---------------------------------------------------------------------------------------------------------
+\begin{satz}[Euler-Lagrange-Gleichung]  \label{ELE}
+Sei $J: C^{2}([a,b]) \to \mathbb{R}$ ein Funktional mit
+%
+\begin{align*}
+J[x] = \int_{t_0}^{t_f} L(t,x(t),x'(t)) \mathrm{d}t, \quad x(t_0) = x_0, x(t_f) = x_f
+\end{align*}
+%
+Dann gilt für die Ableitung $\nabla J(x) = L_x -  \frac{\mathrm{d}}{\mathrm{d}t} L_{x'}$. Sei $x^* (t) = \textsf{argmin } J[x] $
+erfüllt es die folgende Gleichung
+%
+\begin{align*}
+\nabla J(x^*) = 0 \Leftrightarrow L_{x} - \frac{d}{dt} L_{x'} = 0
+\end{align*}
+\end{satz}
+
+\proof{
+Für die Richtungsableitung gilt 
+%
+\begin{align*}
+\frac{d}{d\epsilon} J[x + \epsilon h] \bigg|_{\epsilon = 0} 
+&= \int_{t_0}^{t_f} \frac{d}{d\epsilon} L(t, x(t) + \epsilon h(t), x'(t) + \epsilon h'(t)) \dt \bigg|_{\epsilon = 0} \\
+&= \int_{t_0}^{t_f} L_x \cdot h(t) + \orange{L_{x'} \cdot h'(t)} \dt \\
+&= \int_{t_0}^{t_f} L_x \cdot h(t)  \orange{ - \frac{d}{dt}  L_{x'} \cdot h(t)} \dt + \orange{\left[ L_{x'} \cdot h(t) \vphantom{\int}  \right]_{t_0}^{t_f} }
+\end{align*}
+%
+Für den Gradienten gilt $\delta J(x(t), \dunkelrot{h(t)}) = \gruen{\nabla J(x)} \cdot \dunkelrot{h(t)}$
+%
+\begin{align*}
+\delta J(x(t), \dunkelrot{h(t)}) = \int_{t_0}^{t_f} \left( \gruen{L_{x} - \frac{d}{dt} L_{x'} } \right) \cdot \dunkelrot{h(t)} \dt + \left[ \gruen{L_{x'}} \cdot \dunkelrot{h(t)} \vphantom{\int}  \right]_{t_0}^{t_f}
+\end{align*}
+%
+Für feste Randwerte $x(t_0) = x_0, x(t_f) = x_f$ gilt $h(t_0) = h(t_f) = 0$.
+}
+
+%------------------------------------------------------------------------------------------
+
+%
+%---------------------------------------------------------------------------------------------------------
+\begin{definition}[Hamilton-Funktion]
+Wir betrachten unser Variationsproblem, dann definieren wir den adjungierten Zustand $p$ und die Hamilton-Funktion $H$ durch
+%
+\begin{align*}
+p(t) := L_{x'} \quad H(t,x,p) := x'(t) \cdot p(t) - L(t,x,x')  
+\end{align*}
+
+Die Hamilton-Funktion besitzt wird somit extremal entlang $x'$
+%
+\begin{align*}
+H_{x'} =  p - L_{x'} = 0
+\end{align*}
+
+\begin{itemize}
+\item Partiell Differenzieren von $H$ bezüglich $x$ und $p$ liefert
+%
+\begin{align*}
+\frac{\partial H}{\partial p} &= x' + p \cdot \frac{\partial x'}{\partial p} - \underbrace{L_{x'}}_{= p} \cdot \frac{\partial x'}{\partial p} = x'(t) \\
+\frac{\partial H}{\partial x} &= - L_{x} = -\frac{\mathrm{d}}{\dt} L_{x'} =  -p'(t)
+\end{align*}
+%
+\item Im autonomen Fall $H_{t} = 0$ gilt: $\orange{H_x = - p'}$ und $\lila{H_p = x'}$
+%
+\begin{align*}
+\frac{\mathrm{d}H}{\mathrm{d}t} = H_t + \orange{H_x} \cdot x'(t) + \lila{H_p} \cdot  p'(t) = H_t = 0
+\end{align*}
+\end{itemize}
+
+\end{definition}
+
+%
+%---------------------------------------------------------------------------------------------------------
+\begin{satz}[Optimalitätskriterium]
+Sei $x^{*} (t)$ ein Minimum eines Variationsproblems, so gilt:
+%
+\begin{itemize}
+\item Die Funktion $x$ erfüllt die Euler-Lagrange Gleichung.
+%
+\begin{align*}
+\nabla J(x^*) = 0 \Leftrightarrow L_{x} - \frac{\mathrm{d}}{\dt} L_{x'} = 0
+\end{align*}
+
+\item Für eine freie Endzeit $\dunkelgelb{t_f}$ gilt 
+%
+\begin{align*}
+ H(\dunkelgelb{t_f},x,p) = p(\dunkelgelb{t_f}) \cdot x'(\dunkelgelb{t_f}) - L(\dunkelgelb{t_f})  = 0
+\end{align*}
+
+\item Für einen freien Endpunkt $x_{f}$ gilt
+%
+\begin{align*}
+ p(t_{f}) = L_{x'}(t_{f})  = 0
+\end{align*}
+\end{itemize}
+
+\end{satz}
+
+\proof{
+Für festes $x(t_0) = x_0$ gilt $\dunkelrot{h(t_0)} = 0$. Bei freiem $x(t_f) = x_f$ verschwindet der Randterm für $\gruen{L_{x'}(t_f) }= 0$ und es gilt
+%
+\begin{align*}
+\delta J(x(t), \dunkelrot{h(t)}) 
+&= \int_{t_0}^{t_f} \left( \underbrace{\gruen{L_{x} - \frac{d}{dt} L_{x'} }}_{ = 0} \right) \cdot \dunkelrot{h(t)} \dt + \left[ \gruen{L_{x'}} \cdot \dunkelrot{h(t)} \vphantom{\int}  \right]_{t_0}^{t_f} \\
+0 &=\underbrace{ \gruen{L_{x'}(t_f)}}_{= 0} \cdot \dunkelrot{h(t_f)} - \gruen{L_{x'}(t_0)} \cdot \underbrace{\dunkelrot{h(t_0)}}_{= 0} 
+\end{align*}
+
+
+}
+
+\subsection{Two Link Revolute Manipulator}
+
+% Graphik des Roboterarms
+%--------------------------------------------------------------------------------------------------------
+\begin{center}
+\begin{tikzpicture}[scale = 1.75, every node/.style={transform shape}]
+    % Koordinatensystem
+    %\draw[very thin, gray] (-5,-5) grid (5,5); % Raster
+    %\draw[->] (-5,0) -- (5,0); % x-Achse
+    %\draw[->] (0,-5) -- (0,5); % y-Achse
+    
+    % Achsen und Hilfslinien
+    \draw[white, dashed, ->] (0.0,-1.0) -- (3.5,-1.0);
+    \draw[white, dashed, ->] (0.0,-1.0) -- (0.0,3.0);
+    
+    % Schwerpunkte
+    \draw[gelb, dashed] (1.0,-0.5) -- (1.0,-1.0);
+    \draw[gelb, dashed] (1.0,-0.5) -- (0,-0.5);
+    \node at (-0.2, -0.5) {\tiny $\gelb{y_1}$};  % Punktbeschriftung
+    \node at (1, -1.2) {\tiny $\gelb{x_1}$}; 
+    \draw[orange, dashed] (2.5,1) -- (0.0,1);
+    \draw[orange, dashed] (2.5,1) -- (2.5,-1);
+    \node at (-0.2, 1.0) {\tiny $\orange{y_2}$};  % Punktbeschriftung
+    \node at (2.5, -1.2) {\tiny $\orange{x_2}$}; 
+    
+    % Erste Zeichnung (Original)
+    \fill[hellblau] (-4,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+    \draw[white, line width = 0.2mm] (-4,-1) circle (0.25);  % Weißer Rand um das Objekt
+    
+    \draw[white, line width = 0.2mm] (-4.25,-1.4) rectangle (-3.75,-1);  % Weißer Rand um das Rechteck
+    \fill[hellblau] (-4.25,-1.4) rectangle (-3.75,-1);  % Füllt das Rechteck mit hellblau
+    \draw[thick, white] (-4.5,-1.4) -- (-3.5,-1.4);
+    
+    % Grüne Linie angepasst (Endpunkt auf (-2.0, 0.0))
+    \draw[thick, gruen] (-4,-1) -- (-2.0,0.0);
+    
+    % Rote Linie angepasst (von (-2.0, 0.0) nach (-1.0, 2.0))
+    \draw[thick, dunkelrot] (-2.0,0.0) -- (-1.0,2.0);
+    
+    % Glieder
+    \fill[blau] (-2.0,0.0) circle (0.1);
+    \draw[white, thin] (-2.0,0.0) circle (0.1);  % Weißer Rand um das Objekt
+    \fill[blau] (-4.0,-1.0) circle (0.1);
+    \draw[white, thin] (-4.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+    
+	% Beschriftungen
+	\node at (-3, -0.75) {\tiny $\gruen{l_1}$};  % 
+	\node at (-1.5, 1.5) {\tiny $\dunkelrot{l_2}$};  % 
+	
+	% Schwerpunkte 
+	\fill[white] (-3.0,-0.5) circle (0.05);
+	\fill[white] (-1.5,1) circle (0.05);
+	
+	\draw[white, <->] (-1.85,0.15) -- (-1.5,0.85);
+	\draw[white, <->] (-3.85,-0.85) -- (-3.1,-0.45);
+	
+	% Beschriftungen
+	\node at (-3.5, -0.4) {\tiny $a_1$};  % 
+	\node at (-1.5, 0.5) {\tiny $a_2$};  % 
+    
+    % Zweite Zeichnung (verschoben um 4 Einheiten entlang der x-Achse)
+    \fill[hellblau] (0,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+    \draw[white, line width = 0.2mm] (0,-1) circle (0.25);  % Weißer Rand um das Objekt
+    
+    \draw[white, line width = 0.2mm] (-0.25,-1.4) rectangle (0.25,-1);  % Weißer Rand um das Rechteck
+    \fill[hellblau] (-0.25,-1.4) rectangle (0.25,-1);  % Füllt das Rechteck mit hellblau
+    \draw[thick, white] (-0.5,-1.4) -- (0.5,-1.4);
+    
+    % Grüne Linie (verschoben)
+    \draw[thick, gruen] (0,-1) -- (2.0,0.0);
+    \draw[thick, gruen, dotted] (0,-1) -- (3.5,0.75);
+    
+    % Rote Linie (verschoben)
+    \draw[thick, dunkelrot] (2.0,0.0) -- (3.0,2.0);
+    
+    % Glieder
+    \fill[blau] (2.0,0.0) circle (0.1);
+    \draw[white, thin] (2.0,0.0) circle (0.1);  % Weißer Rand um das Objekt
+    \fill[blau] (0.0,-1.0) circle (0.1);
+    \draw[white, thin] (0.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+    \fill[blau] (3.0,2.0) circle (0.1);
+    \draw[white, thin] (3.0,2.0) circle (0.1);  % Weißer Rand um das Objekt
+    
+
+    
+    % Winkel
+    \draw [gruen, thick] (1,-1)  arc[start angle=0,end angle=45,radius=0.5cm];
+	\node at (0.75, -0.85) {\tiny $\gruen{\theta_1}$};  % Winkelbeschriftung
+	
+	\draw [dunkelrot, thick] (3,0.5)  arc[start angle=0,end angle=80,radius=0.5cm];
+	\node at (2.7, 0.6) {\tiny $\dunkelrot{\theta_2}$};  % Winkelbeschriftung
+\end{tikzpicture}
+\end{center}
+%--------------------------------------------------------------------------------------------------------
+
+\begin{align*}
+\gelb{x_1} = a_1 \cdot \cos(\gruen{\theta_1}) \quad \gelb{y_1} = a_1 \cdot \sin(\gruen{\theta_1}) 
+\end{align*}
+
+Gelenk 2 befindet sich in  $(l_1 \cos(\gruen{\theta_1}),\;l_1 \sin(\gruen{\theta_1}))$. Der Schwerpunkt von Link~2 ist \emph{zusätzlich} noch \(a_2\) vom Gelenk~2 entfernt
+und besitzt eine absolute Winkelausrichtung \(\theta_1 + \theta_2\). Daher:
+%
+\begin{align*}
+\orange{x_2} &= l_1 \cdot \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+\orange{y_2} &= l_1 \cdot \sin(\gruen{\theta_1}) + a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2})
+\end{align*}
+
+
+Die Euler-Lagrange Gleichung des Systems
+%
+\begin{align*}
+D(\theta)
+\theta''
++ 
+C(\theta, \theta')
+\theta'
++
+G(\theta)
+=
+\tau
+\end{align*}
+
+
+\subsubsection{Herleitung der kinetischen Energie}
+
+Für die translatorische Energie von Link $1$ gilt:
+%
+\begin{align*}
+T_{1,trans} 
+= \frac{m_1}{2} \cdot (\gelb{x_{1}'(t)}^2 + y_{1}'(t)^2) 
+= \frac{m_1}{2} \cdot (\gelb{( - a_1 \sin(\theta_1) \theta_{1}' )}^2 + (a_1 \cos(\theta_1) \theta_{1}')^2)  
+= \frac{m_1}{2} \cdot a_1^2  \cdot \gruen{\theta_{1}'(t)}^2 
+\end{align*}
+
+Es gilt $T_1 = T_{1,trans} + T_{1, rot}$ und somit
+
+\begin{align*}
+T_1 
+= \frac{m_1}{2} a_1^2 \gruen{\theta_{1}'(t)}^2 + \frac{I_1}{2} \gruen{\theta_{1}'(t)}^2 
+= \frac{m_1 a_1^2 + I_1}{2} \gruen{\theta_{1}'(t)}^2
+\end{align*}
+
+Analog für die Energie an Link $2$ gilt:
+
+\begin{align*}
+T_2
+&= \underbrace{\frac{m_2}{2} \cdot (\orange{x_{2}'(t)}^2 + y_{2}'(t)^2)}_{\textsc{translatorisch}} + \underbrace{\frac{I_2}{2} \cdot (\gruen{\theta_{1}'(t)} + \dunkelrot{\theta_{2}'(t)})^2}_{\textsc{rotorisch}}
+\end{align*}
+
+\begin{align*}
+T(\gruen{\theta_{1}}, \gruen{\theta_{1}'} , \dunkelrot{\theta_{2}}, \dunkelrot{\theta_{2}'} )
+=
+\frac{1}{2} 
+\begin{pmatrix}
+\gruen{\theta_{1}'} & \dunkelrot{\theta_{2}'}
+\end{pmatrix} 
+D(\gruen{\theta_{1}},  \dunkelrot{\theta_{2}})
+\begin{pmatrix} \gruen{\theta_{1}'} \\ \dunkelrot{\theta_{2}'} \end{pmatrix} 
+=
+\frac{1}{2}  D_{\gruen{1 1}} \gruen{\theta_{1}'}(t)^2 + D_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} + \frac{1}{2} D_{\dunkelrot{22}} \dunkelrot{\theta_{2}'}(t)^2
+\end{align*}
+
+
+\begin{align*}
+x_{2}'(t) 
+&=  -l_1 \sin(\gruen{\theta_1}) \gruen{\theta_{1}'} - a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) (\gruen{\theta_{1}} ' + \dunkelrot{\theta_2} ') \\
+y_{2}'(t)
+&=
+l_1 \cos(\gruen{\theta_{1}}) \gruen{\theta_{1}'} + a_2 \cos(\gruen{\theta_{1}} + \dunkelrot{\theta_2}) (\gruen{\theta_{1}} ' + \dunkelrot{\theta_2} ') 
+\end{align*}
+
+%-------------------------------------------------------------------------------------------------
+\begin{align*}
+x_{2}'(t)^2 + y_{2}'(t)^2 
+&=
+\left[ \vphantom{\int} -l_1 \sin(\gruen{\theta_1}) \gruen{\theta_{1}'} - a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) (\gruen{\theta_{1}} ' + \dunkelrot{\theta_2} ') \right]^2
++
+\left[\vphantom{\int} l_1 \cos(\gruen{\theta_{1}}) \gruen{\theta_{1}'} + a_2 \cos(\gruen{\theta_{1}} + \dunkelrot{\theta_2}) (\gruen{\theta_{1}} ' + \dunkelrot{\theta_2} ') \right]^2
+\\
+&=
+l_1^2 \sin(\gruen{\theta_1})^2 \gruen{\theta_{1}'}^2 +2 l_1 a_2 \sin(\gruen{\theta_1}) \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \gruen{\theta_{1}'} (\gruen{\theta_{1}} ' + \dunkelrot{\theta_{2}'} ) 
++ \underbrace{a_2^2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2})^2 (\gruen{\theta_{1}} ' + \dunkelrot{\theta_2} ')^2}_{a_2^2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2})^2 \cdot (\gruen{\theta_{1}'}^2 + 2\gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} + \dunkelrot{\theta_{2}'}^2  )}  \\
+&\quad +
+l_1^2 \cos(\gruen{\theta_{1}})^2 \gruen{\theta_{1}'}^2 
++ 2 l_1 a_2 \cos(\gruen{\theta_{1}})  \cos(\gruen{\theta_{1}} + \dunkelrot{\theta_2}) \gruen{\theta_{1}'} (\gruen{\theta_{1}} ' + \dunkelrot{\theta_2} ')
++ \underbrace{a_2^2 \cos(\gruen{\theta_{1}} + \dunkelrot{\theta_2})^2 (\gruen{\theta_{1}} ' + \dunkelrot{\theta_2} ')^2}_{a_2^2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2})^2 \cdot (\gruen{\theta_{1}'}^2 + 2\gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} + \dunkelrot{\theta_{2}'}^2  )} \\
+&=
+\left[ \vphantom{\int} \underbrace{l_1^2 \sin(\gruen{\theta_1})^2  + l_1^2 \cos(\gruen{\theta_{1}})^2}_{= l_1^2} + \underbrace{a_2^2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2})^2 + a_2^2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2})^2}_{= a_2^2} \right] \gruen{\theta_{1}'}^2 \\
+&\quad + 2 l_1 a_2 \gruen{\theta_{1}'} \cdot 
+\left[ \vphantom{\int}  \underbrace{\sin(\gruen{\theta_1}) \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) +   \cos(\gruen{\theta_{1}})  \cos(\gruen{\theta_{1}} + \dunkelrot{\theta_2})}_{\cos(\dunkelrot{\theta_{2}})} \right]
+ (\gruen{\theta_{1}} ' + \dunkelrot{\theta_2} ') \\
+&\quad + 2 \cdot 
+\left[  \vphantom{\int}  \underbrace{a_2^2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2})^2  + a_2^2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2})^2}_{= a_2^2}  \right] 
+\gruen{\theta_{1}'} \dunkelrot{\theta_{2}'}  
++ \left[  \vphantom{\int}  \underbrace{a_2^2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2})^2  + a_2^2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2})^2}_{= a_2^2}  \right] \dunkelrot{\theta_{2}'}^2
+\\
+&=
+\left[\vphantom{\int} l_1^2 +a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}}) \right] \gruen{\theta_{1}'}^2 
++ \left[ \vphantom{\int} 2a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}}) \right] \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} + a_2^2 \dunkelrot{\theta_{2}'}^2
+\end{align*}
+
+%------------------------------------------------------------------------------------------------------
+Für die kinetische Energie gilt somit
+%
+\begin{align*}
+T 
+&= 
+T_1  + T_2 
+\\
+&=
+\frac{m_1 a_1^2 + I_1}{2} \gruen{\theta_{1}'}^2 + \frac{m_2}{2} \cdot (x_{2}'(t)^2 + y_{2}'(t)^2 ) + \frac{I_2}{2} \cdot \underbrace{(\gruen{\theta_{1}'} + \dunkelrot{\theta_{2}'})^2}_{\gruen{\theta_{1}'}^2 + 2\gruen{\theta_{1}'}\dunkelrot{\theta_{2}'} + \dunkelrot{\theta_{2}'}^2} \\
+&=
+\left[\vphantom{\int}  \frac{m_1 a_1^2 + I_1 + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}}) ) + I_2}{2}  \right] 
+\gruen{\theta_{1}'}^2 
++ \left[ \vphantom{\int}  \frac{m_2 \cdot (2a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}})) + 2I_2}{2} \right] 
+\gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} \\
+&\quad + \left[\vphantom{\int} \frac{m_2 a_2^2 + I_2}{2}  \right] \dunkelrot{\theta_{2}'}^2 \\
+&=
+\frac{1}{2} 
+\begin{pmatrix}
+\gruen{\theta_{1}'} & \dunkelrot{\theta_{2}'}
+\end{pmatrix} 
+\underbrace{\begin{pmatrix}
+m_1 a_1^2 + I_1 + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}}) ) + I_2 &  m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{\theta_{2}})) + I_2 \\
+m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{\theta_{2}})) + I_2	& m_2 a_2^2 + I_2
+\end{pmatrix}}_{D(\gruen{\theta_{1}},\dunkelrot{\theta_{2}}) = D(\dunkelrot{\theta_{2}})}
+\begin{pmatrix} \gruen{\theta_{1}'} \\ \dunkelrot{\theta_{2}'} \end{pmatrix} 
+\\
+&=
+\frac{1}{2}  D_{\gruen{1 1}} \gruen{\theta_{1}'}(t)^2 + D_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} + \frac{1}{2} D_{\dunkelrot{22}} \dunkelrot{\theta_{2}'}(t)^2
+\end{align*}
+
+
+\subsubsection{Aufstellen der Coriolis-Matrix}
+
+Es gilt 
+
+
+\begin{align*}
+\frac{\partial T}{\partial \gruen{\theta_{1}}}
+&= 
+\frac{1}{2}  \frac{\partial D_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2 
++ \frac{\partial D_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
++ \frac{1}{2} \frac{\partial D_{22}}{\partial \gruen{\theta_{1}}} \dunkelrot{\theta_{2}'}(t)^2
+\end{align*}
+
+\begin{align*}
+\frac{\partial T}{\partial \dunkelrot{\theta_{2}}}
+&= 
+\frac{1}{2} \frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'}^2
++ \frac{\partial D_{12}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
++ \frac{1}{2} \frac{\partial D_{22}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}(t)^2
+\end{align*}
+
+\begin{align*}
+\frac{\partial T}{\partial \gruen{\theta_{1}'}} 
+&= D_{\gruen{1 1}} \gruen{\theta_{1}'} + D_{\gruen{1}\dunkelrot{2}}  \dunkelrot{\theta_{2}'}
+\end{align*}
+%   
+
+\begin{align*}
+\frac{\partial T}{\partial \dunkelrot{\theta_{2}'}} 
+&=
+D_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}'} + D_{\dunkelrot{22}} \dunkelrot{\theta_{2}'}
+\end{align*}
+
+Für die zeitlichen Ableitungen der Größen gilt 
+%
+\begin{align*}
+\frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \gruen{\theta_{1}'}} 
+&=
+\underbrace{\frac{\mathrm{d}}{\dt} D_{\gruen{1 1}}}_{\frac{\partial D_{11}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial D_{11}}{\partial \theta_{2}} \theta_{2}'} \cdot \gruen{\theta_{1}'} + D_{\gruen{1 1}} \gruen{\theta_{1}''} + \underbrace{\frac{\mathrm{d}}{\dt} D_{\gruen{1}\dunkelrot{2}}}_{\frac{\partial D_{12}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial D_{12}}{\partial \theta_{2}} \theta_{2}'} \cdot \dunkelrot{\theta_{2}'} + D_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} 
+\\
+&= \frac{\partial D_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
+ + \frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
+ +  D_{\gruen{1 1}} \gruen{\theta_{1}''} 
+ + \frac{\partial D_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+ + \frac{\partial D_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
+ + D_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} \\
+&=
+\frac{\partial D_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
++ \left[ \frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial D_{12}}{\partial \gruen{\theta_{1}}} \right] \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
++ \frac{\partial D_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
+ +  D_{\gruen{1 1}} \gruen{\theta_{1}''} 
+  + D_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+\begin{align*}
+\frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \dunkelrot{\theta_{2}'}} 
+&=
+\underbrace{\frac{\mathrm{d}}{\dt} D_{\gruen{1}\dunkelrot{2}}}_{\frac{\partial D_{12}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial D_{12}}{\partial \theta_{2}} \theta_{2}'} \cdot \gruen{\theta_{1}'} + D_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''} + \underbrace{\frac{\mathrm{d}}{\dt} D_{\dunkelrot{22}}}_{\frac{\partial D_{22}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial D_{22}}{\partial \theta_{2}} \theta_{2}'} \cdot \dunkelrot{\theta_{2}'} + D_{\dunkelrot{22}} \dunkelrot{\theta_{2}''} \\
+&= 
+\frac{\partial D_{12}}{\partial \theta_{1}}  \gruen{\theta_{1}'}^2 
++ \frac{\partial D_{12}}{\partial \theta_{2}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
++ D_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''}
++ \frac{\partial D_{22}}{\partial \theta_{1}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
++ \frac{\partial D_{22}}{\partial \theta_{2}}  \dunkelrot{\theta_{2}'}^2 
++ D_{\dunkelrot{22}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+Es gilt 
+%
+\begin{align*}
+\frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \gruen{\theta_{1}'}}  - \frac{\partial T}{\partial \gruen{\theta_{1}}}
+&=
+\left[ \frac{\partial D_{11}}{\partial \gruen{\theta_{1}}} - \frac{1}{2}  \frac{\partial D_{11}}{\partial \gruen{\theta_{1}}} \right] \gruen{\theta_{1}'}^2
++ \left[ \frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial D_{12}}{\partial \gruen{\theta_{1}}} -  \frac{\partial D_{12}}{\partial \gruen{\theta_{1}}} \right] \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
++ \left[\frac{\partial D_{12}}{\partial \dunkelrot{\theta_{2}}} - \frac{1}{2} \frac{\partial D_{22}}{\partial \gruen{\theta_{1}}} \right] \dunkelrot{\theta_{2}'}^2 \\
+& \quad
+ +  D_{\gruen{1 1}} \gruen{\theta_{1}''} 
+  + D_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} \\
+&=
+\frac{1}{2}  \frac{\partial D_{11}}{\partial \gruen{\theta_{1}}}  \gruen{\theta_{1}'}^2
++ \frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
++ \left[\frac{\partial D_{12}}{\partial \dunkelrot{\theta_{2}}} - \frac{1}{2} \frac{\partial D_{22}}{\partial \gruen{\theta_{1}}} \right] \dunkelrot{\theta_{2}'}^2
+ +  D_{\gruen{1 1}} \gruen{\theta_{1}''} 
+  + D_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} \\
+&=
+\underbrace{\left[ \frac{1}{2}  \frac{\partial D_{11}}{\partial \gruen{\theta_{1}}}  \gruen{\theta_{1}'} + \frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{ \theta_{2}'} \right] }_{C_{\gruen{11}}}  \gruen{\theta_{1}'} 
++ 
+\underbrace{\left[\frac{\partial D_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'} - \frac{1}{2} \frac{\partial D_{22}}{\partial \gruen{\theta_{1}}} \dunkelrot{\theta_{2}'} \right]}_{C_{\gruen{1}\dunkelrot{2}}} 
+ \dunkelrot{\theta_{2}'}
+ +  D_{\gruen{1 1}} \gruen{\theta_{1}''} 
+  + D_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} 
+\end{align*}
+
+\begin{align*}
+\frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \dunkelrot{\theta_{2}'}} - \frac{\partial T}{\partial \dunkelrot{\theta_{2}}}
+&= 
+\left[ \frac{\partial D_{12}}{\partial \gruen{\theta_{1}}} - \frac{1}{2} \frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}} \right] \gruen{\theta_{1}'}^2 
++ \left[ \frac{\partial D_{12}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial D_{22}}{\partial \gruen{\theta_{1}}} - \frac{\partial D_{12}}{\partial \dunkelrot{\theta_{2}}} \right] \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
++ \left[ \frac{\partial D_{22}}{\partial \dunkelrot{\theta_{2}}} - \frac{1}{2} \frac{\partial D_{22}}{\partial \dunkelrot{\theta_{2}}} \right]  \dunkelrot{\theta_{2}'}^2 \\
+& \quad + D_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''} + D_{\dunkelrot{22}} \dunkelrot{\theta_{2}''} \\
+&=
+\underbrace{\left[ \frac{\partial D_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} - \frac{1}{2} \frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \right]}_{C_{\dunkelrot{2}\gruen{1}}} \gruen{\theta_{1}'}
++ \underbrace{\left[ \frac{1}{2} \frac{\partial D_{22}}{\partial \dunkelrot{\theta_{2}}}  \dunkelrot{\theta_{2}'} + \frac{\partial D_{22}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} \right]}_{C_{\dunkelrot{22}}}  \dunkelrot{\theta_{2}'}
++ D_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''} + D_{\dunkelrot{22}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+Für die Einträge der Matrix $C$ gilt
+%
+\begin{align*}
+C_{11} 
+&=
+\frac{1}{2}  \underbrace{\frac{\partial D_{11}}{\partial \gruen{\theta_{1}}} }_{= 0} \gruen{\theta_{1}'} + \underbrace{\frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}}}_{ =  -2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})} \dunkelrot{ \theta_{2}'}
+=
+-2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{ \theta_{2}'} 
+\\
+C_{12}
+&=
+\underbrace{\frac{\partial D_{12}}{\partial \dunkelrot{\theta_{2}}}}_{= - m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})} \dunkelrot{\theta_{2}'} - \frac{1}{2} \underbrace{\frac{\partial D_{22}}{\partial \gruen{\theta_{1}}}}_{ = 0} \dunkelrot{\theta_{2}'}
+=
+- m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{\theta_{2}'}
+\\
+C_{21} 
+&= \underbrace{\frac{\partial D_{12}}{\partial \gruen{\theta_{1}}}}_{= 0} \gruen{\theta_{1}'} - \frac{1}{2} \underbrace{\frac{\partial D_{11}}{\partial \dunkelrot{\theta_{2}}}}_{= -2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) } \gruen{\theta_{1}'}
+=
+m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})\gruen{\theta_{1}'}
+\\
+C_{22} 
+&=
+\frac{1}{2} \underbrace{\frac{\partial D_{22}}{\partial \dunkelrot{\theta_{2}}}}_{ = 0} \dunkelrot{\theta_{2}'} + \underbrace{ \frac{\partial D_{22}}{\partial \gruen{\theta_{1}}}}_{ = 0} \gruen{\theta_{1}'}
+= 0
+\end{align*}
+%
+
+Es gilt somit 
+%
+\begin{align*}
+C \cdot \theta'(t)
+=
+\begin{pmatrix}
+-2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{ \theta_{2}'} 
+&
+- m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{\theta_{2}'} 
+\\
+m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})\gruen{\theta_{1}'}
+&
+0
+\end{pmatrix}
+\begin{pmatrix}
+\gruen{\theta_{1}'} \\
+\dunkelrot{\theta_{2}'} 
+\end{pmatrix}
+\end{align*}
+
+\subsubsection{Gravitationsterme}
+
+Wählen wir \(y=0\) als Nullhöhe, so ist
+%
+\begin{align*}
+V &= m_1 \cdot g \cdot \gelb{y_1} + m_2 \cdot g \cdot \orange{y_2} \\
+&= m_1  g  a_1 \sin(\gruen{\theta_1}) + m_2  g \left( l_1 \sin(\gruen{\theta_1}) + a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \right)
+\end{align*}
+
+Für die partiellen Ableitungen erhalten wir
+%
+\begin{align*}
+\frac{\partial V}{\partial \gruen{\theta_1}} &= m_1  g  a_1 \cos(\gruen{\theta_1}) + m_2  g \left( l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \right) \\
+\frac{\partial V}{\partial \dunkelrot{\theta_2}} &=  m_2  g \left( l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \right)
+\end{align*}
+
+
+\subsubsection{Simulation gegebener Steuerung}
+
+\begin{itemize}
+\item Diskretisierung des Zeitintervalls $[0,1]$ und der Funktion mittels $N \in \mathbb{N}$
+%
+\begin{align*}
+h = \frac{1}{N} \quad \left(\vphantom{\begin{pmatrix} \tau_{1}^{i} \\ \tau_{2}^{i} \end{pmatrix}} u_i \right)_{i=0}^{N} = \begin{pmatrix} \tau_{1}^{i} \\ \tau_{2}^{i} \end{pmatrix}_{i=0}^N
+\end{align*}
+
+\item 
+%
+\begin{align*}
+x(t)
+= 
+\begin{pmatrix}
+\gruen{\theta_1} \\
+\dunkelrot{\theta_2} \\
+\gruen{\theta_1}' \\
+\dunkelrot{\theta_2}'
+\end{pmatrix}
+\quad
+u(t)
+=
+\begin{pmatrix}
+\tau_1 \\
+\tau_2
+\end{pmatrix}
+\quad
+\begin{pmatrix}
+\gruen{\theta_1}'' \\ \dunkelrot{\theta_2}''
+\end{pmatrix}
+=
+D^{-1} \left[ u - C(x) \begin{pmatrix} \gruen{\theta_1}' \\ \dunkelrot{\theta_2}'  \end{pmatrix}  - G(\gruen{\theta_1}, \dunkelrot{\theta_2}) \right]
+\end{align*}
+
+\item Dynamisches System
+%
+\begin{align*}
+\underbrace{\begin{pmatrix}
+\gruen{\theta_1}' \\
+\dunkelrot{\theta_2}' \\
+\gruen{\theta_1}'' \\
+\dunkelrot{\theta_2}''
+\end{pmatrix}}_{x'(t)}
+=
+\underbrace{\begin{pmatrix}
+\gruen{\theta_1}' \\
+\dunkelrot{\theta_2}'  \\
+D^{-1} \left[ u - C(x) \begin{pmatrix} \gruen{\theta_1}' \\ \dunkelrot{\theta_2}'  \end{pmatrix}  - G(\gruen{\theta_1}, \dunkelrot{\theta_2}) \right]_1 \\
+D^{-1} \left[ u - C(x) \begin{pmatrix} \gruen{\theta_1}' \\ \dunkelrot{\theta_2}'  \end{pmatrix}  - G(\gruen{\theta_1}, \dunkelrot{\theta_2}) \right]_2
+\end{pmatrix}}_{f(x,u)}
+\Rightarrow
+x_{i+1} = x_{i} + h \cdot f(x_{i} , u_{i})
+\end{align*}
+\end{itemize}
+\newpage
+
+\section{Optimale Steuerungsprobleme}
+
+
+
+
+\begin{definition}[Optimales Steuerungsproblem] \label{def_OCP}
+Gegeben seien
+%
+\begin{itemize}
+    \item Systemdynamik:
+	%
+	\begin{align*}
+	x'(t) = f(x(t), u(t), t), \quad x(t_0) = x_0
+	\end{align*}
+	%
+	wobei $x(t) \in \mathbb{R}^n$ der Zustandsvektor und $u(t) \in U \subset \mathbb{R}^m$ die Steuerung ist. 
+    \item Zielfunktional:
+	%
+	\begin{align*}
+	J(u) = \Phi(x(t_f), t_f) + \int_{t_0}^{t_f} L(t,x(t), u(t)) \dt
+	\end{align*}
+	%
+    \item Ziel: Finde die Steuerung $u(t)$, die $J(u)$ minimiert, also
+    %
+    \begin{align*}
+    J(\rot{u^*}) = \min_u J(u) \Rightarrow \rot{u^*} = \argmin_u J(u)
+    \end{align*}
+\end{itemize}
+
+\textbf{Zielfunktional:}
+%
+\begin{align*}
+\min J[u] = \Phi(t_f,x(t_{f})) + \int_{t_{0}}^{t_{f}} \varphi(t,x,u) \dt
+\end{align*}
+
+\textbf{Systemdynamik:}
+%
+\begin{align*}
+x'(t) = f(t,x(t),u(t)) \quad x(t_0) = x_0
+\end{align*}
+
+
+Es gilt mittels Kettenregel:
+%
+\begin{align*}
+\left(\frac{\mathrm{d} \Phi}{\dt} = \Phi_{x} \cdot x' + \Phi_{t} \right)
+\end{align*}
+
+\end{definition}
+
+
+\begin{itemize}
+\item Augmentierte Lagrange Funktion
+%
+\begin{align*}
+J(u) = 
+\int_{t_{0}}^{t_{f}} \underbrace{\varphi(t,x,u) + \Phi_{x} \cdot x' + \Phi_{t} + p \cdot (x' -f(x,u))}_{= L(t,x,x',u)} \dt 
+\end{align*}
+
+\item Für den Kozustand gilt $L_{x'} = p(t)$
+
+\item Optimalitätsbedingung  mit $H(t,x,u,p) = x' \cdot p - L$
+%
+\begin{align*}
+x'(t) = H_p \quad p'(t) = - H_x \quad \rot{\frac{\partial L}{\partial u} = 0} 
+\end{align*}
+
+\item Diese Bedingungen geben uns die notwendigen Optimalitätsbedingungen für das optimale Steuerungsproblem
+\end{itemize}
+
+\begin{satz}[Minimumprinzip] \label{MP}
+Sei  $\textbf{H} = L(t,x,u) + p(t)^T \cdot f(t,x,u)$ die Hamilton-Funktion
+\begin{itemize}
+\item  Es gilt $u^{*} = \textsf{argmin } \textbf{H}(x^{*},u,p^{*})$  
+%
+\begin{align*}
+p'(t) = - H_x   \quad \rot{\textbf{H}_u = 0} \quad x'(t) = H_p
+\end{align*}
+
+\item Weiter gilt die Transversalitätsbedingung 
+%
+\begin{align*}
+ \Phi_{x}(t=t_f) = p(t=t_f) 
+\end{align*}
+%
+\item Für freie Endzeit $t_f$ gilt 
+%
+\begin{align*}
+\textbf{H}(t=t_f) + \Phi_t (t=t_f) = 0 \Rightarrow \underbrace{\textbf{H}(x,u,p) = 0}_{ \textsf{für } \textbf{H}_t = 0}
+\end{align*}
+
+\end{itemize}
+\end{satz}
+
+\begin{beispiel}[Testbeispiel] \label{Testbeispiel}
+Löse das folgende optimale Steuerungsproblem
+%
+\begin{align*}
+\min_u \int_0^{1} x(t) + u(t)^2 \dt \quad x'(t) = x(t) + u(t) + 1, \quad x(0) = 0.
+\end{align*}
+
+Wir definieren die Hamiltonfunktion $\textbf{H} = x +u^2 + p \cdot (x+u +1)$. Das Minimumprinzip liefert
+%
+\begin{align*}
+p'(t) = -\textbf{H}_x = -1-p \quad \textbf{H}_u = 0 = 2u + p \Rightarrow u = - \frac{p}{2}
+\end{align*}
+
+Die adjungierte Gleichung ist trennbar 
+%
+\begin{align*}
+\frac{\mathrm{d}p}{\dt} = -1 - p \Rightarrow \underbrace{\int \frac{\mathrm{d}p}{1+p}}_{\log(p+1)} = \underbrace{\int -1 \dt}_{= -t + K} \Rightarrow p(t) = -1 + C \cdot e^{-t}, \quad C = e^K
+\end{align*}
+
+Für die optimale Steuerung gilt somit $u(t) = - \frac{1}{2} p(t) = \frac{1}{2} - \frac{C}{2} \cdot e^{-t}$. Den optimalen Zustand berechnen wir aus der Systemdynamik
+%
+\begin{align*}
+x'(t) =  x(t) + \underbrace{\frac{1}{2} - \frac{C}{2} \cdot e^{-t}}_{= u(t)} + 1 \Rightarrow x'(t) = \rot{1} \cdot x(t) + \blau{\frac{3}{2} - \frac{C}{2} e^{-t}}
+\end{align*}
+
+Das ist eine lineare inhomogene Gleichung. Es gilt $A(t) =\int_0^t \rot{1} \ds = t$ und somit
+%
+\begin{align*}
+x(t) 
+&= x(0) \cdot e^{\rot{A(t)}} + e^{\rot{A(t)}} \cdot \int_0^t \left( \blau{\frac{3}{2} - \frac{C}{2} e^{-s}} \right) \cdot e^{\rot{-A(s)}} \ds \\
+&= e^{t} \cdot \int_0^t \frac{3}{2} \cdot e^{-s} - \frac{C}{2} e^{-s} \cdot e^{-s} \ds \\
+&= e^t \cdot \left[ -\frac{3}{2} e^{-s} + \frac{C}{4} e^{-2s} \right]_0^t \\
+&=- \frac{3}{2} + \frac{C}{4} e^{-t} + \frac{3}{2} e^{t} - e^{t} \frac{C}{4}
+\end{align*}
+
+Da $x(1)$ frei ist und kein Endkostenterm vorliegt gilt $p(1) = 0$. 
+%
+\begin{align*}
+p(1) = -1 + C \cdot e^{-1} = 0 \Rightarrow C = e. 
+\end{align*}
+
+Wir fassen nun die Resultate zusammen:
+%
+\begin{align*}
+p(t) &= -1 + e^{-t+1} \\
+u(t) &=  \frac{1}{2} \cdot \left(1- e^{-t+1} \right) \\
+x(t) &= - \frac{3}{2} + \frac{ e^{-t+1}}{4} + \frac{3}{2} e^{t} - \frac{e^{t+1}}{4}  
+\end{align*}
+\end{beispiel}
+
+%
+\begin{beispiel}[Minimierung des Treibstoffverbrauchs] \label{Min_Treibstoff_fixed}
+Ein Fahrzeug startet bei $x(0) = 0$ mit $v(0) = 0$ und soll zum festen Zeitpunkt $t_f = 2$ die Position $x(2) = 1$ erreichen. Das Kostenfunktional lautet:
+%
+\begin{align*}
+J[u] = \int_0^{2}  \frac{1}{2} u^2(t)   dt
+\end{align*}
+
+Die Dynamik des Fahrzeugs ist:
+%
+\begin{align*}
+x'(t) = v(t), \quad v'(t) = u(t) \Rightarrow  
+\frac{\mathrm{d}}{\dt} 
+\orange{\begin{pmatrix}
+x(t) \\
+v(t)
+\end{pmatrix}}
+=
+\dunkelrot{
+\begin{pmatrix}
+v(t) \\
+u(t)
+\end{pmatrix}}
+\Rightarrow
+\frac{\mathrm{d}}{\dt} \orange{y(t)} = \dunkelrot{f(y,u)}
+\end{align*}
+
+\begin{itemize}
+\item Aufstellen der Hamilton-Funktion mit $p(t) = \begin{pmatrix} p_x \\ p_v \end{pmatrix}$
+%
+\begin{align*}
+H = L + \textbf{p}(t)^T \cdot \textbf{f}(\textbf{y},u)  = \frac{1}{2} u(t)^2  + p_x (t) v(t) + p_v (t) u(t) 
+\end{align*}
+
+\item Formulierung des Minimumprinzips:
+%
+\begin{align*}
+\frac{\partial H}{\partial u} = 0 \Rightarrow \gruen{-p_v(t) = u^*(t)}, \quad -p'(t) = \nabla_{\orange{y = (x,v)}} H \Rightarrow -p_{x}'(t) = 0,  -p_{v}'(t) = p_x (t)
+\end{align*}
+
+\item Integration der Gleichungen 
+%
+\begin{align*}
+p_{x}(t) = C  ,  \gruen{p_{v}(t) = -C \cdot t + K}
+\end{align*}
+
+\item Integration der Systemdynamik unter Nutzung der Anfangswerte $\rot{x(0)=v(0) = 0}$
+%
+\begin{align*}
+\gruen{u(t)} &\gruen{= C t - k } \\
+v(t) + \rot{v(0)} &= \int_0^t \orange{v'(s)} \ds = \int_0^t \orange{u(s)} \ds =  \frac{C}{2} t^2 - k t  \\
+x(t) + \rot{x(0)} &= \int_0^t \blau{x'(s)} \ds = \int_0^t \blau{v(s)} \ds = \frac{C}{6} t^3 - \dfrac{k}{2} t^2 
+\end{align*}
+
+\item Anwendung der Endwerte $x(2) = 1$ und $v(2) = 0$
+%
+\begin{align*}
+0 &= \frac{C}{2} \cdot 4 - k \cdot 2 \Rightarrow k = C \\
+1 &= \frac{C}{6} \cdot 8 - \frac{C}{2} \cdot 4 \Rightarrow 1 = \left( \frac{4C}{3} - 2C \right) = -\frac{2C}{3} \Rightarrow C = -\frac{3}{2} \\
+u(t) &= \left( -\frac{3}{2} \right) t - \left( -\frac{3}{2} \right) = -\frac{3}{2} t + \frac{3}{2}
+\end{align*}
+
+
+\end{itemize}
+\end{beispiel}
+
+\subsection{Linear-Quadratische Probleme}
+
+\begin{satz}[Riccati-Regler] \label{LQR_Riccati}
+Die Lösung des linear-quadratischen Problems
+%
+\begin{align*}
+\min J(u) &=  \int_0^T   \frac{q}{2} \cdot x^2(t) + \frac{r}{2} \cdot u^2(t) dt + \frac{s}{2} x(T)^2 \\
+\textsf{s.t.} \quad x'(t) &= a \cdot x(t) + b \cdot u(t), \quad x(0) = x_0
+\end{align*}
+
+mit $a,b \in \mathbb{R}$ und $q,r,s \geq 0$ ist gegeben durch die Riccati-Gleichung
+%
+\begin{align*}
+K'(t) = - 2a K(t)  + \frac{b^2}{r} K(t)^2  - q, \quad K(T) = s
+\end{align*}
+
+und die resultierenden Lösungen
+%
+\begin{align*}
+x^*(t) = x_0 \exp\left( \int_0^t a - \frac{b^2}{r} K(s) \ds \right) \quad u^*(t) = -\frac{b}{r} K(t) x(t) 
+\end{align*}
+\end{satz}
+
+
+\proof{ 
+Wir definieren die Hamilton-Funktion:
+
+\begin{align*}
+H = \frac{1}{2} q x(t)^2 + \frac{1}{2} r u(t)^2 + p(t) \left( a x(t) + b u(t) \right)
+\end{align*}
+
+Dann liefert das Minimumprinzip die notwendigen Bedingungen
+
+\begin{align*}
+\frac{\partial H}{\partial u} &= 0 \Rightarrow u^*(t) = -\frac{b}{r} p(t) \quad
+p'(t) = -\frac{\partial H}{\partial x} \Rightarrow p'(t) = - q x(t) - a p(t)
+\end{align*}
+
+Weiter gilt die Transversalitätsbedingung $p(T) = s \cdot x(T)$. Wir nehmen an, dass eine Feedbacksteuerung vorliegt, d.h. 
+
+\begin{align*}
+p(t) = K(t) x(t) \quad p(T) = K(T)x(T) \Rightarrow K(T)= s
+\end{align*}
+
+wobei $K(t)$ eine skalare Funktion ist. Ableiten von $p$ nach $t$ liefert
+
+\begin{align*}
+p'(t) = K'(t) x(t) + K(t)x'(t)
+\end{align*}
+
+Für die Zustandsgleichung gilt mit $u^*(t) = -\frac{b}{r} p(t)$
+
+\begin{align*}
+x'(t) = a x(t) + b u^*(t) = a x(t) - \frac{b^2}{r} K(t) x(t) = \left( a - \frac{b^2}{r} K(t) \right) x(t).
+\end{align*}
+
+Wir setzen nun $p'(t) = -H_x$ und unseren Ausdruck für $x'(t)$ ein, so gilt
+
+\begin{align*}
+\underbrace{- q x(t) - a p(t)}_{= p'(t)} &= K'(t) x(t) + K(t) \underbrace{\left( a - \frac{b^2}{r} K(t) \right) x(t)}_{= x'(t)} \\
+\Leftrightarrow - q x(t) - a K(t) x(t) &= K'(t) x(t) + a K(t) x(t) - \frac{b^2}{r} K(t)^2 x(t) \\
+\Leftrightarrow K'(t) x(t) &= - 2a K(t) x(t) + \frac{b^2}{r} K(t)^2 x(t) - q x(t)
+\end{align*}
+
+Unter der Annahme $x(t) \neq 0$ erhalten wir die Riccati-Differentialgleichung:
+
+\begin{align*}
+K'(t) = - 2a K(t)  + \frac{b^2}{r} K(t)^2  - q, \quad K(T) = s.
+\end{align*}
+
+Wir erhalten $x(t)$ als Lösung der folgenden Differentialgleichung
+
+\begin{align*}
+x'(t) =  \left( a - \frac{b^2}{r} K(t) \right) x(t) \Rightarrow x(t) = x(0) \cdot \exp\left( \int_0^t a - \frac{b^2}{r} K(s) \ds \right).
+\end{align*}
+
+Die optimale Steuerung $u^*(t)$ ergibt sich aus $u^*(t) = -\frac{b}{r} p(t) = -\frac{b}{r} K(t)x(t)$.
+}
+
+
+\begin{beispiel}[Berechnung des Riccati-Reglers] \label{LQR_ex2}
+Wir betrachten erneut ein Beispiel. In diesem Beispiel gilt für die Parameter
+
+\begin{align*}
+a = 0, b = 1, q =1 , r= 1, T=1, s =0, x_0 = 1.
+\end{align*}
+
+Die Riccati-Gleichung lautet somit
+
+\begin{align*}
+K'(t) = K(t)^2 - 1, \quad K(1) = 0
+\end{align*}
+
+Die Gleichung ist trennbar und es gilt
+
+\begin{align*}
+\frac{\mathrm{d}K}{\dt} = K^2 - 1 \Rightarrow \int \frac{1}{K^2 - 1} \mathrm{d}K  = \int 1 \dt
+\end{align*}
+
+Wir nutzen die Partialbruchzerlegung für $\frac{1}{K^2 -1}$ und erhalten
+
+\begin{align*}
+\frac{1}{K^2 -1} = \frac{1}{(K+1)(K-1)} = \frac{A}{K-1} + \frac{B}{K+1} \Rightarrow 1 = \underbrace{A (K+1) + B(K-1) }_{K \cdot (A+B) + A -B}
+\end{align*}
+
+Der Koeffizientenvergleich liefert $A+B = 0$ und $A-B =1$, mit der Lösung $A = \frac{1}{2}$ und $B= -\frac{1}{2}$. Wir erhalten für unser Integral
+
+\begin{align*}
+\int \frac{1}{K^2 - 1} \mathrm{d}K  &= \int 1 \dt \\
+\int \frac{1}{2} \frac{1}{K-1} - \frac{1}{2} \frac{1}{K+1} \mathrm{d}K  &= t + \frac{C}{2} \\
+\frac{1}{2} \cdot \left(\underbrace{ \log(K-1) - \log(K+1)}_{\log\left( \frac{K-1}{K+1} \right)} \right) &= t+ \frac{C}{2} \\
+\frac{K-1}{K+1} &= \exp\left(2t + C \right) = \underbrace{e^C}_{:= A} \cdot e^{2t} \\
+K(t) &= \frac{1+ Ae^{2t}}{1- Ae^{2t}} 
+\end{align*}
+
+Es gilt weiter $K(1) = 0$ und somit $A = -\frac{1}{e^2}$ damit ist die Lösung der Riccati-Gleichung gegeben durch
+
+\begin{align*}
+K(t) = \frac{1- e^{2(t-1)}}{1+e^{2(t-1)}}.
+\end{align*}
+
+Für den optimalen Zustand gilt 
+
+\begin{align*}
+x(t) = 1 \cdot \exp\left( \int_0^t -K(s) \ds \right) = \exp\left( \int_0^t -\frac{1- e^{2(s-1)}}{1+e^{2(s-1)}} \ds \right)
+\end{align*}
+
+Wir nutzen die Substitution $z = e^{2(s-1)}$ dann gilt für das Integral 
+
+\begin{align*}
+\frac{\dz}{\ds} = 2 \cdot \underbrace{e^{2(s-1)}}_{ = z} \Rightarrow \int - \frac{1-z}{1+z} \cdot \frac{\dz}{2z} = -\frac{1}{2} \int \frac{1-z}{z(1+z)} \dz
+\end{align*}
+
+Wir verwenden erneut eine Partialbruchzerlegung
+
+\begin{align*}
+ \frac{1-z}{z(1+z)} = \frac{A}{z} + \frac{B}{z+1} \Rightarrow 1-z = \underbrace{A(1+z) + Bz}_{= (A+B)z + A}
+\end{align*}
+
+Ein Koeffizientenvergleich liefert $A= 1$ und $A+B = -1$ und somit $B= -2$. Für das Integral gilt somit
+
+\begin{align*}
+-\frac{1}{2} \int \frac{1-z}{z(1+z)} \dz 
+&= -\frac{1}{2} \int  \frac{1}{z} - \frac{2}{z+1} \dz = -\frac{1}{2} \left[ \log(z) -2\log(z+1) \right] + C
+\end{align*}
+
+Rücksubstitution von $z(t) = e^{2(t-1)}$ liefert
+
+\begin{align*}
+x(t) = \exp\left[ -(t-1) + \log(e^{2(t-1)}+1)  + C \right]
+\end{align*}
+
+Wir nutzen $x(0) = 1$ und bestimmen die Konstante $C$. 
+
+\begin{align*}
+x(0) &= \exp\left( -(0-1) + \log(e^{2(0-1)}+1)  + C \right) = 1 
+\end{align*}
+
+Wir erhalten somit die Bedingung
+
+\begin{align*}
+-(0-1) + \log(e^{2(0-1)}+1)  + C = 0 \Rightarrow C = -1 - \log(1+e^{-2})
+\end{align*}
+
+Der optimale Zustand ist somit gegeben als 
+
+\begin{align*}
+x(t) = \exp\left[ -t+2 + \log\left(\frac{1+e^{2(t-1)}}{1+e^{-2}}\right) \right] = \underbrace{e^{-t+2} \cdot \frac{1+ e^{2(t-1)}}{1+e^{-2}}}_{= \frac{e^2}{1+e^{-2}} e^{-t} + \frac{1}{1+e^{-2}} e^{t}}
+\end{align*}
+
+Für die optimale Steuerung gilt $u^*(t)= -K(t) x(t)$ und somit
+% \bcancel{\textcolor{red!50}{1+ e^{2(t-1)}}}
+\begin{align*}
+u(t) &=  - \frac{1- e^{2(t-1)}}{\rot{1+e^{2(t-1)}}} \cdot e^{-t+2} \cdot \frac{\rot{1+ e^{2(t-1)}}}{1+e^{-2}} \\
+&=  \frac{e^{-t+2}}{1+e^{-2}} \cdot (-1 + e^{2(t-1)}) \\
+&= - \frac{e^2}{1+e^{-2}} e^{-t} + \frac{1}{1+e^{-2}} e^{t} 
+\end{align*}
+
+Dies entspricht den Lösungen aus dem Beispiel.
+\end{beispiel}
+
+
+\newpage
+
+\section{Numerische Lösungsverfahren}
+
+
+\subsection{Gradientenverfahren}
+
+\begin{align*}
+u(t) + \epsilon \cdot \eta_u (t) \quad x(t) + \epsilon \cdot \eta_x (t), \eta_x (0) = 0
+\end{align*}
+
+Um die Zustandsgleichung als Nebenbedingung zu integrieren, führen wir einen Lagrange-Multiplikator \( p(t) \) ein. Das erweiterte Zielfunktional lautet dann:
+
+\[
+J^{\text{aux}}(u, x, p) = \int_{0}^{T} \left[ L(x(t), u(t), t) + p(t) \left( f(x(t), u(t)) - \dot{x}(t) \right) \right] \mathrm{d}t + \Phi(x(T))
+\]
+
+
+Wir betrachten kleine Variationen der Steuerungsfunktion und des Zustands:
+
+
+
+wobei \( \varepsilon \) ein kleiner Parameter ist.
+
+
+
+Die Variation von \( J^{\text{aux}} \) bezüglich \( \varepsilon \) bei \( \varepsilon = 0 \) ergibt:
+
+\[
+\delta J^{\text{aux}} = \int_{0}^{T} \left[ \frac{\partial L}{\partial x} \delta x(t) + \frac{\partial L}{\partial u} \delta u(t) + p(t) \left( \frac{\partial f}{\partial x} \delta x(t) + \frac{\partial f}{\partial u} \delta u(t) - \delta \dot{x}(t) \right) \right] \mathrm{d}t + \frac{\partial \Phi}{\partial x}(x(T)) \delta x(T) = 0
+\]
+
+
+Der Term mit \( \delta \dot{x}(t) \) wird mittels Integration durch Teile umgeformt:
+
+\[
+\int_{0}^{T} p(t) (-\delta \dot{x}(t)) \, \mathrm{d}t = \left[ -p(t) \delta x(t) \right]_{0}^{T} + \int_{0}^{T} \dot{p}(t) \delta x(t) \, \mathrm{d}t
+\]
+
+Da \( \delta x(0) = 0 \) ist (weil der Anfangszustand festgelegt ist), vereinfacht sich der Randterm zu:
+
+\[
+-p(T) \delta x(T) + \int_{0}^{T} \dot{p}(t) \delta x(t) \, \mathrm{d}t
+\]
+
+
+Setzen wir die Ergebnisse in die Variation des erweiterten Zielfunktionals ein:
+
+\[
+\int_{0}^{T} \left[ \left( \frac{\partial L}{\partial x} + p(t) \frac{\partial f}{\partial x} + \dot{p}(t) \right) \delta x(t) + \left( \frac{\partial L}{\partial u} + p(t) \frac{\partial f}{\partial u} \right) \delta u(t) \right] \mathrm{d}t + \left( \frac{\partial \Phi}{\partial x} - p(T) \right) \delta x(T) = 0
+\]
+
+Für die Gleichung muss jeder Koeffizient der unabhängigen Variation Null sein. Daher ergeben sich die adjungierten Gleichungen:
+
+\[
+\begin{cases}
+\dot{p}(t) = -\frac{\partial L}{\partial x} - p(t) \frac{\partial f}{\partial x} \\
+p(T) = \frac{\partial \Phi}{\partial x}(x(T))
+\end{cases}
+\]
+
+
+
+Der Gradient des Zielfunktionals \( J(u) \) ist gegeben durch:
+
+\[
+\frac{\delta J}{\delta u(t)} = \frac{\partial L}{\partial u} + p(t) \frac{\partial f}{\partial u}
+\]
+
+\subsubsection{Sensitivity Approach}
+
+Erweitertes Zielfunktional
+
+\begin{align*}
+J^{aux}(u) 	&= \int_0^T \varphi(t,x,u) + p(t) \cdot (f(t,x,u) - x'(t)) \dt + \Phi(x(T)) \\
+			&= \int_0^T \underbrace{\varphi(t,x,u) + p(t) \cdot f(t,x,u)}_{= H(t)} \dt \underbrace{-  \int_0^T p(t) x'(t) \dt}_{ = - \left[p(t) x(t) \right]_0^T + \int_0^T p'(t) x(t) \dt} + \Phi(x(T)) \\
+			&= \int_0^T H(t) + p'(t)x(t) \dt - \left[p(t) x(t) \right]_0^T + \Phi(x(T)) \\
+			&= \int_0^T H(t) + p'(t)x(t) \dt - p(T) x(T) +  \gelb{p(0) x(0)} + \Phi(x(T))
+\end{align*}
+
+Der Term $\gelb{p(0) x(0)}$ ist unabhängig von $u$ und fällt bei der Optimierung weg. Bilden der Gateau Ableitung in $u$ entlang $h$ liefert  
+
+\begin{align*}
+J'(u,h) &= \int_0^T H_x [t] \cdot S(t)  + H_u [t] \cdot h(t)  + p'(t)S(t)  \dt - p(T) S(T)  + \Phi_x (x(T)) S(1) \\
+		&= \int_0^T ( \rot{\underbrace{H_x [t] + p'(t)}_{ = 0}}) \cdot S(t)  + H_u [t] \cdot h(t)  \dt  + ( \lila{\underbrace{\Phi_x (x(T))- p(T)}_{= 0}} ) \cdot S(T)  \\
+		&= \int_0^T H_u [t] \cdot h(t)
+\end{align*}
+
+Wir erhalten somit $J'(u) = H_u [t]$
+
+\newpage
+
+\subsubsection{Praktische Implementierung}
+
+\begin{beispiel} \label{ex_gradient_1}
+Wir betrachten das Steuerungsproblem 
+%
+\begin{align*}
+\min_u \int_0^{1} x(t) + u(t)^2 \dt \quad x'(t) = x(t) + u(t) + 1, \quad \orange{x(0) = 0}.
+\end{align*}
+
+welches in einer Aufgabe analytisch gelöst ist. Für den Gradienten gilt
+%
+\begin{align*}
+\nabla J(u) = H_u = \frac{\partial}{\partial u} ( x(t) + u(t)^2 + p(t) \cdot  (x(t) + u(t) + 1) ) = 2u(t) +p(t)
+\end{align*} 
+
+Wir verwenden das explizite Euler-Verfahren zur Diskretisierung der Gleichungen aus dem Minimumprinzip: 
+%
+\begin{itemize}
+\item Diskretisierung des Zeitintervalls $[0,1]$ und der Funktionen mittels $\blau{N} \in \mathbb{N}$
+%
+\begin{align*}
+h = \frac{1}{N} \quad \textbf{u}^k = \left(u_i^k \right)_{i=0}^{N}, \quad  \textbf{x}^k = \left( x^{k}_{i} \right)_{i=0}^{N}, \quad \textbf{t}^k = \left( i \cdot h\right)_{i=0}^{N},
+\end{align*} 
+
+
+\item Armijo Suchrichtung $\gruen{\alpha^{(k)}}$:  Für $0 \leq m < \blau{M=10}$,  $\blau{c= 10^{-4},\beta  = 0.5} \in (0,1)$
+%
+\begin{align*}
+u^{\textsf{neu}} 	&= u^k + \beta^m  \cdot d^{(k)} \\
+\rot{J(u^k)} 				&= \int_0^1 x^{k}(t) + (u^{k}(t))^2 \dt \rot{\approx h \cdot \sum_{i=0}^{N} x^{k}_{i} + (u^{k}_{i})^2}\\
+\rot{J(u^{neu})}			&= \int_0^1 x^{neu}(t) + (u^{neu}(t))^2 \dt \rot{\approx h \cdot \sum_{i=0}^{N} x^{neu}_{i} + (u^{neu}_{i})^2} \\
+		J(u^{neu}) &\leq J(u^{k}) \dunkelrot{-} c \cdot \beta^m \cdot \dunkelrot{h \cdot \sum_{i=0}^{N} (2 \cdot u^{(k)}_{i}  + p^{(k)}_{i})(2 \cdot u^{(k)}_{i}  + p^{(k)}_{i})} \\
+\Leftrightarrow \rot{J(u^{neu})}		&\leq \rot{J(u^{k})}  \dunkelrot{- \norm{d^{(k)})}^2} \cdot c \cdot \beta^m \Rightarrow \gruen{\alpha^{(k)} = \beta^m} 
+\end{align*}
+
+\item Gradientenverfahren: Für $0 \leq \dunkelgelb{k} < MaxIter$, $\blau{\epsilon = 10^{-6}}$:
+%
+	\begin{itemize}
+	\item Forward Integration $x'(t) = x(t) +u(t) +1$
+	%
+	\begin{align*}
+	x^{\dunkelgelb{k}}_{i+1} = x^{\dunkelgelb{k}}_{i} + h \cdot (x^{(\dunkelgelb{k})}_{i} + u^{(\dunkelgelb{k})}_{i} +1) \quad \orange{x^{(k)}_{0} = 0}
+	\end{align*}
+
+	\item Backward Integration $p'(t) = -( 1 + p(t) )$
+	%
+	\begin{align*}
+	p^{\dunkelgelb{k}}_{i} = p^{\dunkelgelb{k}}_{i+1} + h \cdot (1 + p^{\dunkelgelb{k}}_{i+1}) \quad \orange{p^{(k)}_{N} = \partial_x \Phi(x(1)) = 0}
+	\end{align*}
+
+	\item Berechnung des Gradienten $\nabla J = H_u =2u + p$ 
+	%
+	\begin{align*}
+	d^{(\dunkelgelb{k})}  = -(2 \cdot u^{(\dunkelgelb{k})}  + p^{(\dunkelgelb{k})})
+	\end{align*}
+	
+	\item Berechnung der Schrittweite $\gruen{\alpha^{(k)}}$:
+	%
+	\begin{align*}
+	u^{(\dunkelgelb{k+1})} &= u^{(\dunkelgelb{k})} + \gruen{\alpha^{(k)}} \cdot d^{(\dunkelgelb{k})}  \\
+	\norm{u^{(\dunkelgelb{k+1})} - u^{(\dunkelgelb{k})}} &< \blau{\epsilon} \Rightarrow u^{\rot{\textsf{final}}} = u^{(\dunkelgelb{k+1})},  \textsf{ sonst } \dunkelgelb{k \to k+1}
+	\end{align*}
+	%
+	\end{itemize}
+%
+\end{itemize}
+
+
+%\includegraphics[width=\textwidth]{ex3.1.plot}
+\end{beispiel}
+
+\begin{figure}[h] % H für Positionierung der Grafik
+    \centering
+    \includegraphics[width=\textwidth]{ex3.1.plot.pdf}
+    \captionsetup{labelformat=empty}  % Entfernt "Abbildung 1"
+    \caption{Zustand $x$ und Steuerung $u$ mit den Iterationen $\blau{100},\orange{500}$ und der \rot{analytischen Lösung}}
+    \label{fig:plot} % Referenz, falls du auf die Grafik verweisen möchtest
+\end{figure}
+
+\newpage
+
+
+\subsection{Shooting Methods}
+
+Das Ziel ist es, den Anfangswert \( p(t_0) \) so anzupassen, dass die Endbedingung \( p(t_f) = \frac{\partial \Phi}{\partial x}(x(t_f)) \) erfüllt wird. Dieses Verfahren wird mithilfe des Schießverfahrens gelöst. Wir definieren eine Residuenfunktion \( R(p(t_0)) \), die die Abweichung zwischen dem berechneten Endwert \( p(t_f; p(t_0)) \) und dem gewünschten Endwert \( \frac{\partial \Phi}{\partial x}(x(t_f)) \) darstellt:
+
+\begin{equation}
+    R(p(t_0)) = p(t_f; p(t_0)) - \frac{\partial \Phi}{\partial x}(x(t_f; p(t_0)))
+\end{equation}
+
+Das Newton-Verfahren zur Lösung von \( R(p(t_0)) = 0 \) liefert den Update-Schritt:
+
+\begin{equation}
+    p^{(k+1)}(t_0) = p^{(k)}(t_0) - \frac{R(p^{(k)}(t_0))}{R'(p^{(k)}(t_0))}
+\end{equation}
+
+Die Jacobi-Matrix \( R'(p(t_0)) \) ergibt sich durch Ableiten der Residuenfunktion:
+
+\begin{equation}
+    R'(p(t_0)) = \frac{\partial R}{\partial p(t_0)} = S_p(t_f) - \frac{\partial^2 \Phi}{\partial x^2} S_x(t_f),
+\end{equation}
+
+wobei \( S_x(t) = \frac{\partial x(t)}{\partial p(t_0)} \) und \( S_p(t) = \frac{\partial p(t)}{\partial p(t_0)} \) die Sensitivitäten sind.
+
+Wir leiten die Zustandsgleichung und die adjungierte Gleichung nach \( p(t_0) \) ab, um die Sensitivitäten \( S_x(t) \) und \( S_p(t) \) zu berechnen.
+
+\begin{itemize}
+\item Durch Ableiten der Zustandsgleichung nach \( p(t_0) \) erhalten wir die Gleichung für \( S_x(t) \):
+
+\begin{equation}
+    \frac{d}{dt} S_x(t) = \frac{\partial f}{\partial x} S_x(t) + \frac{\partial f}{\partial u} S_u(t),
+\end{equation}
+
+mit der Anfangsbedingung \( S_x(t_0) = 0 \).
+
+
+\item Durch Ableiten der adjungierten Gleichung nach \( p(t_0) \) erhalten wir die Gleichung für \( S_p(t) \):
+
+\begin{equation}
+    \frac{d}{dt} S_p(t) = -\frac{\partial^2 H}{\partial x^2} S_x(t) - \frac{\partial^2 H}{\partial x \partial u} S_u(t),
+\end{equation}
+
+mit der Anfangsbedingung \( S_p(t_0) = I \), wobei \( I \) die Einheitsmatrix ist.
+
+\item Falls die Steuerung \( u \) implizit von \( p(t_0) \) abhängt, bestimmen wir \( S_u(t) = \frac{\partial u}{\partial p(t_0)} \) aus der Optimalitätsbedingung \( \frac{\partial H}{\partial u} = 0 \):
+
+\begin{equation}
+    \frac{\partial^2 H}{\partial u \partial x} S_x(t) + \frac{\partial^2 H}{\partial u^2} S_u(t) + \frac{\partial^2 H}{\partial u \partial p} S_p(t) = 0
+\end{equation}
+
+Diese Gleichung kann nach \( S_u(t) \) aufgelöst werden, sofern \( \frac{\partial^2 H}{\partial u^2} \) invertierbar ist:
+
+\begin{equation}
+    S_u(t) = -\left( \frac{\partial^2 H}{\partial u^2} \right)^{-1} \left( \frac{\partial^2 H}{\partial u \partial x} S_x(t) + \frac{\partial f}{\partial u}^\top S_p(t) \right)
+\end{equation}
+\end{itemize}
+
+
+% Beispiel aus Gerdts p.198
+\begin{beispiel}
+Betrachten wir das folgende konkrete Beispiel:
+
+\begin{align*}
+\min & \frac{1}{2} (x(1) - 1)^2 + \frac{1}{2} \int_0^1 \left( u(t)^2 + x(t)^3 \right) \, dt \\
+\textsf{s.t }  x'(t) &=   u(t) - 15 \exp(-2t), \quad x(0) = 4
+\end{align*}
+
+Der adjungierte Zustand ist gegeben durch
+
+\begin{align*}
+p'(t) &= -\frac{3}{2} x(t)^2 \quad p(1) = 5(x(1) - 1)
+\end{align*}
+
+
+
+\begin{itemize}
+\item Resultierende Sensitivitätsgleichungen für \( S_x \) und \( S_p \)
+
+In diesem Beispiel ergibt sich die Steuerung \( u(t) = -p(t) \) aus der Optimalitätsbedingung. Durch Einsetzen in die Zustandsgleichung erhalten wir das gekoppelte System:
+
+\begin{align*}
+    \dot{x}(t) &= -p(t) - 15 \exp(-2t), \quad x(0) = 4 \\
+    \dot{p}(t) &= -\frac{3}{2} x(t)^2, \quad p(1) = 5(x(1) - 1)
+\end{align*}
+
+Die Sensitivitätsgleichungen für \( S_x(t) \) und \( S_p(t) \) lauten:
+
+\begin{align*}
+    \frac{d}{dt} S_x(t) &= -S_p(t), \quad S_x(0) = 0 \\
+    \frac{d}{dt} S_p(t) &= -3 x(t) S_x(t), \quad S_p(0) = 1
+\end{align*}
+
+\item Die Jacobi-Matrix ergibt sich zu:
+
+\begin{equation}
+    R'(p(0)) = S_p(1) - 5 \cdot S_x(1)
+\end{equation}
+\end{itemize}
+
+
+
+Das Newton-Verfahren zur Anpassung von \( p(0) \) sieht folgendermaßen aus:
+
+\begin{enumerate}
+    \item \textbf{Initialisierung}: Wählen Sie eine Startschätzung \( p^{(0)}(0) \).
+    
+    \item \textbf{Iterative Berechnung}:
+    
+    \begin{enumerate}
+        \item \textbf{Vorwärtsintegration der Zustandsgleichungen}: Integrieren Sie die Gleichungen für \( x(t) \) und \( p(t) \) mit \( p^{(k)}(0) \) von \( t = 0 \) bis \( t = 1 \).
+        
+        \item \textbf{Berechnung des Residuals}: Berechnen Sie das Residuum
+        \[
+        R(p^{(k)}(0)) = p(1; p^{(k)}(0)) - 5(x(1; p^{(k)}(0)) - 1)
+        \]
+        
+        \item \textbf{Integration der Sensitivitätsgleichungen}: Integrieren Sie die Sensitivitätsgleichungen für \( S_x(t) \) und \( S_p(t) \) von \( t = 0 \) bis \( t = 1 \), um \( S_x(1) \) und \( S_p(1) \) zu berechnen.
+        
+        \item \textbf{Berechnung der Ableitung \( R'(p^{(k)}(0)) \)}:
+        \[
+        R'(p^{(k)}(0)) = S_p(1) - 5 \cdot S_x(1)
+        \]
+        
+        \item \textbf{Aktualisierung mittels Newton-Schritt}:
+        \[
+        p^{(k+1)}(0) = p^{(k)}(0) - \frac{R(p^{(k)}(0))}{R'(p^{(k)}(0))}
+        \]
+        
+        \item \textbf{Konvergenzkriterium}: Falls \( |R(p^{(k+1)}(0))| < \epsilon \) (Toleranz), beenden Sie die Iteration. Falls nicht, setzen Sie \( k = k + 1 \) und wiederholen ab Schritt (a).
+    \end{enumerate}
+\end{enumerate}
+\end{beispiel}
+
+\subsection{Riccati Regler}
+
+Es gilt 
+%
+\begin{align*}
+F(K) := Q - KPK + KA + A^T K \Rightarrow F(K) = 0
+\end{align*}
+
+% Wichtige Grundbegriffe aus LA
+%----------------------------------------------------------------------------
+\begin{definition}
+Sei $X \in \mathbb{R}^{n \times n}$ dann definieren wir 
+%
+\begin{align*}
+\textsf{vec}(X) = 
+\begin{pmatrix}
+X_{11} & X_{21} & \cdots & X_{n1} & X_{12} & X_{22} & \cdots X_{nn}  
+\end{pmatrix}^T 
+\in 
+\mathbb{R}^{n^2}
+\end{align*}
+%
+Seien $A \in \mathbb{R}^{n \times m}, B \in \mathbb{R}^{p \times r}$, dann definieren wir 
+%
+\begin{align*}
+A \otimes B =
+\begin{pmatrix}
+A_{11} B 	& \cdots 	& A_{1m} B 	\\
+A_{12} B 	& \hdots 	& A_{2m} B	\\
+\vdots		& \ddots	& \vdots	\\
+A_{n1} B	& \cdots	& A_{nm} B
+\end{pmatrix}
+\in 
+\mathbb{R}^{mp \times nr}
+\end{align*}
+\end{definition}
+%----------------------------------------------------------------------------
+
+Es gilt die Formel
+%
+\begin{align*}
+\textsf{vec}(MXN) = (N^T \otimes M) \textsf{vec}(X)  
+\end{align*}
+
+Betrachten wir den Fall $M= 1$ und $N=A$ bzw. $N = 1$ und $M=A^T$ erhalten wir mit $X=K$ 
+%
+\begin{align*}
+\textsf{vec}(KA)= (A^T \otimes 1) \textsf{vec}(K) \quad \textsf{vec}(A^T K) = (1 \otimes A^T) \textsf{vec}(K)
+\end{align*}
+
+Anwendung auf unser Problem liefert
+%
+\begin{align*}
+\underbrace{\textsf{vec}(F(K))}_{f(x = \textsf{vec}(K))} = \underbrace{\textsf{vec}(Q)}_{q} - \underbrace{\textsf{vec}(KPK)}_{g(x = \textsf{vec}(K))} + \underbrace{\textsf{vec}(KA)}_{(A^T \otimes 1) \textsf{vec}(K)} + \underbrace{\textsf{vec}(A^T K)}_{(1 \otimes A^T) \textsf{vec}(K)}
+\end{align*}
+
+Durch Einführung von $x = \textsf{vec}(K) \in \mathbb{R}^{n^2}$ erhalten wir 
+%
+\begin{align*}
+f(x) = q - g(x)+ (A^T \otimes 1)x + (1 \otimes A^T)x
+\end{align*}
+
+Da $(KP)^T = KP$ gilt 
+% 
+\begin{align*}
+g(\textsf{vec}(K)) = \textsf{vec}(KPK) = (1 \otimes KP) \textsf{vec}(K) 
+\end{align*}
+
+% Hier arbeit 14.07
+%-----------------------------------------------------------------------------------
+
+Wir betrachten die Variation $K(\epsilon) = K + \epsilon \cdot \bar{K}$ und die Funktion $h:\mathbb{R} \to \mathbb{R}^{n^2}$ mit
+%
+\begin{align*}
+h(\epsilon) 
+:= g(\textsf{vec}(K(\epsilon))) 
+&= \textsf{vec}(K(\epsilon) P K(\epsilon)) \\
+&= \textsf{vec}((K + \epsilon \cdot \bar{K}) P (K + \epsilon \cdot \bar{K})) \\
+&= \textsf{vec}(KPK + \epsilon KP \bar{K} + \epsilon \bar{K} PK + \epsilon^2 \bar{K} P \bar{K})
+\end{align*}
+
+Ableitung nach $\epsilon$ und Auswertung in $\epsilon = 0$ ergibt
+%
+\begin{align*}
+h'(0) = \frac{d}{d\epsilon} g(\textsf{vec}(K + \epsilon \bar{K})) \bigg|_{\epsilon = 0} = \textsf{vec}(KP\bar{K} + \bar{K}PK)
+= \textsf{vec}(KP\bar{K}) + \textsf{vec}(\bar{K}PK)
+\end{align*}
+
+Umschreiben als Matrix-Vektor-Produkt
+%
+\begin{align*}
+\textsf{vec}(KP \cdot \bar{K} \cdot 1) = (1 \otimes KP) \textsf{vec}(\bar{K}) \quad \textsf{vec}(1 \cdot \bar{K} \cdot PK) = ((PK)^T \otimes 1) \textsf{vec}(\bar{K})
+\end{align*}
+
+Wir erhalten als Ableitung 
+%
+\begin{align*}
+g'(x) = (1 \otimes KP) + ((PK)^T \otimes 1) \Rightarrow f'(x) = - (1 \otimes KP) - ((PK)^T \otimes 1) + (A^T \otimes 1) + (1 \otimes A^T)
+\end{align*}
+
+\subsubsection{Implementierung}
+
+\begin{minipage}{0.65\textwidth}
+\begin{lstlisting}
+def vec(X):
+    return X.reshape(-1, order='F')
+
+def unvec(v, n):
+    return v.reshape((n, n), order='F')
+\end{lstlisting}
+\end{minipage}
+%
+\begin{minipage}{0.35\textwidth}
+Hier normaler text
+\end{minipage}
+
+\begin{minipage}{0.65\textwidth}
+\begin{lstlisting}
+# Newton Kleinman Verfahren 
+def solv_CARE(A,B,R,Q,tol=1e-8,max_iter=50):
+	n = A.shape[0]
+	I = np.eye(n)
+	q = vec(Q)
+	L = np.kron(I, A.T) + np.kron(A.T, I)
+	P = B @ np.linalg.solve(R, B.T)
+	# Startwert K0 hier Einheitsmatrix
+	K = I
+	x = vec(K)	
+	
+	for i in range(max_iter):
+		X = K @ P #KP
+		vec_KPK = np.kron(I,X) @ x
+		f = q - vec_KPK + L @ x 
+		Dg = np.kron(I,X)+np.kron(X,I) 
+		Df = L - Dg
+		dx = np.linalg.solve(Df, -f)
+		x_new = x + dx
+		# Abbruch
+		if np.linalg.norm(dx) / np.linalg.norm(x_new) < tol:
+			x=x_new
+			break
+        
+        x = x_new
+        K = unvec(x, n)
+	return K
+\end{lstlisting}
+\end{minipage}
+%
+\begin{minipage}{0.35\textwidth}
+\rot{Erklärung des Codes}
+
+\blau{Stabilität der Startlösung hier Gershgorin kreise und Stabilität erklären}
+
+Für $Y$ mit $RY=B^T \Rightarrow Y = B^{-1}B^T$ und $B \cdot Y = P$
+\end{minipage}
+%
+
+
+
+
+%-----------------------------------------------------------------------------------
+\newpage
+
+%------------------------------------------------------------------------------------------------------------
+\section{Hamilton-Jacobi-Bellmann Gleichung}
+
+
+Wir betrachten ein Steuerungsproblem und definieren die Value-Function $V$ mittels
+%
+\begin{align*}
+V(x(t),\dunkelgelb{t}) := \min_{\dunkelrot{u}} \left\{ \int_{\dunkelgelb{t}}^{t_f} L(s,x(s),\dunkelrot{u}(s)) \ds + \Phi(x(t_f)) \right\}
+\end{align*}
+
+\begin{satz}[Hamilton-Jacobi-Bellman Gleichung]
+Die Value-Function erfüllt
+%
+\begin{align*}
+0 = \frac{\partial V(x, t)}{\partial t} + \min_{u} \left[ L(t,x, u) + \frac{\partial V(x,t)}{\partial x} \cdot f(t,x,u) \right], \quad x \in \mathbb{R}^n, \, t_0 \leq t \leq t_f
+\end{align*}
+%
+mit den Randbedingungen
+%
+\begin{align*}
+V(x, \lila{t_f}) = \Phi(x(\lila{t_f})) \quad V(x, \dunkelgelb{t_0} ) = \min_u \int_{\dunkelgelb{t_0}}^{t_f} L(t,x(t),u(t)) \dt + \Phi(x(t_f)) 
+\end{align*}
+\end{satz}
+
+%------------------------------------------------------------------------------------------------------------
+\proof{ 
+
+Die Value-Function $V(x,t)$ beschreibt die minimalen Kosten von Zustand $x$ zum Endzeitpunkt $t_f$.  Für $s \in [t,t_f]$ gilt
+%
+\begin{itemize}
+\item Systemdynamik
+%
+\begin{align*}
+x'(s) = f(x(s), u(s)), \quad x(t) = x
+\end{align*}
+
+\item Kostenfunktional
+%
+\begin{align*}
+J(u) = \int_t^{t_f} L(s,x(s),u(s)) \ds + \Phi(x(t_f))
+\end{align*}
+\end{itemize}
+
+Angenommen, wir wechseln zum Zeitpunkt $t+h$ zu einer optimalen Steuerung, dann gilt für unser Zielfunktional 
+%
+\begin{align*}
+J(u) 
+&= \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{\int_{t+h}^{t_f} L(s,x(s),u(s)) \ds + \Phi(x(t_f)) } \\
+&= \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} 
+\end{align*}
+
+Da $V(x(t), t)$ die minimalen Kosten vom Zustand $x$ zur Zeit $t$ angibt, gilt:
+%
+\begin{align*}
+V(x(t),t) 
+&\leq \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} \\
+\Rightarrow 0 &\leq \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} - V(x(t),t) 
+\end{align*}
+
+Im Grenzübergang $h \to 0$ erhalten wir
+%
+\begin{align*}
+0 &\leq \gruen{\lim_{h \to 0}  \frac{1}{h}  \int_{t}^{t+h} L(s,x(s),u(s)) \ds} + \dunkelrot{\lim_{h \to 0} \frac{ V(x(t+h),t+h) - V(x,t) }{h}} \\
+&= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\mathrm{d}}{\dt} V(x(t),t)} \\
+&= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\partial V}{\partial t}  + \frac{\partial V}{\partial x} \cdot x'(t)} \\
+&= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\partial V}{\partial t}  + \frac{\partial V}{\partial x} \cdot f(t,x(t), u(t))}
+\end{align*}
+
+Durch Minimierung bezüglich $u$ erhalten wir die Gleichheit und somit
+%
+\begin{align*}
+0 &= \frac{\partial V}{\partial t} + \orange{\min_{u} \left[L(t,x(t),u(t)) +  \frac{\partial V}{\partial x} \cdot f(t,x(t), u(t))   \right]} \\
+&= \frac{\partial V}{\partial t} + \orange{\textsf{H}\left(t,x(t) , \frac{\partial V}{\partial x}(t,x(t)) \right)}
+\end{align*}
+}
+%------------------------------------------------------------------------------------------------------------
+
+
+\subsection{Herleitung des Minimumprinzips}
+
+Berechnung der totalen Ableitung der Value-Function $V$ entlang der Charakteristik $x(t)$:
+%
+\begin{align*}
+\frac{dV}{dt} &= \blau{\frac{\partial V}{\partial x}} \frac{dx}{dt} + \lila{\frac{\partial V}{\partial t}} = \blau{p(x,t)} \cdot x'(t) \lila{- H\left( t,x , \frac{\partial V}{\partial x} \right)} \\
+\end{align*}
+
+Berechnung der totalen Ableitung von $p = \frac{\partial V}{\partial x}$:
+%
+\begin{align*}
+\frac{dp}{dt} &= \frac{\mathrm{d}}{\dt} \left( \frac{\partial V}{\partial x} \right) =  \frac{\partial^2 V}{\partial x^2} \cdot x'(t) + \rot{\frac{\partial V}{\partial x \partial t}}
+\end{align*}
+
+Differenzieren der HJB bezüglich $x$ liefert
+%
+\begin{align*}
+0 = \frac{\mathrm{d}}{\dx} \left[ \frac{\partial V}{\partial t} + H\left(t,x, \orange{ \frac{\partial V}{\partial x}} \right) \right] = \rot{\frac{\partial V}{\partial t \partial x}} + \frac{\partial H}{\partial x} + \frac{\partial H}{\partial \orange{p}} \cdot \frac{\partial^2 V}{\partial x^2}
+\end{align*}
+
+Einsetzen der Gleichung liefert:
+%
+\begin{align*}
+\frac{dp}{dt} =  \frac{\partial^2 V}{\partial x^2} \cdot x'(t) + \rot{\left(- \frac{\partial H}{\partial x} - \frac{\partial H}{\partial p} \cdot \frac{\partial^2 V}{\partial x^2} \right)}
+= \frac{\partial^2 V}{\partial x^2} \cdot \gruen{\left(x'(t) - \frac{\partial H}{\partial p} \right)} - \frac{\partial H}{\partial x}
+\end{align*}
+
+Wir erhalten somit die bekannten, notwendigen Optimalitätsbedingungen:
+%
+\begin{align*}
+p'(t) = -H_x , \quad \gruen{x'(t) = f(t,x,u^*)}, \quad u^* = \textsf{argmin} \left[ L(t,x,u)+ p(t,x)f(t,x,u) \right]
+\end{align*}
+
+%-----------------------------------------------------------------------------------------------------------
+\subsection{Anwendung auf Linear-Quadratische Probleme}
+
+\subsubsection{Finite time problem}
+
+Gegeben sei das Steuerungsproblem 
+%
+\begin{align*}
+\min_u &  \int_{\dunkelgelb{t_0}}^{t_f} x^T Q x + u^T R u \dt + \underbrace{(x(t_f)- x_f)^T S (x(t_f)- x_f)}_{x(t_f)^T S x(t_f) -2x_{f}^T S x(t_f) +x_{f}^{T} S x_f} 
+= V(\dunkelgelb{t_0},x(\dunkelgelb{t_0})) + x_{f}^{T} S x_f
+\end{align*}
+
+unter der Nebenbedingung $x'(t) = Ax+Bu$ und $x(t_0) = x_0$. Der Term $x_{f}^{T} S x_f$ ist unabhängig von $u$ und kann bei der Minimierung weggelassen werden.
+
+% Aufbau der Value Funktion und HJB
+%----------------------------------------------------------------------------------------------
+%\begin{itemize}
+%\item Als Ansatz für die Value-Funktion wählen wir 
+%
+\begin{align*}
+V(x,t) 	&= x^T K(t) x + 2 s(t)^T x +r(t) \quad V(x,t_f) = x(t_f)^T K(t_f) x(t_f) + 2 s(t_f)^T x(t_f) + r(t_f)
+\end{align*}
+
+Wir erhalten für die Endwerte
+%
+\begin{align*}
+K(t_f) = S, \quad s(t_f) = - S x_f \quad r(t_f) = 0
+\end{align*}
+
+%\item Für die partiellen Ableitungen gilt:
+%
+\begin{align*}
+V_t = x^T K'(t) x + 2 s'(t)^T x +r'(t) \quad \rot{V_x = 2K(t)x +2s(t)} 
+\end{align*}
+
+
+%\item Minimierung bezüglich $u$ liefert 
+%
+\begin{align*}
+\frac{\partial}{\partial u} \left[ x^T Q x + u^T R u + V_x^T \cdot (Ax+Bu) \right] &= 2Ru + B^T \cdot V_x \Rightarrow u^{*}(t) = - \frac{1}{2} R^{-1} B^T \rot{V_x}
+\end{align*}
+
+%\item Da $R^T = R$ gilt, folgt $(R^{-1})^T = R^{-1}$ und $K^T = K$, da Hesse-Matrix von $V$. %   weiter mit $u^{*}$
+%
+
+% Hier weitermachen und ausmultiplizieren
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{align*}
+(u^{*})^T R u^{*} 
+&=  \left(- \frac{1}{2} R^{-1} B^T V_x \right)^T R \left(- \frac{1}{2} R^{-1} B^T V_x \right) \\
+&= \frac{1}{4} \cdot \left( R^{-1} B^T \rot{V_x} \right)^T R \left( R^{-1} B^T \rot{V_x} \right) \\
+&= \frac{1}{4} \cdot \left(\rot{2} R^{-1} B^T \rot{(K(t)x + s(t))} \right)^T R \left( \rot{2} R^{-1} B^T \rot{(K(t)x + s(t))} \right) \\
+&=  (K(t)x + s(t))^T \orange{B R^{-1}} \gruen{ R R^{-1}} \orange{B^T} (K(t)x + s(t)) \\
+&=    < K(t)x + s(t) , \orange{P} (2K(t)x + s(t)) >  \\
+&=  < K(t)x, P K(t)x > +  \underbrace{< K(t)x, Ps(t) >}_{< s(t),  \orange{P^{T}} K(t)x  >} + < s(t), P K(t)x  > + <s(t), P s(t) >  \\
+&= x^T K(t)^T P K(t)x + 2 \cdot s(t)^T P K(t) x +  s(t)^T P s(t)
+\end{align*}
+
+mit $P = B R^{-1} B^T$ und $P^T = P$.  
+%
+
+\begin{align*}
+V_x^{T}  \left( - \frac{1}{2} B R^{-1} B^T V_x \right)
+&= (2K(t)x +2s(t))^T \left( - \frac{1}{2} B R^{-1} B^T (2K(t)x +2s(t)) \right) \\
+&= -2 \cdot (K(t)x + s(t))^T P (K(t)x + s(t)) \\
+&= -2 \cdot x^T K(t)^T P K(t)x -4 \cdot s(t)^T P K(t)x -2 \cdot s(t)^T P s(t) 
+\end{align*}
+
+\begin{align*}
+V_x^T Ax &= 2 (K(t)x + s(t))^T A x = 2 x^T K(t)^T A x + 2 s(t)^T Ax = x^T (K(t)^T A + A^T K(t) ) x + 2 s(t)^T Ax
+\end{align*}
+
+
+\begin{align*}
+- V_t 	&= \min_u \left[ x^T Q x + u^T R u + V_x^T \cdot (Ax+Bu) \right] 
+\end{align*}
+
+
+
+\begin{align*}
+- V_t 								&=  x^T Q x + (u^{*})^T R u^{*}  + V_x^T \cdot \left( Ax- \frac{1}{2} B R^{-1} B^T V_x \right) 
+\\
+\dunkelrot{-} x^T \dunkelrot{K'(t)} x - 2 \blau{s'(t)}^T x  -\orange{r'(t)} 	&= x^T (\dunkelrot{Q-KPK+ KA + A^T K}) x - 2 \cdot (\blau{(P K -A)^T s(t)})^T x - \orange{ s(t)^T P s(t)}
+\end{align*}
+
+\begin{align*}
+K'(t) &= -Q+K(t) B R^{-1} B^T K(t) - K(t) A - A^T K(t) \quad K(t_f) = S \\
+s'(t) &= (K(t) B R^{-1} B^T  - A^T) s(t) \quad s(t_f) = -S x_f  \\
+r'(t) &= s(t)^T B R^{-1} B^T s(t) \quad r(t_f) = 0
+\end{align*}
+
+\subsubsection{infinite time problem}
+
+Im Grenzfall $t \to \infty$ betrachten wir das Steuerungsproblem
+%
+\begin{align*}
+\min_u &  \int_{\dunkelgelb{t_0}}^{\infty} (x-x_f)^T Q (x-x_f)  + u^T R u \dt 
+= V(x(\dunkelgelb{t_0}))
+\end{align*}
+
+unter der Nebenbedingung $x'(t) = Ax+Bu$ und $x(t_0) = x_0$. Als Ansatz für die Value Funktion wählen wir erneut 
+%
+\begin{align*}
+V(x) = x^T K x + 2s^T x + r \Rightarrow V_x = 2Kx + 2s
+\end{align*}
+
+Es gilt erneut 
+%
+\begin{align*}
+\frac{\partial}{\partial u} \left((x-x_f)^T Q (x-x_f)  + u^T R u  + V_x^T (Ax+Bu) \right) = 2Ru + B^T V_x  = 0 \Rightarrow u^{*} = -\frac{1}{2} R^{-1} B^T V_x 
+\end{align*}
+
+
+\begin{align*}
+(x-x_f)^T Q (x-x_f) 
+&= x^T Q x - 2 x_f^T Q x + x_f^T Q x_f
+\end{align*}
+
+\begin{align*}
+0 &= x^T ( Q - KPK + KA + A^T K ) x -2 ((PK-A)^T s + Qx_f)^T x - s^T (P) s + x_f^T Q x_f
+\end{align*}
+
+%----------------------------------------------------------------------------------------------
+\section{Paper Lin}
+
+\begin{align*}
+    M(q)\,\ddot{q} + C(q,\dot{q})\,\dot{q} + g(q) = \tau + d(q,\dot{q})
+\end{align*}
+
+mit Störung/Unsicherheit $d$. Zustand:
+
+\begin{align*}
+        \begin{bmatrix}
+    x :=
+    q\\
+    \dot{q}
+    \end{bmatrix},\quad
+    \dot x =
+        \begin{bmatrix}
+        \dot{q}\\[2pt]
+        \ddot{q}
+        \end{bmatrix}
+\end{align*}
+
+Direkte Eingabe $\tau$: kanonische Zustandsdarstellung -- explizit nach $\ddot{q}$ auflösen:
+\begin{align*}
+    \ddot{q} &= M(q)^{-1}\big(\tau - C(q,\dot{q})\,\dot{q} - g(q) + d(q, \dot{q}) \big)
+\end{align*}
+
+- Zustandsform:
+
+\begin{align*}
+    \dot x
+    =
+    \underbrace{
+        \begin{bmatrix}
+            \dot{q}\\[2pt]
+            -\,M(q)^{-1}\big(C(q,\dot{q})\,\dot{q} + g(q)\big)
+        \end{bmatrix}}_{A(x)}
+    +
+    \underbrace{
+        \begin{bmatrix}
+        0\\[2pt]
+        M(q)^{-1}
+        \end{bmatrix}}_{B(x)} \tau
+    +
+    \underbrace{   
+        \begin{bmatrix}
+        0\\[2pt]
+        M(q)^{-1} d(q,\dot{q})
+        \end{bmatrix}}_{\Delta(x)}
+\end{align*}
+
+Merke: In dieser "reinen" Form ist $B(x)$ die Eingabematrix zur physischen Eingabe $\tau$. 
+Dein gewünschtes Schema ist dann wörtlich
+\begin{align*}
+    x' = A(x) + B(x) \tau + \Delta(x)
+\end{align*}
+
+LinReparametrisierung: nominales Modell + strukturierte Unsicherheit. Lin führt eine Nominaldynamik ein, 
+um Unsicherheit strukturiert zu kapseln.
+Nominalgrößen wählen: $M_0(q),\; N_0(q,\dot{q}):=C_0(q,\dot{q}) \dot{q} + g_0(q)$
+Neue Eingabe definieren:
+
+\begin{align*}
+    u := M_0(q)^{-1} \big( \tau - N_0 (q,\dot{q}) \big)
+\end{align*}
+
+Einsetzen und umformen:
+
+\begin{align*}
+    \ddot{q}
+    =
+    M(q)^{-1}M_0(q)\,u
+    +
+    M(q)^{-1}\big(N_0(q,\dot{q})-N(q,\dot{q})\big)- Strukturterme:
+    h(x) := M(q)^{-1}M_0(q) - I,\qquad
+    f(x) := M(q)^{-1}\big(N_0(q,\dot{q})-N(q,\dot{q})\big):
+    \dot{x}
+    =
+    \underbrace{\begin{bmatrix}
+    \dot{q}\\[2pt]
+    0
+    \end{bmatrix}}_{A(x)}
+    +
+    \underbrace{\begin{bmatrix}
+    0\\[2pt]
+    I
+    \end{bmatrix}}_{B}\,u
+    +
+    \underbrace{\begin{bmatrix}
+    0\\[2pt]
+    h(x)\,u + f(x)
+    \end{bmatrix}}_{\Delta(x,u)}
+    \Rightarrow
+    \dot{x}
+    =
+    \begin{bmatrix}
+    \dot{q}\\[2pt]
+    u
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+    0\\[2pt]
+    h(x)\,u + f(x)
+    \end{bmatrix}
+\end{align*}
+
+
+Interpretation: Das nominale Hilfssystem ist DoppelIntegrator in $(q,\dot{q})$, 
+und alle Nichtlinearitäten/Parameterfehler erscheinen als
+matched Unsicherheit $h(x)u$ (EingabematrixUnsicherheit, mit $h(x)\succeq 0$ in Lins Annahmen),
+additive matched Störung $f(x)$ (wirkt über dieselbe Richtung wie $u$).
+Diese Struktur erlaubt Lins Hilfsproblem und die Reduktion auf LQR, sobald du lokal linearisierst 
+und eine quadratische Schranke $\|f(x)\|^2 \le x^\top P x$ aufstellst.
+Häufige Stolperstelle in der Notation- In „$x' = A(x) + B(x) + \Delta_x$“ fehlt meist das $u$. 
+Korrekt ist $x' = A(x) + B(x)\,u + \Delta(x)$.
+Falls du $u$ bereits in $\Delta$ „eingebaut“ hast (LinForm), dann schreib klar: 
+\begin{align*}
+    \Delta(x,u) = [0;\,h(x)u + f(x)]
+\end{align*}
+
+Kurzformeln zum direkten Einsetzen- Mit physischer Eingabe $\tau$:
+
+\begin{align*}
+    A(x)=
+    \begin{bmatrix}
+    \dot{q}\\
+    -M^{-1}(C\dot{q} + g)
+    \end{bmatrix},\quad
+    B(x)=
+    \begin{bmatrix}
+    0\\
+    M^{-1}
+    \end{bmatrix},\quad
+    \Delta(x)=
+    \begin{bmatrix}
+    0\\
+    M^{-1} d
+    \end{bmatrix}.- Mit Lin‑Eingabe u = M_0^{-1}(\tau - N_0):
+    A(x)=
+    \begin{bmatrix}
+    \dot{q}\\
+    0
+    \end{bmatrix},\quad
+    B=
+    \begin{bmatrix}
+    0\\
+    I
+    \end{bmatrix},\quad
+    \Delta(x,u)=
+    \begin{bmatrix}
+    0\\
+    h(x)u + f(x)
+    \end{bmatrix}
+\end{align*}
+
+\subsection{Mein Ansatz auf Lin}
+% -------------------------
+% Variante A: Direkte Zustandsform mit physischer Eingabe \tau
+% -------------------------
+% Zustandsvektor
+\begin{align*}
+    x = \begin{bmatrix} q \\ \dot q \end{bmatrix}
+    \in \mathbb{R}^{4}, \qquad
+    q = \begin{bmatrix} q_1 \\ q_2 \end{bmatrix},\;
+    \dot{q} = \begin{bmatrix} \dot{q}_1 \\ \dot{q}_2 \end{bmatrix},\;
+    \tau = \begin{bmatrix} \tau_1 \\ \tau_2 \end{bmatrix}
+\end{align*}
+
+% EL‑Dynamik mit Störung d(q,\dot q)
+\begin{align*}
+    M(q)\,\ddot{q} + C(q,\dot{q})\,\dot{q} + g(q) = \tau + d(q,\dot{q})
+\end{align*}
+
+% Explizit nach \ddot q aufgelöst und Zustandsform
+\begin{align*}
+    \ddot{q} = M(q)^{-1}\big(\tau - C(q,\dot{q})\,\dot{q} - g(q) + d(q,\dot{q})\big).
+    \Rightarrow
+    \dot{x} =
+    \underbrace{\begin{bmatrix} \dot{q} \\[4pt] -M(q)^{-1}\big(C(q,\dot{q})\,\dot{q} + g(q)\big) \end{bmatrix}}_{A(x)}
+    +
+    \underbrace{\begin{bmatrix} 0 \\[4pt] M(q)^{-1} \end{bmatrix}}_{B(x)}\,\tau
+    +
+    \underbrace{\begin{bmatrix} 0 \\[4pt] M(q)^{-1} d(q,\dot{q}) \end{bmatrix}}_{\Delta(x)}
+\end{align*}
+
+
+\end{document}
