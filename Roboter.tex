@@ -1,7 +1,5 @@
 \input{header_light_mode}
-
 \usepackage{listings}
-
 \definecolor{codebg}{rgb}{0.92,0.92,0.92}
 \definecolor{keywordcolor}{rgb}{0.2,0.2,0.7}
 \definecolor{stringcolor}{rgb}{0.8,0.1,0.1}
@@ -91,135 +89,6 @@ Für generalisierte Koordinaten $\textbf{q} = \theta \in \mathbb{R}^n$
 \begin{align*}
 \frac{d}{dt} \left( \frac{\partial T}{\partial \theta_{i}'}  \right) - \frac{\partial T}{\partial \theta_i}  + \frac{\partial V}{\partial \theta_i} = \tau_i \quad i=1, \cdots , n
 \end{align*}
-
-
-\subsection{Euler-Lagrange-Gleichung}
-%---------------------------------------------------------------------------------------------------
-
-
-\begin{definition}[Richtungsableitung]
-Die Richtungsableitung des Funktionals $J$ an der Stelle $x$ in Richtung $h$ ist definiert als 
-%
-\begin{align*}
-\delta J(x(t), h(t)) = \lim_{\epsilon \to 0} \frac{J[x(t)+ \epsilon \cdot h(t)] - J[x(t)]}{\epsilon} =
-\gruen{\frac{d}{d\epsilon} J[x + \epsilon h] \bigg|_{\epsilon = 0}}
-\end{align*}
-\end{definition}
-
-Wir definieren $f:\mathbb{R} \to \mathbb{R}$ mit $f(\epsilon) := J[x+ \epsilon \cdot h]$, dann gilt
-%
-\begin{align*}
-\gruen{f'(0)} = \lim_{\epsilon \to 0} \frac{f(\epsilon) -f(0)}{\epsilon} = \delta J(x(t), h(t))
-\end{align*}
-
-%
-%---------------------------------------------------------------------------------------------------------
-\begin{satz}[Euler-Lagrange-Gleichung]  \label{ELE}
-Sei $J: C^{2}([a,b]) \to \mathbb{R}$ ein Funktional mit
-%
-\begin{align*}
-J[x] = \int_{t_0}^{t_f} L(t,x(t),x'(t)) \mathrm{d}t, \quad x(t_0) = x_0, x(t_f) = x_f
-\end{align*}
-%
-Dann gilt für die Ableitung $\nabla J(x) = L_x -  \frac{\mathrm{d}}{\mathrm{d}t} L_{x'}$. Sei $x^* (t) = \textsf{argmin } J[x] $
-erfüllt es die folgende Gleichung
-%
-\begin{align*}
-\nabla J(x^*) = 0 \Leftrightarrow L_{x} - \frac{d}{dt} L_{x'} = 0
-\end{align*}
-\end{satz}
-
-\proof{
-Für die Richtungsableitung gilt 
-%
-\begin{align*}
-\frac{d}{d\epsilon} J[x + \epsilon h] \bigg|_{\epsilon = 0} 
-&= \int_{t_0}^{t_f} \frac{d}{d\epsilon} L(t, x(t) + \epsilon h(t), x'(t) + \epsilon h'(t)) \dt \bigg|_{\epsilon = 0} \\
-&= \int_{t_0}^{t_f} L_x \cdot h(t) + \orange{L_{x'} \cdot h'(t)} \dt \\
-&= \int_{t_0}^{t_f} L_x \cdot h(t)  \orange{ - \frac{d}{dt}  L_{x'} \cdot h(t)} \dt + \orange{\left[ L_{x'} \cdot h(t) \vphantom{\int}  \right]_{t_0}^{t_f} }
-\end{align*}
-%
-Für den Gradienten gilt $\delta J(x(t), \dunkelrot{h(t)}) = \gruen{\nabla J(x)} \cdot \dunkelrot{h(t)}$
-%
-\begin{align*}
-\delta J(x(t), \dunkelrot{h(t)}) = \int_{t_0}^{t_f} \left( \gruen{L_{x} - \frac{d}{dt} L_{x'} } \right) \cdot \dunkelrot{h(t)} \dt + \left[ \gruen{L_{x'}} \cdot \dunkelrot{h(t)} \vphantom{\int}  \right]_{t_0}^{t_f}
-\end{align*}
-%
-Für feste Randwerte $x(t_0) = x_0, x(t_f) = x_f$ gilt $h(t_0) = h(t_f) = 0$.
-}
-
-%------------------------------------------------------------------------------------------
-
-%
-%---------------------------------------------------------------------------------------------------------
-\begin{definition}[Hamilton-Funktion]
-Wir betrachten unser Variationsproblem, dann definieren wir den adjungierten Zustand $p$ und die Hamilton-Funktion $H$ durch
-%
-\begin{align*}
-p(t) := L_{x'} \quad H(t,x,p) := x'(t) \cdot p(t) - L(t,x,x')  
-\end{align*}
-
-Die Hamilton-Funktion besitzt wird somit extremal entlang $x'$
-%
-\begin{align*}
-H_{x'} =  p - L_{x'} = 0
-\end{align*}
-
-\begin{itemize}
-\item Partiell Differenzieren von $H$ bezüglich $x$ und $p$ liefert
-%
-\begin{align*}
-\frac{\partial H}{\partial p} &= x' + p \cdot \frac{\partial x'}{\partial p} - \underbrace{L_{x'}}_{= p} \cdot \frac{\partial x'}{\partial p} = x'(t) \\
-\frac{\partial H}{\partial x} &= - L_{x} = -\frac{\mathrm{d}}{\dt} L_{x'} =  -p'(t)
-\end{align*}
-%
-\item Im autonomen Fall $H_{t} = 0$ gilt: $\orange{H_x = - p'}$ und $\lila{H_p = x'}$
-%
-\begin{align*}
-\frac{\mathrm{d}H}{\mathrm{d}t} = H_t + \orange{H_x} \cdot x'(t) + \lila{H_p} \cdot  p'(t) = H_t = 0
-\end{align*}
-\end{itemize}
-
-\end{definition}
-
-%
-%---------------------------------------------------------------------------------------------------------
-\begin{satz}[Optimalitätskriterium]
-Sei $x^{*} (t)$ ein Minimum eines Variationsproblems, so gilt:
-%
-\begin{itemize}
-\item Die Funktion $x$ erfüllt die Euler-Lagrange Gleichung.
-%
-\begin{align*}
-\nabla J(x^*) = 0 \Leftrightarrow L_{x} - \frac{\mathrm{d}}{\dt} L_{x'} = 0
-\end{align*}
-
-\item Für eine freie Endzeit $\dunkelgelb{t_f}$ gilt 
-%
-\begin{align*}
- H(\dunkelgelb{t_f},x,p) = p(\dunkelgelb{t_f}) \cdot x'(\dunkelgelb{t_f}) - L(\dunkelgelb{t_f})  = 0
-\end{align*}
-
-\item Für einen freien Endpunkt $x_{f}$ gilt
-%
-\begin{align*}
- p(t_{f}) = L_{x'}(t_{f})  = 0
-\end{align*}
-\end{itemize}
-
-\end{satz}
-
-\proof{
-Für festes $x(t_0) = x_0$ gilt $\dunkelrot{h(t_0)} = 0$. Bei freiem $x(t_f) = x_f$ verschwindet der Randterm für $\gruen{L_{x'}(t_f) }= 0$ und es gilt
-%
-\begin{align*}
-\delta J(x(t), \dunkelrot{h(t)}) 
-&= \int_{t_0}^{t_f} \left( \underbrace{\gruen{L_{x} - \frac{d}{dt} L_{x'} }}_{ = 0} \right) \cdot \dunkelrot{h(t)} \dt + \left[ \gruen{L_{x'}} \cdot \dunkelrot{h(t)} \vphantom{\int}  \right]_{t_0}^{t_f} \\
-0 &=\underbrace{ \gruen{L_{x'}(t_f)}}_{= 0} \cdot \dunkelrot{h(t_f)} - \gruen{L_{x'}(t_0)} \cdot \underbrace{\dunkelrot{h(t_0)}}_{= 0} 
-\end{align*}
-
-
-}
 
 \subsection{Two Link Revolute Manipulator}
 
@@ -886,8 +755,6 @@ x(t) + \rot{x(0)} &= \int_0^t \blau{x'(s)} \ds = \int_0^t \blau{v(s)} \ds = \fra
 1 &= \frac{C}{6} \cdot 8 - \frac{C}{2} \cdot 4 \Rightarrow 1 = \left( \frac{4C}{3} - 2C \right) = -\frac{2C}{3} \Rightarrow C = -\frac{3}{2} \\
 u(t) &= \left( -\frac{3}{2} \right) t - \left( -\frac{3}{2} \right) = -\frac{3}{2} t + \frac{3}{2}
 \end{align*}
-
-
 \end{itemize}
 \end{beispiel}
 
@@ -1778,186 +1645,187 @@ Es gilt erneut
 \section{Paper Lin}
 
 \begin{align*}
-    M(q)\,\ddot{q} + C(q,\dot{q})\,\dot{q} + g(q) = \tau + d(q,\dot{q})
+    M(q) \ddot{q} + C(q,\dot{q}) \dot{q} + G(q) = \tau
 \end{align*}
 
-mit Störung/Unsicherheit $d$. Zustand:
+Wir wählen den Zustand $x = \begin{pmatrix} q \\ \dot{q} \end{pmatrix}$ und die Nominalterme
 
 \begin{align*}
-        \begin{bmatrix}
-    x :=
-    q\\
-    \dot{q}
-    \end{bmatrix},\quad
-    \dot x =
-        \begin{bmatrix}
-        \dot{q}\\[2pt]
-        \ddot{q}
-        \end{bmatrix}
+    M_0(q), \quad C_0(q,\dot{q}), \quad G_0(q)
 \end{align*}
 
-Direkte Eingabe $\tau$: kanonische Zustandsdarstellung -- explizit nach $\ddot{q}$ auflösen:
+Auflösen nach $\ddot{q}$ 
+
 \begin{align*}
-    \ddot{q} &= M(q)^{-1}\big(\tau - C(q,\dot{q})\,\dot{q} - g(q) + d(q, \dot{q}) \big)
+    \ddot{q} = M^{-1}(q) \cdot [ \tau - \underbrace{C(q,\dot{q}) \dot{q} + G(q)}_{N(q, \dot{q})} ]
 \end{align*}
 
-- Zustandsform:
+Wir setzen nun 
 
 \begin{align*}
-    \dot x
-    =
-    \underbrace{
-        \begin{bmatrix}
-            \dot{q}\\[2pt]
-            -\,M(q)^{-1}\big(C(q,\dot{q})\,\dot{q} + g(q)\big)
-        \end{bmatrix}}_{A(x)}
-    +
-    \underbrace{
-        \begin{bmatrix}
-        0\\[2pt]
-        M(q)^{-1}
-        \end{bmatrix}}_{B(x)} \tau
-    +
-    \underbrace{   
-        \begin{bmatrix}
-        0\\[2pt]
-        M(q)^{-1} d(q,\dot{q})
-        \end{bmatrix}}_{\Delta(x)}
-\end{align*}
-
-Merke: In dieser "reinen" Form ist $B(x)$ die Eingabematrix zur physischen Eingabe $\tau$. 
-Dein gewünschtes Schema ist dann wörtlich
-\begin{align*}
-    x' = A(x) + B(x) \tau + \Delta(x)
-\end{align*}
-
-LinReparametrisierung: nominales Modell + strukturierte Unsicherheit. Lin führt eine Nominaldynamik ein, 
-um Unsicherheit strukturiert zu kapseln.
-Nominalgrößen wählen: $M_0(q),\; N_0(q,\dot{q}):=C_0(q,\dot{q}) \dot{q} + g_0(q)$
-Neue Eingabe definieren:
-
-\begin{align*}
-    u := M_0(q)^{-1} \big( \tau - N_0 (q,\dot{q}) \big)
-\end{align*}
-
-Einsetzen und umformen:
-
-\begin{align*}
-    \ddot{q}
-    =
-    M(q)^{-1}M_0(q)\,u
-    +
-    M(q)^{-1}\big(N_0(q,\dot{q})-N(q,\dot{q})\big)- Strukturterme:
-    h(x) := M(q)^{-1}M_0(q) - I,\qquad
-    f(x) := M(q)^{-1}\big(N_0(q,\dot{q})-N(q,\dot{q})\big):
-    \dot{x}
-    =
-    \underbrace{\begin{bmatrix}
-    \dot{q}\\[2pt]
-    0
-    \end{bmatrix}}_{A(x)}
-    +
-    \underbrace{\begin{bmatrix}
-    0\\[2pt]
-    I
-    \end{bmatrix}}_{B}\,u
-    +
-    \underbrace{\begin{bmatrix}
-    0\\[2pt]
-    h(x)\,u + f(x)
-    \end{bmatrix}}_{\Delta(x,u)}
+    u := M_0^{-1}(q) \cdot [ \tau - N_0(q, \dot{q}) ] 
     \Rightarrow
-    \dot{x}
-    =
-    \begin{bmatrix}
-    \dot{q}\\[2pt]
-    u
-    \end{bmatrix}
-    +
-    \begin{bmatrix}
-    0\\[2pt]
-    h(x)\,u + f(x)
-    \end{bmatrix}
+    \tau = M_0(q) u + N_0(q, \dot{q})
 \end{align*}
 
-
-Interpretation: Das nominale Hilfssystem ist DoppelIntegrator in $(q,\dot{q})$, 
-und alle Nichtlinearitäten/Parameterfehler erscheinen als
-matched Unsicherheit $h(x)u$ (EingabematrixUnsicherheit, mit $h(x)\succeq 0$ in Lins Annahmen),
-additive matched Störung $f(x)$ (wirkt über dieselbe Richtung wie $u$).
-Diese Struktur erlaubt Lins Hilfsproblem und die Reduktion auf LQR, sobald du lokal linearisierst 
-und eine quadratische Schranke $\|f(x)\|^2 \le x^\top P x$ aufstellst.
-Häufige Stolperstelle in der Notation- In „$x' = A(x) + B(x) + \Delta_x$“ fehlt meist das $u$. 
-Korrekt ist $x' = A(x) + B(x)\,u + \Delta(x)$.
-Falls du $u$ bereits in $\Delta$ „eingebaut“ hast (LinForm), dann schreib klar: 
+Setze $\tau = M_0 u + N_0$ in die echte Dynamik ein:
 \begin{align*}
-    \Delta(x,u) = [0;\,h(x)u + f(x)]
+    \ddot{q} 
+    &= M^{-1} \cdot [ M_0 u + N_0 - N] \\
+    &= M^{-1} M_0 u + M^{-1} (N_0 - N) \\
+    &= u + \underbrace{(M^{-1} M_0- I)}_{h(x)} u + \underbrace{M^{-1} (N_0 - N)}_{f(x)}
 \end{align*}
 
-Kurzformeln zum direkten Einsetzen- Mit physischer Eingabe $\tau$:
-
+Für den Zustandsraum $x$ erhalten wir folgendes System:
 \begin{align*}
-    A(x)=
-    \begin{bmatrix}
-    \dot{q}\\
-    -M^{-1}(C\dot{q} + g)
-    \end{bmatrix},\quad
-    B(x)=
-    \begin{bmatrix}
-    0\\
-    M^{-1}
-    \end{bmatrix},\quad
-    \Delta(x)=
-    \begin{bmatrix}
-    0\\
-    M^{-1} d
-    \end{bmatrix}.- Mit Lin‑Eingabe u = M_0^{-1}(\tau - N_0):
-    A(x)=
-    \begin{bmatrix}
-    \dot{q}\\
-    0
-    \end{bmatrix},\quad
-    B=
-    \begin{bmatrix}
-    0\\
-    I
-    \end{bmatrix},\quad
-    \Delta(x,u)=
-    \begin{bmatrix}
-    0\\
-    h(x)u + f(x)
-    \end{bmatrix}
+    \dot{x} 
+    = \begin{pmatrix} \dot{q} \\ u + h(x) u + f(x) \end{pmatrix} 
+    = \underbrace{\begin{pmatrix} 0 & I \\ 0 & 0 \end{pmatrix}}_{A} x + \underbrace{\begin{pmatrix} 0 \\ I \end{pmatrix}}_{B} u + \begin{pmatrix} 0 \\ h(x) u + f(x) \end{pmatrix}
 \end{align*}
 
-\subsection{Mein Ansatz auf Lin}
-% -------------------------
-% Variante A: Direkte Zustandsform mit physischer Eingabe \tau
-% -------------------------
-% Zustandsvektor
+Unter vernachlässigung $\ddot{q} = u$ erhalten wir das lineare System 
 \begin{align*}
-    x = \begin{bmatrix} q \\ \dot q \end{bmatrix}
-    \in \mathbb{R}^{4}, \qquad
-    q = \begin{bmatrix} q_1 \\ q_2 \end{bmatrix},\;
-    \dot{q} = \begin{bmatrix} \dot{q}_1 \\ \dot{q}_2 \end{bmatrix},\;
-    \tau = \begin{bmatrix} \tau_1 \\ \tau_2 \end{bmatrix}
+    \dot{x} = A x + B u
 \end{align*}
 
-% EL‑Dynamik mit Störung d(q,\dot q)
-\begin{align*}
-    M(q)\,\ddot{q} + C(q,\dot{q})\,\dot{q} + g(q) = \tau + d(q,\dot{q})
-\end{align*}
+\begin{satz}
+    Die Lösung des optimalen Steuerungsproblem:
+    \begin{align*}
+        \min_u \int_0^{\infty} x^T Q x + u^T R u \dt 
+        \quad 
+        \dot{x} = 
+        \underbrace{\begin{pmatrix} 0 & I \\ 0 & 0 \end{pmatrix}}_{A} x 
+        + \underbrace{\begin{pmatrix} 0 \\ I \end{pmatrix}}_{B} u
+    \end{align*}
+    ist gegeben durch
+    %
+    \begin{align*}
+        u^{*} = -R^{-1} B^T K x  \quad \text{mit} \quad Q - KPK + KA + A^T K = 0
+    \end{align*}
 
-% Explizit nach \ddot q aufgelöst und Zustandsform
-\begin{align*}
-    \ddot{q} = M(q)^{-1}\big(\tau - C(q,\dot{q})\,\dot{q} - g(q) + d(q,\dot{q})\big).
-    \Rightarrow
-    \dot{x} =
-    \underbrace{\begin{bmatrix} \dot{q} \\[4pt] -M(q)^{-1}\big(C(q,\dot{q})\,\dot{q} + g(q)\big) \end{bmatrix}}_{A(x)}
-    +
-    \underbrace{\begin{bmatrix} 0 \\[4pt] M(q)^{-1} \end{bmatrix}}_{B(x)}\,\tau
-    +
-    \underbrace{\begin{bmatrix} 0 \\[4pt] M(q)^{-1} d(q,\dot{q}) \end{bmatrix}}_{\Delta(x)}
-\end{align*}
+    und für die Momente gilt 
+    %
+    \begin{align*}
+        \tau^{*} = M_0(q) u^{*} + N_0(q, \dot{q}) = -M_0(q) R^{-1} B^T K x + N_0(q, \dot{q})
+    \end{align*}
+\end{satz}
 
+\usetikzlibrary{positioning}
+
+
+\begin{tikzpicture}[>=latex]
+    \node[draw= boxframe,anchor = north west ,align=left] (a) at (-2,0) {
+        Ursprungsproblem:\\
+        $\begin{aligned}
+            \min_u & \int_0^\infty q^T Q q + \tau^T R \tau \\
+            	ext{s.t. } & M(q) \ddot{q} + C(q,\dot{q}) \dot{q} + G(q) = \tau;
+        \end{aligned}$
+    };
+    \node[draw = rot, anchor = north west, align=left] (b) at ([xshift=1cm]a.north east) {
+        LQR:\\
+        %1. Wahl von Nominaltermen $M_0, C_0, G_0$\\
+        $\begin{aligned}
+            \min_u \int_0^{\infty} x^T Q x + u^T R u \dt 
+            \quad 
+            \dot{x} = 
+            \underbrace{\begin{pmatrix} 0 & I_2 \\ 0 & 0 \end{pmatrix}}_{A} x 
+            + \underbrace{\begin{pmatrix} 0 \\ I_2 \end{pmatrix}}_{B} u
+        \end{aligned}$
+    };
+    \node[draw = rot, below=of b, align=center] (c) {
+        Lösung der CARE für $n=2$ \\
+        $\begin{aligned}
+            Q - K \underbrace{B R^{-1} B^T}_{P} K + KA + A^T K &= 0 
+        \end{aligned}$
+        };
+    \node[draw = rot, below=of c, align=center] (d) {Closed-Loop Regelung:\\
+        $\begin{aligned}
+            u^{*} = -R^{-1} B^T K x
+        \end{aligned}$
+        };
+    \node[draw = boxframe, anchor=south, align=left] (e) at ([yshift=-6cm]a.south) {
+        Lösung Originalsystem \\
+        $\begin{aligned}
+            \tau^{*} &= M_0(q) u^{*} + N_0(q, \dot{q}) \\
+            M_0 &= M(q=0)  \\
+            N_0 &= N(q, \dot{q}) = C_0(q, \dot{q}) \dot{q} + G_0(q)
+        \end{aligned}$
+        };
+
+    \draw[->, color = boxframe] (a) -- (b);
+    \draw[->, color = boxframe] (b) -- (c);
+    \draw[->, color = boxframe] (c) -- (d);
+    \draw[->, color = boxframe] (d.west) -- ++(-3.65cm,0cm);
+    \draw[->, color = gruen] (a) -- (e);
+\end{tikzpicture}
+
+\proof{
+    Für die Value Funktion erhalten wir 
+    %
+    \begin{align*}
+        \frac{\mathrm{d}}{\dt} V(x(t)) &= 
+        \underbrace{\nabla V(x)}_{2K x(t)} 
+        \cdot 
+        \underbrace{x'(t)}_{Ax(t) + Bu(t)} \\
+        &= 2 x(t)^T K 
+        \left[ 
+            Ax(t) + B \underbrace{ - R^{-1} B^T K x(t)}_{u(t)} 
+        \right] \\
+        &= x(t)^T 
+        \left[ 
+            \underbrace{K A + A^T K - 2 K B R^{-1} B^T K}_{-Q - K B R^{-1} B^T K} 
+        \right] 
+        x(t) \\
+        &= - x(t)^T Q x(t) - \underbrace{x(t)^T K B}_{x(t)^T K B R^{-1} R} \underbrace{R^{-1} B^T K x(t)}_{-u^*(t)} \\
+        &= - x(t)^T Q x(t) - \underbrace{x(t)^T K B R^{-1} R}_{u^{*}(t)^T R} u^*(t) \\
+        &= - x(t)^T Q x(t) - u^{*}(t)^T R u^{*}(t)
+    \end{align*}
+
+    Wir erhalten somit $\frac{\mathrm{d}}{\dt} V(x(t)) \leq 0$ mit Gleichheit genau dann wenn $x(t) = u^{*}(t) = 0$. 
+    Damit ist die Value Funktion $V(x(t))$ streng monoton fallend und 
+    somit ist das optimale Steuerungssignal $u^{*}(t)$ stabil.
+
+    Verwenden wir die Value Funktion auf die reale Dynamik, so gilt
+
+    \begin{align*}
+        \frac{\mathrm{d}}{\dt} V(x(t)) 
+        &= \nabla V(x) \cdot x'(t) \\
+        &= 2 x(t)^T K 
+        \left[ 
+            Ax(t) + B u^{*}(t) + \begin{pmatrix} 0 \\ h(x(t)) u^{*}(t) + f(x(t)) \end{pmatrix}
+        \right] \\
+        &= 2 x(t)^T K 
+        \left[ 
+            Ax(t) + B u^{*}(t) + B h(x(t)) u^{*}(t) + B f(x(t))
+        \right] \\
+        &= \underbrace{ 2 x(t)^T K (Ax+Bu^{*})}_{(1)} + \underbrace{2 x(t)^T K B (h(x) u^{*} + f(x))}_{(2)}
+    \end{align*}
+
+    wobei wir $B = \begin{pmatrix} 0 \\ I_2 \end{pmatrix}$ verwendet haben. 
+    Aus $u^* = -R^{-1} B^T K x(t)$ folgt $B^T K x(t) = -R u^{*}$ und wir erhalten für $(2)$
+
+    \begin{align*}
+        2 x(t)^T K B (h(x) u^{*} + f(x)) 
+        &= 2 \left[\underbrace{B^T K x(t)}_{-R u^{*}} \right]^T (h(x) u^{*} + f(x)) \\
+        &= -2 (u^{*})^T R (h(x) u^{*} + f(x)) \\
+        &= -2 (u^{*})^T R h(x) u^{*} - 2 (u^{*})^T R f(x)
+    \end{align*}
+
+    Für $h$ positiv definit gilt:
+    \begin{align*}
+        -(u^{*})^T R h(x) u^{*} \leq 0
+    \end{align*}
+
+    Für jedes $\epsilon > 0$ gilt:
+    \begin{align*}
+        -2 (u^{*})^T R f(x) 
+        &\leq 2 \|u^{*}\| \|R\| \|f(x)\| \\
+        &\leq \epsilon \|u^{*}\|^2 + \frac{1}{\epsilon} \|R\|^2 \|f(x)\|^2 \\
+        &= \epsilon (u^{*})^T u^{*} + \frac{1}{\epsilon} \|R\|^2 \|f(x)\|^2 \\
+        &\leq \epsilon (u^{*})^T R u^{*} + \frac{1}{\epsilon} \|R\|^2 \|f(x)\|^2
+    \end{align*}
+
+    Wir wählen als Schranke $f^T R f \leq x^T P x$
+}
 
 \end{document}
