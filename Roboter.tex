@@ -1744,18 +1744,15 @@ Aus der Produktregel folgt für die Ableitung
     \frac{\partial}{\partial \bm{x}} 
     \left[ 
         \vphantom{\int}
-        M(x_1,x_2) \ddot{\bm{q}}
+        M(\bm{q}) \ddot{\bm{q}}
     \right] 
     &= 
     \frac{\partial}{\partial \bm{x}} 
     \left[
     \underbrace{
         \bm{u} - C(\bm{x}) 
-        \begin{pmatrix}
-            x_3 \\
-            x_4
-        \end{pmatrix} 
-        - G(x_1,x_2)
+        \dot{\bm{q}}
+        - G(\bm{q})
         }_{
             := h(\bm{x}, \bm{u})
             }  
@@ -1767,8 +1764,22 @@ Aus der Produktregel folgt für die Ableitung
     \frac{\partial h}{\partial \bm{x}}
 \end{align*}
 
-Am Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$ gilt $\ddot{\bm{q}} = \bm{0}$ 
-und somit folgt für die Ableitung von $h$ in $(\bm{x}^*, \bm{u}^*)$:
+Am Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$ gilt 
+% f(x*,u*) = 0 => q'' = q' = 0 => h(x*,u*) = 0
+\begin{align*}
+    \bm{0} 
+    = f(\bm{x}^*, \bm{u}^*)
+    = \begin{bmatrix}
+        \dot{\bm{q}} \\
+        \ddot{\bm{q}}
+    \end{bmatrix}
+    \Rightarrow
+    \ddot{\bm{q}} = \dot{\bm{q}} = \bm{0}
+    \Rightarrow
+    h(\bm{x}^*, \bm{u}^*) = \bm{0}
+\end{align*}
+
+Für die Ableitung von $h$ in $(\bm{x}^*, \bm{u}^*)$ erhalten wir:
 % Am Gleichgewichtspunkt q'' = 0
 \begin{align*}
     \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
@@ -1779,9 +1790,132 @@ und somit folgt für die Ableitung von $h$ in $(\bm{x}^*, \bm{u}^*)$:
     + M(\bm{x}^*) \frac{\partial \ddot{\bm{q}}}{\partial \bm{x}}  
     \Rightarrow
     \frac{\partial \ddot{\bm{q}}}{\partial \bm{x}} 
+    =
+    \frac{\partial}{\partial \bm{x}}
+    \begin{bmatrix}
+        f_3(\bm{x},\bm{u}) \\
+        f_4(\bm{x},\bm{u}) 
+    \end{bmatrix}
     = 
     M^{-1}(\bm{x}^*) \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
 \end{align*}
+
+Wir berechnen zunächst die Ableitung von $h$ bzgl. $\bm{x}$ im Punkt $(\bm{x}^*, \bm{u}^*)$ 
+und erhalten
+% Ableitung von h nach x
+% h_x = [h_q \\ h_q']
+\begin{align*}
+    \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        \frac{\partial h_1}{\partial x_1} 
+        & \frac{\partial h_2}{\partial x_1} 
+         \\
+        \frac{\partial h_1}{\partial x_2} 
+        & \frac{\partial h_2}{\partial x_2} \\
+        \frac{\partial h_1}{\partial x_3} 
+        & \frac{\partial h_2}{\partial x_3} \\
+        \frac{\partial h_1}{\partial x_4} 
+        & \frac{\partial h_2}{\partial x_4}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        \frac{\partial G_1}{\partial q_1} & \frac{\partial G_2}{\partial q_1} \\
+        \frac{\partial G_1}{\partial q_2} & \frac{\partial G_2}{\partial q_2} \\
+        -C_{11} & -C_{12} \\
+        -C_{21} & -C_{22}
+    \end{bmatrix}
+    (\bm{x}^*, \bm{u}^*)
+\end{align*}
+
+Für die konkrete Matrix $A = f_{\bm{x}}(\bm{x}^*, \bm{u}^*)$ gilt
+% Matrix A
+\begin{align*}
+    A(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        \frac{\partial f_1}{\partial x_1}  
+        & \frac{\partial f_2}{\partial x_1}  
+        & \frac{\partial f_3}{\partial x_1}  
+        & \frac{\partial f_4}{\partial x_1} 
+        \\ \frac{\partial f_1}{\partial x_2} 
+        & \frac{\partial f_2}{\partial x_2} 
+        & \frac{\partial f_3}{\partial x_2} 
+        & \frac{\partial f_4}{\partial x_2} 
+        \\ \frac{\partial f_1}{\partial x_3} 
+        & \frac{\partial f_2}{\partial x_3} 
+        & \frac{\partial f_3}{\partial x_3} 
+        & \frac{\partial f_4}{\partial x_3} 
+        \\ \frac{\partial f_1}{\partial x_4} 
+        & \frac{\partial f_2}{\partial x_4} 
+        & \frac{\partial f_4}{\partial x_3} 
+        & \frac{\partial f_4}{\partial x_4}
+    \end{bmatrix}(\bm{x}^*, \bm{u}^*) \\
+    &=  
+    \begin{bmatrix}
+        \frac{\partial \dot{q}_1}{\partial q_1}
+        & \frac{\partial \dot{q}_1}{\partial q_2}
+        & \frac{\partial \dot{q}_1}{\partial \dot{q_1}}
+        & \frac{\partial \dot{q}_1}{\partial \dot{q_2}}
+        \\
+        \frac{\partial \dot{q}_2}{\partial q_1}
+        & \frac{\partial \dot{q}_2}{\partial q_2}
+        & \frac{\partial \dot{q}_2}{\partial \dot{q _1}}
+        & \frac{\partial \dot{q}_2}{\partial \dot{q_2}}
+        \\
+        \frac{(M^-1)_{11} h_1 + (M^{-1})_{12} h_2}{\partial q_1}
+        & \frac{(M^-1)_{11} h_1 + (M^{-1})_{12} h_2}{\partial q_2}
+        & \frac{(M^-1)_{11} h_1 + (M^{-1})_{12} h_2}{\partial \dot{q_1}}
+        & \frac{(M^-1)_{11} h_1 + (M^{-1})_{12} h_2}{\partial \dot{q_2}}
+        \\
+        \frac{(M^{-1})_{21} h_1 + (M^{-1})_{22} h_2}{\partial q_1}
+        & \frac{(M^{-1})_{21} h_1 + (M^{-1})_{22} h_2}{\partial q_2}
+        & \frac{(M^{-1})_{21} h_1 + (M^{-1})_{22} h_2}{\partial \dot{q_1}}
+        & \frac{(M^{-1})_{21} h_1 + (M^{-1})_{22} h_2}{\partial \dot{q_2}}
+    \end{bmatrix}
+    (\bm{x}^*, \bm{u}^*) \\
+    &=
+    \begin{bmatrix}
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 1 \\
+        * & * & * & * \\
+        * & * & * & *
+    \end{bmatrix}
+\end{align*}
+
+% Satz mit den Blockmatrizen
+%----------------------------------------------------------------------------------------------
+\begin{satz}
+    Wir erhalten die Struktur der Ableitungen konkret fest:
+    \begin{align*}
+        A &=
+        \begin{bmatrix}
+            0 & 1 \\
+            M^{-1} \left( -\frac{\partial G}{\partial \bm{q}} \right) & 0
+        \end{bmatrix}, \quad
+        B =
+        \begin{bmatrix}
+            0 \\
+            M^{-1}
+        \end{bmatrix},
+        \quad
+        h_{\bm{x}} =
+        \begin{bmatrix}
+        - \frac{\partial C}{\partial \bm{q}} \dot{\bm{q}} - \frac{\partial G}{\partial \bm{q}}
+        \\
+        - C(\bm{x}^*) - \frac{\partial C}{\partial \dot{\bm{q}}} \dot{\bm{q}}
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            - \frac{\partial G}{\partial \bm{q}}(\bm{x}^*)
+            \\
+            - C(\bm{x}^*)
+        \end{bmatrix}
+    \end{align*}
+    da $\dot{\bm{q}} = \bm{0}$
+\end{satz}
+% (M^-1 h)_1 = (M^-1)_{11} h_1 + (M^{-1})_{12} h_2
+% (M^-1 h)_2 = (M^{-1})_{21} h_1 + (M^{-1})_{22} h_2
 
 % Hier konkrete Ableitungen der Dynamik um A unf B zu erhalten. 
 % Dazu müssen wir die konkreten Dynamik in jeder Komponente aufschreiben.
