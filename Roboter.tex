@@ -1598,7 +1598,7 @@ def unvec(v, n):
 \end{minipage}
 %
 \begin{minipage}{0.35\textwidth}
-Hier normaler text
+Hilfsfunktionen für die Vektorisierung
 \end{minipage}
 
 \begin{minipage}{0.65\textwidth}
@@ -1706,6 +1706,8 @@ Für die Ableitung der Größen gilt
     \bar{\bm{x}}(t) = A \bar{\bm{x}}(t) + B \bar{\bm{u}}(t)
 \end{align*}
 
+Somit ist die Rückführung von $\bar{\bm{x}}$ auf $\bm{0}$ 
+äquivalten zu der Rückführung von $\bm{x}$ auf den Arbeitspunkt $\bm{x}^*$.
 Wir definieren 
 $h(\bm{q} , \dot{\bm{q}}, \bm{u}):= \bm{u} - C(\bm{q},\dot{\bm{q}}) \dot{\bm{q}} - G(\bm{q})$.
 und wenden die Produktregel auf den Term $M(\bm{q}) \ddot{\bm{q}}$ an, um die Ableitung von $f$ nach $\bm{x}$ zu bestimmen.
@@ -2107,45 +2109,67 @@ Für die Inverse der Massenmatrix gilt somit
     \node[draw= boxframe,anchor = north west ,align=left] (a) at (-2,0) {
         Ursprungsproblem:\\
         $\begin{aligned}
-            \min_u & \int_0^\infty \bm{q}^T Q \bm{q} + \bm{u}^T R \bm{u} \\
-            	\textsf{s.t. } & M(\bm{q}) \ddot{\bm{q}} + C(\bm{q},\dot{\bm{q}}) \dot{\bm{q}} + G(\bm{q}) = \bm{u};
+            \min_u & \int_0^\infty 
+            (\bm{q} - \bm{q}_f)^T Q (\bm{q} - \bm{q}_f) 
+            + (\bm{u} - \bm{u}_f)^T R (\bm{u} - \bm{u}_f) \dt \\
+            	\textsf{s.t. } & M(\bm{q}) \ddot{\bm{q}} 
+                + C(\bm{q},\dot{\bm{q}}) \dot{\bm{q}} 
+                + G(\bm{q}) = \bm{u};
+                \quad
+                \bm{u}_f - G(\bm{q}_f) = \bm{0} 
         \end{aligned}$
     };
     \node[draw = rot, anchor = north west, align=left] (b) at ([xshift=1cm]a.north east) {
-        LQR:\\
-        %1. Wahl von Nominaltermen $M_0, C_0, G_0$\\
+        Berechnung von $M^{-1}(\bm{q}_f)$ und $\frac{\partial G}{\partial \bm{q}}(\bm{q}_f)$: \\
+        %
         $\begin{aligned}
-            \min_u \int_0^{\infty} x^T Q x + u^T R u \dt 
-            \quad 
-            \dot{x} = 
-            \underbrace{\begin{pmatrix} 0 & I_2 \\ 0 & 0 \end{pmatrix}}_{A} x 
-            + \underbrace{\begin{pmatrix} 0 \\ I_2 \end{pmatrix}}_{B} u
+            A &= 
+            \begin{bmatrix}
+                \bm{0}_2 & I_2 \\
+                M^{-1} \frac{\partial G}{\partial \bm{q}}
+                & 
+                \bm{0}_2
+            \end{bmatrix}, \quad
+            B &=
+            \begin{bmatrix}
+                \bm{0} \\
+                M^{-1}
+            \end{bmatrix}
         \end{aligned}$
     };
     \node[draw = rot, below=of b, align=center] (c) {
-        Lösung der CARE für $n=2$ \\
+        LQR mit $\bar{\bm{x}} = \bm{x} - \bm{x}_f, \bar{\bm{u}} = \bm{u} - \bm{u}_f$ \\
+
         $\begin{aligned}
-            Q - K \underbrace{B R^{-1} B^T}_{P} K + KA + A^T K &= 0 
+            \min_{\bar{\bm{u}}} & \int_0^\infty 
+            \bar{\bm{x}}^T Q \bar{\bm{x}} + \bar{\bm{u}}^T R \bar{\bm{u}} \dt 
+            \quad\dot{\bar{\bm{x}}} = A \bar{\bm{x}} + B \bar{\bm{u}};
+        \end{aligned}$ \\
+        Lösung der Riccati-Gleichung für $K \in \mathbb{R}^{2 \times 2}$ \\
+        $\begin{aligned}
+            Q - K B R^{-1} B^T K + KA + A^T K &= 0 
         \end{aligned}$
         };
     \node[draw = rot, below=of c, align=center] (d) {Closed-Loop Regelung:\\
         $\begin{aligned}
-            u^{*} = -R^{-1} B^T K x
+            \bm{u} 
+            = \bm{u}_f + \bar{\bm{u}} 
+            = G(\bm{q}_f) -R^{-1} B^T K (\bm{x} - \bm{x}_f)
         \end{aligned}$
         };
     \node[draw = boxframe, anchor=south, align=left] (e) at ([yshift=-6cm]a.south) {
         Lösung Originalsystem \\
         $\begin{aligned}
-            \tau^{*} &= M_0(q) u^{*} + N_0(q, \dot{q}) \\
-            M_0 &= M(q=0)  \\
-            N_0 &= N(q, \dot{q}) = C_0(q, \dot{q}) \dot{q} + G_0(q)
+            \bm{x}_0 &= \bm{x}(0) \\
+            \bm{u}_i &= G(\bm{q}_f) - R^{-1} B^T K (\bm{x}_i - \bm{x}_f) \\
+            \bm{x}_{i+1} &= \bm{x}_i + h \cdot f(\bm{x}_i, \bm{u}_i)  
         \end{aligned}$
         };
 
     \draw[->, color = boxframe] (a) -- (b);
     \draw[->, color = boxframe] (b) -- (c);
     \draw[->, color = boxframe] (c) -- (d);
-    \draw[->, color = boxframe] (d.west) -- ++(-3.65cm,0cm);
+    \draw[->, color = boxframe] (d.west) -- ++(-2.45cm,0cm);
     \draw[->, color = gruen] (a) -- (e);
 \end{tikzpicture}
 
