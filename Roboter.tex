@@ -1683,38 +1683,6 @@ und schreiben unsere Dynamikgleichung wir folgt um
     }
 \end{align*}
 
-\subsection{Linearisierung des two link revolute manipulators}
-
-Wir definieren  $x_1 = q_1$, $x_2 = q_2$, $x_3 = \dot{q_1}$, $x_4 = \dot{q_2}$  
-und erhalten $\dot{\bm{x}} = f(\bm{x},\bm{u})$ mit
-% Hier f genau definieren
-\begin{align*}
-    \begin{bmatrix}
-        f_1(\bm{x},\bm{u})  \\
-        f_2(\bm{x},\bm{u}) 
-    \end{bmatrix} 
-    =
-    \begin{bmatrix}
-        x_3 \\
-        x_4
-    \end{bmatrix}
-    \quad
-    \begin{bmatrix}
-        f_3(\bm{x},\bm{u}) \\
-        f_4(\bm{x},\bm{u}) 
-    \end{bmatrix}
-    =
-    M(x_1,x_2)^{-1}
-    \left[ 
-        \bm{u} - C(\bm{x}) 
-        \begin{pmatrix} 
-            x_3 \\ 
-            x_4  
-        \end{pmatrix}  
-        - G(x_1, x_2) 
-    \right]
-\end{align*}
-
 Wir linearisieren um den Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$
 % Linearisierung x' = f(x,u) approx f(x*,u*) + df/dx (x-x*) + df/du (u-u*)
 \begin{align*}
@@ -1738,7 +1706,9 @@ Für die Ableitung der Größen gilt
     \bar{\bm{x}}(t) = A \bar{\bm{x}}(t) + B \bar{\bm{u}}(t)
 \end{align*}
 
-Aus der Produktregel folgt für die Ableitung
+Wir definieren 
+$h(\bm{q} , \dot{\bm{q}}, \bm{u}):= \bm{u} - C(\bm{q},\dot{\bm{q}}) \dot{\bm{q}} - G(\bm{q})$.
+und wenden die Produktregel auf den Term $M(\bm{q}) \ddot{\bm{q}}$ an, um die Ableitung von $f$ nach $\bm{x}$ zu bestimmen.
 % D(M q'') = DM q'' + M D(q'') = Dh
 \begin{align*}
     \frac{\partial}{\partial \bm{x}} 
@@ -1749,13 +1719,8 @@ Aus der Produktregel folgt für die Ableitung
     &= 
     \frac{\partial}{\partial \bm{x}} 
     \left[
-    \underbrace{
-        \bm{u} - C(\bm{x}) 
-        \dot{\bm{q}}
-        - G(\bm{q})
-        }_{
-            := h(\bm{x}, \bm{u})
-            }  
+        \vphantom{\int}
+        h(\bm{q}, \dot{\bm{q}}, \bm{u})
     \right]
     \Rightarrow
     \frac{\partial M}{\partial \bm{x}} \ddot{\bm{q}} 
@@ -1764,22 +1729,9 @@ Aus der Produktregel folgt für die Ableitung
     \frac{\partial h}{\partial \bm{x}}
 \end{align*}
 
-Am Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$ gilt 
-% f(x*,u*) = 0 => q'' = q' = 0 => h(x*,u*) = 0
-\begin{align*}
-    \bm{0} 
-    = f(\bm{x}^*, \bm{u}^*)
-    = \begin{bmatrix}
-        \dot{\bm{q}} \\
-        \ddot{\bm{q}}
-    \end{bmatrix}
-    \Rightarrow
-    \ddot{\bm{q}} = \dot{\bm{q}} = \bm{0}
-    \Rightarrow
-    h(\bm{x}^*, \bm{u}^*) = \bm{0}
-\end{align*}
-
-Für die Ableitung von $h$ in $(\bm{x}^*, \bm{u}^*)$ erhalten wir:
+Werten wir $h$ im Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$ aus, 
+so gilt $\ddot{\bm{q}} = \dot{\bm{q}} = \bm{0}$, 
+somit fällt der erste Term weg und wir erhalten
 % Am Gleichgewichtspunkt q'' = 0
 \begin{align*}
     \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
@@ -1790,14 +1742,160 @@ Für die Ableitung von $h$ in $(\bm{x}^*, \bm{u}^*)$ erhalten wir:
     + M(\bm{x}^*) \frac{\partial \ddot{\bm{q}}}{\partial \bm{x}}  
     \Rightarrow
     \frac{\partial \ddot{\bm{q}}}{\partial \bm{x}} 
+    = 
+    M^{-1}(\bm{q}^*) \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
+\end{align*}
+
+Für die Ableitung der Funktion $h = \bm{u} - C(\bm{q}, \dot{\bm{q}}) \dot{\bm{q}} - G(\bm{q})$ in ($\bm{x}^*, \bm{u}^*$) gilt
+% Ableitung von h nach x    
+\begin{align*}
+    \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
     =
-    \frac{\partial}{\partial \bm{x}}
+    \begin{bmatrix}
+        \frac{\partial h}{\partial \bm{q}} & \frac{\partial h}{\partial \dot{\bm{q}}}
+    \end{bmatrix}
+    &=
+    \begin{bmatrix}
+        -\frac{\partial C}{\partial \bm{q}} \dot{\bm{q}} - \frac{\partial G}{\partial \bm{q}} & -C(\bm{q}, \dot{\bm{q}}) - \frac{\partial C}{\partial \dot{\bm{q}}} \dot{\bm{q}} \\
+    \end{bmatrix}
+    (\bm{q}^*, \dot{\bm{q}}^* = \bm{0}) \\
+    &=
+    \begin{bmatrix}
+        -\frac{\partial G}{\partial \bm{q}} & -C(\bm{q}^*, \bm{0})
+    \end{bmatrix}
+\end{align*}
+
+Fassen wir die Ergebnisse zusammen, so gilt für die Ableitung von $f$ nach $\bm{x}$ im Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$
+% Ableitung von f nach x    
+\begin{align*}
+    A(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        \frac{\partial \dot{\bm{q}}}{\partial \bm{q}} 
+        & \frac{\partial \dot{\bm{q}}}{\partial \dot{\bm{q}}} \\[6pt]
+        \frac{\partial \ddot{\bm{q}}}{\partial \bm{q}} 
+        & \frac{\partial \ddot{\bm{q}}}{\partial \dot{\bm{q}}}
+    \end{bmatrix}
+    (\bm{x}^*, \bm{u}^*) 
+    =
+    \begin{bmatrix}
+        0 & I \\
+        M^{-1}(\bm{q}^*) 
+        \left[
+            -\frac{\partial G}{\partial \bm{q}}(\bm{q}^*) 
+        \right]
+        & 
+        M^{-1}(\bm{q}^*) 
+        \left[
+            -C(\bm{q}^*,\bm{0})
+        \right]
+    \end{bmatrix}   
+\end{align*}
+
+Für die Ableitung von $f$ nach $\bm{u}$ gilt
+% Ableitung von f nach u
+\begin{align*}
+    B(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        \frac{\partial \dot{\bm{q}}}{\partial \bm{u}} \\[6pt]
+        \frac{\partial \ddot{\bm{q}}}{\partial \bm{u}}
+    \end{bmatrix}
+    (\bm{x}^*, \bm{u}^*) 
+    =
+    \begin{bmatrix}
+        0 \\[6pt]
+        M^{-1}(\bm{q}^*)
+    \end{bmatrix}
+\end{align*}
+
+% Satz mit den Blockmatrizen
+%----------------------------------------------------------------------------------------------
+\begin{satz}
+    Gegeben sei die Dynamikgleichung
+    %
+    \begin{align*}
+        M(\bm{q}) \ddot{\bm{q}} 
+        + C(\bm{q}, \dot{\bm{q}}) \dot{\bm{q}} 
+        + G(\bm{q}) = \bm{u}
+        \Rightarrow
+        \dot{\bm{x}} = f(\bm{x}, \bm{u})
+    \end{align*}
+    und ein Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$ mit $f(\bm{x}^*, \bm{u}^*) = \bm{0}$. 
+    Dann gilt für die Linearisierung:
+    %
+    \begin{align*}
+        \dot{\bm{x}}
+        &=
+        A(\bm{x}^*, \bm{u}^*) \bm{x} + B(\bm{x}^*, \bm{u}^*) \bm{u} \\
+        &=
+        \begin{bmatrix}
+            0 & I \\
+            M^{-1}(\bm{q}^*) 
+            \left[
+                -\frac{\partial G}{\partial \bm{q}}(\bm{q}^*) 
+            \right]
+            & 
+            M^{-1}(\bm{q}^*) 
+            \left[
+                -C(\bm{q}^*,\bm{0})
+            \right]
+        \end{bmatrix} 
+        \bm{x} +
+        \begin{bmatrix}
+            0 \\[6pt]
+            M^{-1}(\bm{q}^*)
+        \end{bmatrix}
+        \bm{u}
+    \end{align*}
+\end{satz}
+% (M^-1 h)_1 = (M^-1)_{11} h_1 + (M^{-1})_{12} h_2
+% (M^-1 h)_2 = (M^{-1})_{21} h_1 + (M^{-1})_{22} h_2
+
+\subsection{Linearisierung des two link revolute manipulators}
+
+Wir definieren  $x_1 = q_1$, $x_2 = q_2$, $x_3 = \dot{q_1}$, $x_4 = \dot{q_2}$  
+und erhalten $\dot{\bm{x}} = f(\bm{x},\bm{u})$ mit
+% Hier f genau definieren
+\begin{align*}
+    \begin{bmatrix}
+        f_1(\bm{x},\bm{u})  \\
+        f_2(\bm{x},\bm{u}) 
+    \end{bmatrix} 
+    =
+    \begin{bmatrix}
+        \dot{q}_1 \\
+        \dot{q}_2
+    \end{bmatrix}
+    \quad
     \begin{bmatrix}
         f_3(\bm{x},\bm{u}) \\
         f_4(\bm{x},\bm{u}) 
     \end{bmatrix}
-    = 
-    M^{-1}(\bm{x}^*) \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
+    =
+    M(\bm{q})^{-1}
+    \left[ 
+        \bm{u} - C(\bm{x}) 
+        \dot{\bm{q}}
+        - G(\bm{q}) 
+    \right]
+\end{align*}
+
+Für die Corioliskraft im Punkt $(\bm{x}^*,\bm{u}^*)$, 
+bzw. für die Matrix $C(\bm{q}, \dot{\bm{q}}= \bm{0})$ gilt:
+%
+\begin{align*}
+    C(\bm{q}^*, \bm{0}) 
+    =
+    \begin{bmatrix}
+        0 & -m_2 l_1 a_2 \sin(q_2^*) \cdot 0 \\
+        m_2 l_1 a_2 \sin(q_2^*) \cdot 0 & 0
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        0 & 0 \\
+        0 & 0
+    \end{bmatrix}
 \end{align*}
 
 Wir berechnen zunächst die Ableitung von $h$ bzgl. $\bm{x}$ im Punkt $(\bm{x}^*, \bm{u}^*)$ 
@@ -1808,24 +1906,17 @@ und erhalten
     \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
     &=
     \begin{bmatrix}
-        \frac{\partial h_1}{\partial x_1} 
-        & \frac{\partial h_2}{\partial x_1} 
-         \\
-        \frac{\partial h_1}{\partial x_2} 
-        & \frac{\partial h_2}{\partial x_2} \\
-        \frac{\partial h_1}{\partial x_3} 
-        & \frac{\partial h_2}{\partial x_3} \\
-        \frac{\partial h_1}{\partial x_4} 
-        & \frac{\partial h_2}{\partial x_4}
+        - \frac{\partial G}{\partial \bm{q}} & - \underbrace{C(\bm{q}^*, \bm{0})}_{= \bm{0}}
     \end{bmatrix}
     =
     \begin{bmatrix}
-        \frac{\partial G_1}{\partial q_1} & \frac{\partial G_2}{\partial q_1} \\
-        \frac{\partial G_1}{\partial q_2} & \frac{\partial G_2}{\partial q_2} \\
-        -C_{11} & -C_{12} \\
-        -C_{21} & -C_{22}
+        - \frac{\partial G_1}{\partial q_1}(\bm{q}^*) 
+        & - \frac{\partial G_1}{\partial q_2}(\bm{q}^*) 
+        & 0 & 0 \\
+        - \frac{\partial G_2}{\partial q_1}(\bm{q}^*) 
+        & - \frac{\partial G_2}{\partial q_2}(\bm{q}^*) 
+        & 0 & 0
     \end{bmatrix}
-    (\bm{x}^*, \bm{u}^*)
 \end{align*}
 
 Für die konkrete Matrix $A = f_{\bm{x}}(\bm{x}^*, \bm{u}^*)$ gilt
@@ -1835,190 +1926,156 @@ Für die konkrete Matrix $A = f_{\bm{x}}(\bm{x}^*, \bm{u}^*)$ gilt
     &=
     \begin{bmatrix}
         \frac{\partial f_1}{\partial x_1}  
-        & \frac{\partial f_2}{\partial x_1}  
-        & \frac{\partial f_3}{\partial x_1}  
-        & \frac{\partial f_4}{\partial x_1} 
-        \\ \frac{\partial f_1}{\partial x_2} 
+        & \frac{\partial f_1}{\partial x_2}  
+        & \frac{\partial f_1}{\partial x_3}  
+        & \frac{\partial f_1}{\partial x_4} 
+        \\ \frac{\partial f_2}{\partial x_1} 
         & \frac{\partial f_2}{\partial x_2} 
-        & \frac{\partial f_3}{\partial x_2} 
-        & \frac{\partial f_4}{\partial x_2} 
-        \\ \frac{\partial f_1}{\partial x_3} 
         & \frac{\partial f_2}{\partial x_3} 
-        & \frac{\partial f_3}{\partial x_3} 
-        & \frac{\partial f_4}{\partial x_3} 
-        \\ \frac{\partial f_1}{\partial x_4} 
         & \frac{\partial f_2}{\partial x_4} 
+        \\ \frac{\partial f_3}{\partial x_1} 
+        & \frac{\partial f_3}{\partial x_2} 
+        & \frac{\partial f_3}{\partial x_3} 
+        & \frac{\partial f_3}{\partial x_4} 
+        \\ \frac{\partial f_4}{\partial x_1} 
+        & \frac{\partial f_4}{\partial x_2} 
         & \frac{\partial f_4}{\partial x_3} 
         & \frac{\partial f_4}{\partial x_4}
-    \end{bmatrix}(\bm{x}^*, \bm{u}^*) \\
-    &=  
+    \end{bmatrix}(\bm{x}^*, \bm{u}^*) 
+    =  
     \begin{bmatrix}
-        \frac{\partial \dot{q}_1}{\partial q_1}
-        & \frac{\partial \dot{q}_1}{\partial q_2}
-        & \frac{\partial \dot{q}_1}{\partial \dot{q_1}}
-        & \frac{\partial \dot{q}_1}{\partial \dot{q_2}}
-        \\
-        \frac{\partial \dot{q}_2}{\partial q_1}
-        & \frac{\partial \dot{q}_2}{\partial q_2}
-        & \frac{\partial \dot{q}_2}{\partial \dot{q _1}}
-        & \frac{\partial \dot{q}_2}{\partial \dot{q_2}}
-        \\
-        \frac{(M^-1)_{11} h_1 + (M^{-1})_{12} h_2}{\partial q_1}
-        & \frac{(M^-1)_{11} h_1 + (M^{-1})_{12} h_2}{\partial q_2}
-        & \frac{(M^-1)_{11} h_1 + (M^{-1})_{12} h_2}{\partial \dot{q_1}}
-        & \frac{(M^-1)_{11} h_1 + (M^{-1})_{12} h_2}{\partial \dot{q_2}}
-        \\
-        \frac{(M^{-1})_{21} h_1 + (M^{-1})_{22} h_2}{\partial q_1}
-        & \frac{(M^{-1})_{21} h_1 + (M^{-1})_{22} h_2}{\partial q_2}
-        & \frac{(M^{-1})_{21} h_1 + (M^{-1})_{22} h_2}{\partial \dot{q_1}}
-        & \frac{(M^{-1})_{21} h_1 + (M^{-1})_{22} h_2}{\partial \dot{q_2}}
-    \end{bmatrix}
-    (\bm{x}^*, \bm{u}^*) \\
-    &=
-    \begin{bmatrix}
-        0 & 0 & 1 & 0 \\
-        0 & 0 & 0 & 1 \\
-        * & * & * & * \\
-        * & * & * & *
+        \begin{matrix}
+            0 & 0 \\
+            0 & 0
+        \end{matrix}
+        &
+        \begin{matrix}
+            1 & 0 \\
+            0 & 1
+        \end{matrix}
+        \\[12pt]
+        - M^{-1}(\bm{q}^*) \frac{\partial G}{\partial \bm{q}}(\bm{q}^*)
+        &
+        \begin{matrix}
+            0 & 0 \\
+            0 & 0
+        \end{matrix}
     \end{bmatrix}
 \end{align*}
 
-% Satz mit den Blockmatrizen
-%----------------------------------------------------------------------------------------------
-\begin{satz}
-    Wir erhalten die Struktur der Ableitungen konkret fest:
-    \begin{align*}
-        A &=
-        \begin{bmatrix}
-            0 & 1 \\
-            M^{-1} \left( -\frac{\partial G}{\partial \bm{q}} \right) & 0
-        \end{bmatrix}, \quad
-        B =
-        \begin{bmatrix}
-            0 \\
-            M^{-1}
-        \end{bmatrix},
-        \quad
-        h_{\bm{x}} =
-        \begin{bmatrix}
-        - \frac{\partial C}{\partial \bm{q}} \dot{\bm{q}} - \frac{\partial G}{\partial \bm{q}}
-        \\
-        - C(\bm{x}^*) - \frac{\partial C}{\partial \dot{\bm{q}}} \dot{\bm{q}}
-        \end{bmatrix}
-        =
-        \begin{bmatrix}
-            - \frac{\partial G}{\partial \bm{q}}(\bm{x}^*)
-            \\
-            - C(\bm{x}^*)
-        \end{bmatrix}
-    \end{align*}
-    da $\dot{\bm{q}} = \bm{0}$
-\end{satz}
-% (M^-1 h)_1 = (M^-1)_{11} h_1 + (M^{-1})_{12} h_2
-% (M^-1 h)_2 = (M^{-1})_{21} h_1 + (M^{-1})_{22} h_2
-
-% Hier konkrete Ableitungen der Dynamik um A unf B zu erhalten. 
-% Dazu müssen wir die konkreten Dynamik in jeder Komponente aufschreiben.
-%----------------------------------------------------------------------------------------------
-
+Für die konkrete Matrix $B = f_{\bm{u}}(\bm{x}^*, \bm{u}^*)$ gilt
+% Matrix B
 \begin{align*}
-    \begin{pmatrix}
-        m_1 a_1^2 + I_1 + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{x_{2}}) ) + I_2 
-        &  m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{x_{2}})) + I_2 \\
-        m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{x_{2}})) + I_2	
-        & m_2 a_2^2 + I_2
-    \end{pmatrix}
-    \cdot
-    \begin{pmatrix}
-        \gruen{x_3}' \\
-        \dunkelrot{x_4}'
-    \end{pmatrix}
+    B(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        \frac{\partial f_1}{\partial u_1}  
+        & \frac{\partial f_1}{\partial u_2}  
+        \\ \frac{\partial f_2}{\partial u_1} 
+        & \frac{\partial f_2}{\partial u_2} 
+        \\ \frac{\partial f_3}{\partial u_1} 
+        & \frac{\partial f_3}{\partial u_2} 
+        \\ \frac{\partial f_4}{\partial u_1} 
+        & \frac{\partial f_4}{\partial u_2} 
+    \end{bmatrix}(\bm{x}^*, \bm{u}^*) 
+    =  
+    \begin{bmatrix}
+        \begin{matrix}
+            0 & 0 \\
+            0 & 0
+        \end{matrix}
+        \\[12pt]
+        M^{-1}(\bm{q}^*)
+    \end{bmatrix}   
 \end{align*}
 
+Für die konkret Berechnung der partiellen Ableitungen der Gravitationskraft gilt
+% Ableitung der Gravitationskraft
 \begin{align*}
-    C \cdot \theta'(t)
-    &=
-    \begin{pmatrix}
-        -2m_2 l_1 a_2 \sin(\dunkelrot{x_2}) \dunkelrot{x_4} 
-        &
-        - m_2 l_1 a_2 \sin(\dunkelrot{x_2}) \dunkelrot{x_4} 
-        \\
-        m_2 l_1 a_2 \sin(\dunkelrot{x_2})\gruen{x_3}
-        &
-        0
-    \end{pmatrix}
-    \begin{pmatrix}
-        \gruen{x_3} \\
-        \dunkelrot{x_4} 
-    \end{pmatrix}
+    G(\bm{q}) &=
+    \begin{bmatrix}
+        m_1  g  a_1 \cos(\gruen{q_1}) + m_2  g \left( l_1 \cos(\gruen{q_1}) 
+        + a_2 \cos(\gruen{q_1} + \dunkelrot{q_2}) \right) \\
+        m_2  g \left( l_1 \cos(\gruen{q_1}) + a_2 \cos(\gruen{q_1} + \dunkelrot{q_2}) \right)
+    \end{bmatrix}
     \\
-    &= 
-    \begin{pmatrix}
-        -2m_2 l_1 a_2 \sin(\dunkelrot{x_2}) \dunkelrot{x_4} \gruen{x_3} 
-        - m_2 l_1 a_2 \sin(\dunkelrot{x_2}) \dunkelrot{x_4}^2 \\
-        m_2 l_1 a_2 \sin(\dunkelrot{x_2})\gruen{x_3}^2
-    \end{pmatrix}
+    \frac{\partial G}{\partial \bm{q}}
+    &=
+    \begin{bmatrix}
+        \frac{\partial G_1}{\partial q_1}
+        & \frac{\partial G_1}{\partial q_2} \\
+        \frac{\partial G_2}{\partial q_1}
+        & \frac{\partial G_2}{\partial q_2}
+    \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+        - m_1 g a_1 \sin(\gruen{q_1}) 
+        - m_2 g \left( l_1 \sin(\gruen{q_1}) + a_2 \sin(\gruen{q_1} + \dunkelrot{q_2}) \right)
+        & - m_2 g a_2 \sin(\gruen{q_1} + \dunkelrot{q_2}) \\
+        - m_2 g \left( l_1 \sin(\gruen{q_1}) + a_2 \sin(\gruen{q_1} + \dunkelrot{q_2}) \right)
+        & - m_2 g a_2 \sin(\gruen{q_1} + \dunkelrot{q_2})
+    \end{bmatrix}
 \end{align*}
 
-
+Die Massenmatrix $M(\bm{q})$ ist gegeben durch den Ausdruck:
+% Massenmatrix M^-1
 \begin{align*}
-    G(x_1,x_2) &=
-    \begin{pmatrix}
-        m_1  g  a_1 \cos(\gruen{x_1}) + m_2  g \left( l_1 \cos(\gruen{x_1}) 
-        + a_2 \cos(\gruen{x_1} + \dunkelrot{x_2}) \right) \\
-        m_2  g \left( l_1 \cos(\gruen{x_1}) + a_2 \cos(\gruen{x_1} 
-        + \dunkelrot{x_2}) \right)
-    \end{pmatrix}
+    M(\bm{q})
+    =
+    \begin{bmatrix}
+        m_1 a_1^2 + I_{1,zz} + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{q_{2}}) ) + I_{2,zz}
+        &  m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{q_{2}})) + I_{2,zz} \\
+        m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{q_{2}})) + I_{2,zz}
+        & m_2 a_2^2 + I_{2,zz}
+    \end{bmatrix}
 \end{align*}
 
 
-
-
-Für die Inverse der Massenmatrix gilt analytisch 
-mittels $F_{\dunkelrot{x_2}} := m_2 l_1 a_2 \cos(\dunkelrot{x_{2}})$
+Für die Inverse der Massenmatrix $M^{-1}$ gilt analytisch 
+mittels $F_{\dunkelrot{q_2}} := m_2 l_1 a_2 \cos(\dunkelrot{q_{2}})$
 
 \begin{align*}
     \det(M) &= M_{11} M_{22} - M_{12}^2 \\
-            &= \left[ m_1 a_1^2 + I_1 + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  
-            \cos(\dunkelrot{x_{2}}) ) + I_2 \right]
-             \cdot (m_2 a_2^2 + I_2) \\
-            &\quad - (m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{x_{2}})) + I_2)^2 \\
+            &= \left[ m_1 a_1^2 + I_{1,zz} + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  
+            \cos(\dunkelrot{q_{2}}) ) + I_{2,zz} \right]
+             \cdot (m_2 a_2^2 + I_{2,zz}) \\
+            &\quad - (m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{q_{2}})) + I_{2,zz})^2 \\
             &= 
             \left[
-            m_1 a_1^2 + I_1 + I_2 + m_2 l_1^2 +m_2 a_2^2 + 
+            m_1 a_1^2 + I_{1,zz} + I_{2,zz} + m_2 l_1^2 +m_2 a_2^2 + 
             2 \underbrace{m_2 l_1 a_2  
-            \cos(\dunkelrot{x_{2}})}_{F_{\dunkelrot{x_2}}} 
+            \cos(\dunkelrot{q_{2}})}_{F_{\dunkelrot{q_{2}}}} 
             \right] 
-            (m_2 a_2^2 + I_2) \\ 
+            (m_2 a_2^2 + I_{2,zz}) \\ 
             &\quad
-            - (m_2 a_2^2 + I_2)^2
-            - 2 \underbrace{m_2 l_1 a_2 \cos(\dunkelrot{x_{2}})}_{F_{\dunkelrot{x_2}}}
-            \cdot (m_2 a_2^2 + I_2)
-            - F_{\dunkelrot{x_2}}^2 \\
+            - (m_2 a_2^2 + I_{2,zz})^2
+            - 2 \underbrace{m_2 l_1 a_2 \cos(\dunkelrot{q_{2}})}_{F_{\dunkelrot{q_{2}}}}
+            \cdot (m_2 a_2^2 + I_{2,zz})
+            - F_{\dunkelrot{q_{2}}}^2 \\
             &= 
-            (m_2 a_2^2 + I_2) \cdot 
+            (m_2 a_2^2 + I_{2,zz}) \cdot 
             \left[
-                m_1 a_1^2 + I_1 + m_2 l_1^2 +
-                \underbrace{I_2  + m_2 a_2^2 - m_2 a_2^2 - I_2}_{= 0}
+                m_1 a_1^2 + I_{1,zz} + m_2 l_1^2 +
+                \underbrace{I_{2,zz}  + m_2 a_2^2 - m_2 a_2^2 - I_{2,zz}}_{= 0}
             \right]
             - \underbrace{
-                (m_2 l_1 a_2 )^2 (1- \sin(\dunkelrot{x_2})^2)
-                }_{F_{\dunkelrot{x_2}}^2}
+                (m_2 l_1 a_2 )^2 (1- \sin(\dunkelrot{q_{2}})^2)
+                }_{F_{\dunkelrot{q_{2}}}^2}
             \\
             &= 
-            (m_2 a_2^2 + I_2) \cdot (m_1 a_1^2 + I_1 + m_2 l_1^2)
-            - (m_2 l_1 a_2 )^2 + (m_2 l_1 a_2 )^2 \sin(\dunkelrot{x_2})^2
+            (m_2 a_2^2 + I_{2,zz}) \cdot (m_1 a_1^2 + I_1 + m_2 l_1^2)
+            - (m_2 l_1 a_2 )^2 + (m_2 l_1 a_2 )^2 \sin(\dunkelrot{q_{2}})^2
             \\
-            &= (m_2 a_2^2 + I_2) \cdot (m_1 a_1^2 + I_1) 
+            &= (m_2 a_2^2 + I_{2,zz}) \cdot (m_1 a_1^2 + I_1) 
             + \underbrace{
-                (m_2 a_2^2 + I_2) \cdot m_2 l_1^2
-            }_{m_2^2 l_1^2 a_2^2+ m_2 l_1^2 I_2}
-            - (m_2 l_1 a_2 )^2 + (m_2 l_1 a_2 )^2 \sin(\dunkelrot{x_2})^2
+                (m_2 a_2^2 + I_{2,zz}) \cdot m_2 l_1^2
+            }_{m_2^2 l_1^2 a_2^2+ m_2 l_1^2 I_{2,zz}}
+            - (m_2 l_1 a_2 )^2 + (m_2 l_1 a_2 )^2 \sin(\dunkelrot{q_{2}})^2
             \\
             &= (m_1 a_1^2 + I_1 + m_2 l_1^2)
             \cdot (m_2 a_2^2 + I_2) 
-            + m_2 l_1^2 I_2
-            + m_2^2 l_1^2 a_2^2  \sin(\dunkelrot{x_2})^2
+            + m_2 l_1^2 I_{2,zz}
+            + m_2^2 l_1^2 a_2^2  \sin(\dunkelrot{q_{2}})^2
 \end{align*}
 
 Für die Inverse der Massenmatrix gilt somit
@@ -2044,36 +2101,14 @@ Für die Inverse der Massenmatrix gilt somit
 %----------------------------------------------------------------------------------------------
 
 
-\begin{satz}
-    Die Lösung des optimalen Steuerungsproblem:
-    \begin{align*}
-        \min_u \int_0^{\infty} x^T Q x + u^T R u \dt 
-        \quad 
-        \dot{x} = 
-        \underbrace{\begin{pmatrix} 0 & I \\ 0 & 0 \end{pmatrix}}_{A} x 
-        + \underbrace{\begin{pmatrix} 0 \\ I \end{pmatrix}}_{B} u
-    \end{align*}
-    ist gegeben durch
-    %
-    \begin{align*}
-        u^{*} = -R^{-1} B^T K x  \quad \text{mit} \quad Q - KPK + KA + A^T K = 0
-    \end{align*}
-
-    und für die Momente gilt 
-    %
-    \begin{align*}
-        \tau^{*} = M_0(q) u^{*} + N_0(q, \dot{q}) = -M_0(q) R^{-1} B^T K x + N_0(q, \dot{q})
-    \end{align*}
-\end{satz}
-
 
 \usetikzlibrary{positioning}
 \begin{tikzpicture}[>=latex]
     \node[draw= boxframe,anchor = north west ,align=left] (a) at (-2,0) {
         Ursprungsproblem:\\
         $\begin{aligned}
-            \min_u & \int_0^\infty q^T Q q + \tau^T R \tau \\
-            	ext{s.t. } & M(q) \ddot{q} + C(q,\dot{q}) \dot{q} + G(q) = \tau;
+            \min_u & \int_0^\infty \bm{q}^T Q \bm{q} + \bm{u}^T R \bm{u} \\
+            	\textsf{s.t. } & M(\bm{q}) \ddot{\bm{q}} + C(\bm{q},\dot{\bm{q}}) \dot{\bm{q}} + G(\bm{q}) = \bm{u};
         \end{aligned}$
     };
     \node[draw = rot, anchor = north west, align=left] (b) at ([xshift=1cm]a.north east) {
@@ -2113,176 +2148,6 @@ Für die Inverse der Massenmatrix gilt somit
     \draw[->, color = boxframe] (d.west) -- ++(-3.65cm,0cm);
     \draw[->, color = gruen] (a) -- (e);
 \end{tikzpicture}
-
-\proof{
-    Für die Value Funktion erhalten wir 
-    %
-    \begin{align*}
-        \frac{\mathrm{d}}{\dt} V(x(t)) &= 
-        \underbrace{\nabla V(x)}_{2K x(t)} 
-        \cdot 
-        \underbrace{x'(t)}_{Ax(t) + Bu(t)} \\
-        &= 2 x(t)^T K 
-        \left[ 
-            Ax(t) + B \underbrace{ - R^{-1} B^T K x(t)}_{u(t)} 
-        \right] \\
-        &= x(t)^T 
-        \left[ 
-            \underbrace{K A + A^T K - 2 K B R^{-1} B^T K}_{-Q - K B R^{-1} B^T K} 
-        \right] 
-        x(t) \\
-        &= - x(t)^T Q x(t) - \underbrace{x(t)^T K B}_{x(t)^T K B R^{-1} R} \underbrace{R^{-1} B^T K x(t)}_{-u^*(t)} \\
-        &= - x(t)^T Q x(t) - \underbrace{x(t)^T K B R^{-1} R}_{u^{*}(t)^T R} u^*(t) \\
-        &= - x(t)^T Q x(t) - u^{*}(t)^T R u^{*}(t)
-    \end{align*}
-
-    Wir erhalten somit $\frac{\mathrm{d}}{\dt} V(x(t)) \leq 0$ mit Gleichheit genau dann wenn $x(t) = u^{*}(t) = 0$. 
-    Damit ist die Value Funktion $V(x(t))$ streng monoton fallend und 
-    somit ist das optimale Steuerungssignal $u^{*}(t)$ stabil.
-
-    Verwenden wir die Value Funktion auf die reale Dynamik, so gilt
-
-    \begin{align*}
-        \frac{\mathrm{d}}{\dt} V(x(t)) 
-        &= \nabla V(x) \cdot x'(t) \\
-        &= 2 x(t)^T K 
-        \left[ 
-            Ax(t) + B u^{*}(t) + \begin{pmatrix} 0 \\ h(x(t)) u^{*}(t) + f(x(t)) \end{pmatrix}
-        \right] \\
-        &= 2 x(t)^T K 
-        \left[ 
-            Ax(t) + B u^{*}(t) + B h(x(t)) u^{*}(t) + B f(x(t))
-        \right] \\
-        &= \underbrace{ 2 x(t)^T K (Ax+Bu^{*})}_{(1)} + \underbrace{2 x(t)^T K B (h(x) u^{*} + f(x))}_{(2)}
-    \end{align*}
-
-    wobei wir $B = \begin{pmatrix} 0 \\ I_2 \end{pmatrix}$ verwendet haben. 
-    Aus $u^* = -R^{-1} B^T K x(t)$ folgt $B^T K x(t) = -R u^{*}$ und wir erhalten für $(2)$
-
-    \begin{align*}
-        2 x(t)^T K B (h(x) u^{*} + f(x)) 
-        &= 2 \left[\underbrace{B^T K x(t)}_{-R u^{*}} \right]^T (h(x) u^{*} + f(x)) \\
-        &= -2 (u^{*})^T R (h(x) u^{*} + f(x)) \\
-        &= -2 (u^{*})^T R h(x) u^{*} - 2 (u^{*})^T R f(x)
-    \end{align*}
-
-    Für $h$ positiv definit gilt:
-    \begin{align*}
-        -(u^{*})^T R h(x) u^{*} \leq 0
-    \end{align*}
-
-    Für jedes $\epsilon > 0$ gilt:
-    \begin{align*}
-        -2 (u^{*})^T R f(x) 
-        &\leq 2 \|u^{*}\| \|R\| \|f(x)\| \\
-        &\leq \epsilon \|u^{*}\|^2 + \frac{1}{\epsilon} \|R\|^2 \|f(x)\|^2 \\
-        &= \epsilon (u^{*})^T u^{*} + \frac{1}{\epsilon} \|R\|^2 \|f(x)\|^2 \\
-        &\leq \epsilon (u^{*})^T R u^{*} + \frac{1}{\epsilon} \|R\|^2 \|f(x)\|^2
-    \end{align*}
-
-    Wir wählen als Schranke $f^T R f \leq x^T P x$
-}
-
-\subsection{Beispiel von Lin}
-
-\begin{align*}
-    & m_1 = 13.86 \approx \mathrm{oz}, \quad m_2 = 3.33 \approx \mathrm{oz}, \\
-& r_1 = 6.12 \approx \mathrm{in}, \quad r_2 = 3.22 \approx \mathrm{in}, \\
-& l_1 = 8 \approx \mathrm{in}, \quad l_2 = 6 \approx \mathrm{in}, \\
-& J_1 = 62.39 \approx \mathrm{oz\cdot in/rad/s^2}, 
-\quad J_2 = 16.70 \approx \mathrm{oz\cdot in/rad/s^2}, \\
-& m_L = 10\,\varepsilon \approx \mathrm{oz}, \quad J_L = 60\,\varepsilon^2 \approx \mathrm{oz\cdot in/rad/s^2}, \quad \varepsilon=1.
-\end{align*}
-
-Umrechnung in SI 
-
-\begin{align*}
-    1\mathrm{oz} = 0.0283495\mathrm{kg}, \quad
-    1\mathrm{in} = 0.0254\mathrm{m}, \quad
-    1\mathrm{oz\cdot in/rad/s^2} = 7.06155\times 10^{-3}\mathrm{kg\cdot m^2}.
-\end{align*}
-
-\begin{align*}
-    & m_1 = 13.86\cdot 0.0283495 \approx 0.3929~\mathrm{kg}, \qquad
-    m_2 = 3.33\cdot 0.0283495 \approx 0.0944~\mathrm{kg}, \\
-    & r_1 = 6.12\cdot 0.0254 \approx 0.1554~\mathrm{m}, \qquad
-    r_2 = 3.22\cdot 0.0254 \approx 0.0818~\mathrm{m}, \\
-    & l_1 = 8\cdot 0.0254 = 0.2032~\mathrm{m}, \qquad
-    l_2 = 6\cdot 0.0254 = 0.1524~\mathrm{m}, \\
-    & J_1 = 62.39\cdot 7.06155\times 10^{-3} \approx 0.4400~\mathrm{kg\cdot m^2}, \\
-    & J_2 = 16.70\cdot 7.06155\times 10^{-3} \approx 0.1181~\mathrm{kg\cdot m^2}, \\
-    & m_L = 10\cdot 0.0283495 = 0.2835~\mathrm{kg}, \qquad
-    J_L = 60\cdot 7.06155\times 10^{-3} \approx 0.4237~\mathrm{kg\cdot m^2}.
-\end{align*}
-
-
-% Formeln für a,b,c (2R-Planar mit Payload am Endeffektor)
-
-\begin{align*}
-    a &= J_1 + J_2 + m_1 r_1^2 + m_2\!\left(l_1^2 + r_2^2\right) + m_L\!\left(l_1^2 + l_2^2\right) + J_L,\\
-b &= m_2\, l_1\, r_2 + m_L\, l_1\, l_2,\\
-c &= J_2 + m_2 r_2^2 + m_L\, l_2^2 + J_L.
-\end{align*}
-
-% Numerische Werte für a,b,c in SI
-
-\begin{align*}
-    a &\approx 1.0145~\mathrm{kg\cdot m^2},\\
-b &\approx 0.01035~\mathrm{kg\cdot m^2},\\
-c &\approx 0.5488~\mathrm{kg\cdot m^2}.
-\end{align*}
-
-
-% Nominale Massmatrix M_0(q) in SI
-
-\begin{align*}
-    M_0(q) =
-    \begin{pmatrix}
-        a + 2b\,\cos q_2 & c + b\,\cos q_2 \\
-        c + b\,\cos q_2 & c
-    \end{pmatrix}
-    =
-    \begin{pmatrix}
-        1.0145 + 2\cdot 0.01035\,\cos q_2 & 0.5488 + 0.01035\,\cos q_2 \\
-        0.5488 + 0.01035\,\cos q_2 & 0.5488
-    \end{pmatrix}
-\end{align*}
-
-% Vergleich in der "Papier"-Skalierung (ohne SI-Umrechnung der Summanden)
-% (= direkte Einsetzung der imperialen Zahlen in die gleichen Formeln)
-
-\begin{align*}
-    a_{\text{paper}} &\approx 846.4 + 1000 + 60 \;=\; 1906.4,\\
-    b_{\text{paper}} &\approx 85.6 + 480 \;=\; 565.6,\\
-    c_{\text{paper}} &\approx 51.2 + 360 + 60 \;=\; 471.2.
-\end{align*}
-
-
-\begin{align*}
-    M_0(q)\_{\text{paper}} \approx
-    \begin{pmatrix}
-        1906 + 2\cdot 565.6\,\cos q_2 & 471 + 565.6\,\cos q_2 \\
-        471 + 565.6\,\cos q_2 & 471
-    \end{pmatrix}
-    =
-    \begin{pmatrix}
-        1906 + 1131.2\,\cos q_2 & 471 + 565.6\,\cos q_2 \\
-        471 + 565.6\,\cos q_2 & 471
-    \end{pmatrix}.
-\end{align*}
-
-
-% Abgleich mit der im Text zitierten Form und Hinweis auf Tippfehler
-
-\begin{align*}
-    \text{Im Text zitiert:}\quad
-    M_0(q) =
-    \begin{pmatrix}
-        1906 + 1132\,\cos q_2 & 471 + \color{red}{86}\,\cos q_2 \\
-        471 + \color{red}{86}\,\cos q_2 & 471
-    \end{pmatrix}.
-\end{align*}
-
 
 
 \end{document}

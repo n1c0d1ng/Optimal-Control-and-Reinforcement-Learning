@@ -17,6 +17,5 @@
 \contentsline {subsection}{\numberline {3.2}Riccati Regler}{17}{subsection.3.2}%
 \contentsline {subsubsection}{\numberline {3.2.1}Implementierung}{18}{subsubsection.3.2.1}%
 \contentsline {section}{\numberline {4}Linearisierung der Dynamik}{19}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Linearisierung des two link revolute manipulators}{19}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Beispiel von Lin}{23}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.1}Linearisierung des two link revolute manipulators}{20}{subsection.4.1}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
