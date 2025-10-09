@@ -1,5 +1,7 @@
 % !TeX root = Roboter.tex
 \input{header_light_mode}
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{references.bib}
 \usepackage{listings}
 \definecolor{codebg}{rgb}{0.92,0.92,0.92}
 \definecolor{keywordcolor}{rgb}{0.2,0.2,0.7}
@@ -74,7 +76,7 @@
 \raggedbottom
 
 \section{Modellierung eines Roboters}
-
+ Wir halten uns an \cite{spong2004} und \cite{siciliano2010}
 % Herleitung der ELE aus Newton
 \begin{align*}
     \underbrace{f - mg}_{\textsf{Kräftebilanz}} 
@@ -141,7 +143,7 @@ Für die Geschwindigkeiten gilt mittels der Kettenregel:
     \textbf{v} = J_v(\textbf{q}) \dot{\textbf{q}} \quad \text{und} \quad
     \boldsymbol{\omega} = J_\omega(\textbf{q}) \dot{\textbf{q}}
     \quad
-    J_v = \frac{\partial \textbf{x}}{\partial \textbf{q}} 
+    J_v = \frac{\partial \textbf{r}}{\partial \textbf{q}} 
     \quad \text{und} \quad  
     J_\omega = \frac{\partial \boldsymbol{\omega}}{\partial \dot{\textbf{q}}}
 \end{align*}
@@ -1010,77 +1012,40 @@ und erhalten für die Jacobi-Matrix bezüglich der Winkelgeschwindigkeit:
     \end{pmatrix}
 \end{align*}
 
-\newpage
 
-% Systemparameter
-\newcommand{\mG}{m_G}
-
-% Aktualisierte Parameter für Link 2 mit Greifobjekt
-\newcommand{\mtwoPrime}{m_2'}
-\newcommand{\atwoPrime}{a_2'}
-\newcommand{\ItwozzPrime}{I_{2,zz}''}
-
-\begin{align*}
-    % Massenmatrix
-    M(\theta) &= \begin{pmatrix}
-        M_{11} & M_{12} \\
-        M_{21} & M_{22}
-    \end{pmatrix} \\
-    M_{11} &= m_1 a_1^2 + I_{1,zz} + \mtwoPrime\left(L_1^2 + \atwoPrime^2 + 2L_1 \atwoPrime \cos\theta_2\right) + \ItwozzPrime \\
-    M_{12} &= M_{21} = \mtwoPrime\left(\atwoPrime^2 + L_1 \atwoPrime \cos\theta_2\right) + \ItwozzPrime \\
-    M_{22} &= \mtwoPrime \atwoPrime^2 + \ItwozzPrime
-\end{align*}
-
-\begin{align*}
-    % Coriolis- und Zentrifugalmatrix
-    C(\theta, \dot{\theta}) &= \begin{pmatrix}
-        C_{11} & C_{12} \\
-        C_{21} & C_{22}
-    \end{pmatrix} \\
-    C_{11} &= -\mtwoPrime L_1 \atwoPrime \sin\theta_2 \cdot \dot{\theta}_2 \\
-    C_{12} &= -\mtwoPrime L_1 \atwoPrime \sin\theta_2 \cdot (\dot{\theta}_1 + \dot{\theta}_2) \\
-    C_{21} &= \mtwoPrime L_1 \atwoPrime \sin\theta_2 \cdot \dot{\theta}_1 \\
-    C_{22} &= -\mtwoPrime L_1 \atwoPrime \sin\theta_2 \cdot \dot{\theta}_1
-\end{align*}
-
-\begin{align*}
-    % Gravitationsterm
-    G(\theta) &= \begin{pmatrix}
-        G_1 \\
-        G_2
-    \end{pmatrix} \\
-    G_1 &= m_1 g a_1 \cos\theta_1 + \mtwoPrime g \left(L_1 \cos\theta_1 + \atwoPrime \cos(\theta_1 + \theta_2)\right) \\
-    G_2 &= \mtwoPrime g \atwoPrime \cos(\theta_1 + \theta_2)
-\end{align*}
-
-% Dynamikgleichung
-\begin{equation*}
-    M(\theta)\ddot{\theta} + C(\theta, \dot{\theta}) + G(\theta) = \tau
-\end{equation*}
-
-% Aktualisierte Parameter
-\begin{align*}
-    \mtwoPrime &= m_2 + \mG \\
-    \atwoPrime &= L_2 \cdot \frac{m_2/2 + \mG}{m_2 + \mG} \\
-    \ItwozzPrime &= \frac{1}{12}m_2 L_2^2 + \frac{m_2 \mG L_2^2}{4(m_2 + \mG)}
-\end{align*}
-
-\begin{tabular}{c c c}
-    Parameter & Ohne Greifobjekt & Mit Greifobjekt \\
-    \hline
-    Masse Link 2 & $m_2$ & $m_{2}' = m_2 + m_G$ \\
-    Schwerpunkt Link 2 
-    & $a_2 = \frac{L_2}{2}$ 
-    & $a_{2}' = \frac{L_2}{m_2 + m_G} \left(\frac{m_2}{2} + m_G\right)$ \\
-    Trägheitstensor Link 2 
-    & $I_{2,zz} = \frac{1}{12} m_2 L_2^2$ 
-    & $I_{2,zz}' = \frac{1}{12}m_2 L_2^2 + \frac{m_2 m_G L_2^2}{4(m_2 + m_G)}$ \\
-\end{tabular}
 \newpage
 
 
 %------------------------------------------------------------------------------------------------------------
 \section{Theorie optimaler Steuerungungsprobleme}
+
+Wir halten uns an die Definitionen in \cite{gerdts2012}
+
+\begin{definition}[Optimales Steuerungsproblem]
+    Seien $t_0<t_f$ feste Zeiten und 
+    %
+    \begin{align*}
+        \Phi &: \mathbb{R}^{n_{\bm{x}}} \to \mathbb{R}, \\
+        L &: [t_0,t_f] \times \mathbb{R}^{n_{\bm{x}}}  \to \mathbb{R},  \\
+        f &: [t_0,t_f] \times \mathbb{R}^{n_{\bm{x}}} \times \mathbb{R}^{n_{\bm{u}}} 
+        \to \mathbb{R}^{n_{\bm{x}}}
+    \end{align*}
+    %
+    hinreichend glatte Funktionen und $\mathcal{U} \subset \mathbb{R}^{n_{\bm{u}}}$ 
+    eine abgeschlossene konvexe nichtleere Menge. 
+    %
+    \begin{align*}
+        \min_{\bm{u}} \int_{t_0}^{t_f} L(t,\bm{x}(t),\bm{u}(t)) \dt + \Phi(\bm{x}(t_f))
+    \end{align*}
+    %
+    mit $\bm{x} \in W_{1,\infty}^{n_{\bm{x}}}([t_0,t_f]), 
+    \bm{u} \in L_{\infty}^{n_{\bm{u}}}([t_0,t_f])$ und 
+    %
+    \begin{align*}
+        \dot{\bm{x}}(t) = f(t,\bm{x}(t),\bm{u}(t)), \quad \bm{x}(t_0) = \bm{x}_0, \quad \bm{u}(t) \in \mathcal{U} \text{ f.ü. } t \in [t_0,t_f]
+    \end{align*}
+\end{definition}
+
 Wir betrachten ein Steuerungsproblem und definieren die Value-Function $V$ mittels
 %
 \begin{align*}
@@ -1314,341 +1279,9 @@ Es gilt erneut
 %----------------------------------------------------------------------------------------------
 
 
-\section{Numerische Lösungsverfahren}
-
-
-\subsection{Gradientenverfahren}
-
-\begin{align*}
-u(t) + \epsilon \cdot \eta_u (t) \quad x(t) + \epsilon \cdot \eta_x (t), \eta_x (0) = 0
-\end{align*}
-
-Um die Zustandsgleichung als Nebenbedingung zu integrieren, führen wir einen Lagrange-Multiplikator \( p(t) \) ein. Das erweiterte Zielfunktional lautet dann:
-
-\[
-J^{\text{aux}}(u, x, p) = \int_{0}^{T} \left[ L(x(t), u(t), t) + p(t) \left( f(x(t), u(t)) - \dot{x}(t) \right) \right] \mathrm{d}t + \Phi(x(T))
-\]
-
-
-Wir betrachten kleine Variationen der Steuerungsfunktion und des Zustands:
-
-
-
-wobei \( \varepsilon \) ein kleiner Parameter ist.
-
-
-
-Die Variation von \( J^{\text{aux}} \) bezüglich \( \varepsilon \) bei \( \varepsilon = 0 \) ergibt:
-
-\[
-\delta J^{\text{aux}} = \int_{0}^{T} \left[ \frac{\partial L}{\partial x} \delta x(t) + \frac{\partial L}{\partial u} \delta u(t) + p(t) \left( \frac{\partial f}{\partial x} \delta x(t) + \frac{\partial f}{\partial u} \delta u(t) - \delta \dot{x}(t) \right) \right] \mathrm{d}t + \frac{\partial \Phi}{\partial x}(x(T)) \delta x(T) = 0
-\]
-
-
-Der Term mit \( \delta \dot{x}(t) \) wird mittels Integration durch Teile umgeformt:
-
-\[
-\int_{0}^{T} p(t) (-\delta \dot{x}(t)) \, \mathrm{d}t = \left[ -p(t) \delta x(t) \right]_{0}^{T} + \int_{0}^{T} \dot{p}(t) \delta x(t) \, \mathrm{d}t
-\]
-
-Da \( \delta x(0) = 0 \) ist (weil der Anfangszustand festgelegt ist), vereinfacht sich der Randterm zu:
-
-\[
--p(T) \delta x(T) + \int_{0}^{T} \dot{p}(t) \delta x(t) \, \mathrm{d}t
-\]
-
-
-Setzen wir die Ergebnisse in die Variation des erweiterten Zielfunktionals ein:
-
-\[
-\int_{0}^{T} \left[ \left( \frac{\partial L}{\partial x} + p(t) \frac{\partial f}{\partial x} + \dot{p}(t) \right) \delta x(t) + \left( \frac{\partial L}{\partial u} + p(t) \frac{\partial f}{\partial u} \right) \delta u(t) \right] \mathrm{d}t + \left( \frac{\partial \Phi}{\partial x} - p(T) \right) \delta x(T) = 0
-\]
-
-Für die Gleichung muss jeder Koeffizient der unabhängigen Variation Null sein. Daher ergeben sich die adjungierten Gleichungen:
-
-\[
-\begin{cases}
-\dot{p}(t) = -\frac{\partial L}{\partial x} - p(t) \frac{\partial f}{\partial x} \\
-p(T) = \frac{\partial \Phi}{\partial x}(x(T))
-\end{cases}
-\]
-
-
-
-Der Gradient des Zielfunktionals \( J(u) \) ist gegeben durch:
-
-\[
-\frac{\delta J}{\delta u(t)} = \frac{\partial L}{\partial u} + p(t) \frac{\partial f}{\partial u}
-\]
-
-\subsubsection{Sensitivity Approach}
-
-Erweitertes Zielfunktional
-
-\begin{align*}
-J^{aux}(u) 	&= \int_0^T \varphi(t,x,u) + p(t) \cdot (f(t,x,u) - x'(t)) \dt + \Phi(x(T)) \\
-			&= \int_0^T \underbrace{\varphi(t,x,u) + p(t) \cdot f(t,x,u)}_{= H(t)} \dt \underbrace{-  \int_0^T p(t) x'(t) \dt}_{ = - \left[p(t) x(t) \right]_0^T + \int_0^T p'(t) x(t) \dt} + \Phi(x(T)) \\
-			&= \int_0^T H(t) + p'(t)x(t) \dt - \left[p(t) x(t) \right]_0^T + \Phi(x(T)) \\
-			&= \int_0^T H(t) + p'(t)x(t) \dt - p(T) x(T) +  \gelb{p(0) x(0)} + \Phi(x(T))
-\end{align*}
-
-Der Term $\gelb{p(0) x(0)}$ ist unabhängig von $u$ und fällt bei der Optimierung weg. Bilden der Gateau Ableitung in $u$ entlang $h$ liefert  
-
-\begin{align*}
-J'(u,h) &= \int_0^T H_x [t] \cdot S(t)  + H_u [t] \cdot h(t)  + p'(t)S(t)  \dt - p(T) S(T)  + \Phi_x (x(T)) S(1) \\
-		&= \int_0^T ( \rot{\underbrace{H_x [t] + p'(t)}_{ = 0}}) \cdot S(t)  + H_u [t] \cdot h(t)  \dt  + ( \lila{\underbrace{\Phi_x (x(T))- p(T)}_{= 0}} ) \cdot S(T)  \\
-		&= \int_0^T H_u [t] \cdot h(t)
-\end{align*}
-
-Wir erhalten somit $J'(u) = H_u [t]$
-
-\newpage
-
-\subsubsection{Praktische Implementierung}
-
-\begin{beispiel} \label{ex_gradient_1}
-Wir betrachten das Steuerungsproblem 
-%
-\begin{align*}
-\min_u \int_0^{1} x(t) + u(t)^2 \dt \quad x'(t) = x(t) + u(t) + 1, \quad \orange{x(0) = 0}.
-\end{align*}
-
-welches in einer Aufgabe analytisch gelöst ist. Für den Gradienten gilt
-%
-\begin{align*}
-\nabla J(u) = H_u = \frac{\partial}{\partial u} ( x(t) + u(t)^2 + p(t) \cdot  (x(t) + u(t) + 1) ) = 2u(t) +p(t)
-\end{align*} 
-
-Wir verwenden das explizite Euler-Verfahren zur Diskretisierung der Gleichungen aus dem Minimumprinzip: 
-%
-\begin{itemize}
-\item Diskretisierung des Zeitintervalls $[0,1]$ und der Funktionen mittels $\blau{N} \in \mathbb{N}$
-%
-\begin{align*}
-h = \frac{1}{N} \quad \textbf{u}^k = \left(u_i^k \right)_{i=0}^{N}, \quad  \textbf{x}^k = \left( x^{k}_{i} \right)_{i=0}^{N}, \quad \textbf{t}^k = \left( i \cdot h\right)_{i=0}^{N},
-\end{align*} 
-
-
-\item Armijo Suchrichtung $\gruen{\alpha^{(k)}}$:  Für $0 \leq m < \blau{M=10}$,  $\blau{c= 10^{-4},\beta  = 0.5} \in (0,1)$
-%
-\begin{align*}
-u^{\textsf{neu}} 	&= u^k + \beta^m  \cdot d^{(k)} \\
-\rot{J(u^k)} 				&= \int_0^1 x^{k}(t) + (u^{k}(t))^2 \dt \rot{\approx h \cdot \sum_{i=0}^{N} x^{k}_{i} + (u^{k}_{i})^2}\\
-\rot{J(u^{neu})}			&= \int_0^1 x^{neu}(t) + (u^{neu}(t))^2 \dt \rot{\approx h \cdot \sum_{i=0}^{N} x^{neu}_{i} + (u^{neu}_{i})^2} \\
-		J(u^{neu}) &\leq J(u^{k}) \dunkelrot{-} c \cdot \beta^m \cdot \dunkelrot{h \cdot \sum_{i=0}^{N} (2 \cdot u^{(k)}_{i}  + p^{(k)}_{i})(2 \cdot u^{(k)}_{i}  + p^{(k)}_{i})} \\
-\Leftrightarrow \rot{J(u^{neu})}		&\leq \rot{J(u^{k})}  \dunkelrot{- \norm{d^{(k)})}^2} \cdot c \cdot \beta^m \Rightarrow \gruen{\alpha^{(k)} = \beta^m} 
-\end{align*}
-
-\item Gradientenverfahren: Für $0 \leq \dunkelgelb{k} < MaxIter$, $\blau{\epsilon = 10^{-6}}$:
-%
-	\begin{itemize}
-	\item Forward Integration $x'(t) = x(t) +u(t) +1$
-	%
-	\begin{align*}
-	x^{\dunkelgelb{k}}_{i+1} = x^{\dunkelgelb{k}}_{i} + h \cdot (x^{(\dunkelgelb{k})}_{i} + u^{(\dunkelgelb{k})}_{i} +1) \quad \orange{x^{(k)}_{0} = 0}
-	\end{align*}
-
-	\item Backward Integration $p'(t) = -( 1 + p(t) )$
-	%
-	\begin{align*}
-	p^{\dunkelgelb{k}}_{i} = p^{\dunkelgelb{k}}_{i+1} + h \cdot (1 + p^{\dunkelgelb{k}}_{i+1}) \quad \orange{p^{(k)}_{N} = \partial_x \Phi(x(1)) = 0}
-	\end{align*}
-
-	\item Berechnung des Gradienten $\nabla J = H_u =2u + p$ 
-	%
-	\begin{align*}
-	d^{(\dunkelgelb{k})}  = -(2 \cdot u^{(\dunkelgelb{k})}  + p^{(\dunkelgelb{k})})
-	\end{align*}
-	
-	\item Berechnung der Schrittweite $\gruen{\alpha^{(k)}}$:
-	%
-	\begin{align*}
-	u^{(\dunkelgelb{k+1})} &= u^{(\dunkelgelb{k})} + \gruen{\alpha^{(k)}} \cdot d^{(\dunkelgelb{k})}  \\
-	\norm{u^{(\dunkelgelb{k+1})} - u^{(\dunkelgelb{k})}} &< \blau{\epsilon} \Rightarrow u^{\rot{\textsf{final}}} = u^{(\dunkelgelb{k+1})},  \textsf{ sonst } \dunkelgelb{k \to k+1}
-	\end{align*}
-	%
-	\end{itemize}
-%
-\end{itemize}
-
-
-%\includegraphics[width=\textwidth]{ex3.1.plot}
-\end{beispiel}
-
-\begin{figure}[h] % H für Positionierung der Grafik
-    \centering
-    \includegraphics[width=\textwidth]{ex3.1.plot.pdf}
-    \captionsetup{labelformat=empty}  % Entfernt "Abbildung 1"
-    \caption{Zustand $x$ und Steuerung $u$ mit den Iterationen $\blau{100},\orange{500}$ und der \rot{analytischen Lösung}}
-    \label{fig:plot} % Referenz, falls du auf die Grafik verweisen möchtest
-\end{figure}
-
-\newpage
-
-\subsection{Riccati Regler}
-
-Es gilt 
-%
-\begin{align*}
-F(K) := Q - KPK + KA + A^T K \Rightarrow F(K) = 0
-\end{align*}
-
-% Wichtige Grundbegriffe aus LA
-%----------------------------------------------------------------------------
-\begin{definition}
-Sei $X \in \mathbb{R}^{n \times n}$ dann definieren wir 
-%
-\begin{align*}
-\textsf{vec}(X) = 
-\begin{pmatrix}
-X_{11} & X_{21} & \cdots & X_{n1} & X_{12} & X_{22} & \cdots X_{nn}  
-\end{pmatrix}^T 
-\in 
-\mathbb{R}^{n^2}
-\end{align*}
-%
-Seien $A \in \mathbb{R}^{n \times m}, B \in \mathbb{R}^{p \times r}$, dann definieren wir 
-%
-\begin{align*}
-A \otimes B =
-\begin{pmatrix}
-A_{11} B 	& \cdots 	& A_{1m} B 	\\
-A_{12} B 	& \hdots 	& A_{2m} B	\\
-\vdots		& \ddots	& \vdots	\\
-A_{n1} B	& \cdots	& A_{nm} B
-\end{pmatrix}
-\in 
-\mathbb{R}^{mp \times nr}
-\end{align*}
-\end{definition}
-%----------------------------------------------------------------------------
-
-Es gilt die Formel
-%
-\begin{align*}
-\textsf{vec}(MXN) = (N^T \otimes M) \textsf{vec}(X)  
-\end{align*}
-
-Betrachten wir den Fall $M= 1$ und $N=A$ bzw. $N = 1$ und $M=A^T$ erhalten wir mit $X=K$ 
-%
-\begin{align*}
-\textsf{vec}(KA)= (A^T \otimes 1) \textsf{vec}(K) \quad \textsf{vec}(A^T K) = (1 \otimes A^T) \textsf{vec}(K)
-\end{align*}
-
-Anwendung auf unser Problem liefert
-%
-\begin{align*}
-\underbrace{\textsf{vec}(F(K))}_{f(x = \textsf{vec}(K))} = \underbrace{\textsf{vec}(Q)}_{q} - \underbrace{\textsf{vec}(KPK)}_{g(x = \textsf{vec}(K))} + \underbrace{\textsf{vec}(KA)}_{(A^T \otimes 1) \textsf{vec}(K)} + \underbrace{\textsf{vec}(A^T K)}_{(1 \otimes A^T) \textsf{vec}(K)}
-\end{align*}
-
-Durch Einführung von $x = \textsf{vec}(K) \in \mathbb{R}^{n^2}$ erhalten wir 
-%
-\begin{align*}
-f(x) = q - g(x)+ (A^T \otimes 1)x + (1 \otimes A^T)x
-\end{align*}
-
-Da $(KP)^T = KP$ gilt 
-% 
-\begin{align*}
-g(\textsf{vec}(K)) = \textsf{vec}(KPK) = (1 \otimes KP) \textsf{vec}(K) 
-\end{align*}
-
-% Hier arbeit 14.07
-%-----------------------------------------------------------------------------------
-
-Wir betrachten die Variation $K(\epsilon) = K + \epsilon \cdot \bar{K}$ und die Funktion $h:\mathbb{R} \to \mathbb{R}^{n^2}$ mit
-%
-\begin{align*}
-h(\epsilon) 
-:= g(\textsf{vec}(K(\epsilon))) 
-&= \textsf{vec}(K(\epsilon) P K(\epsilon)) \\
-&= \textsf{vec}((K + \epsilon \cdot \bar{K}) P (K + \epsilon \cdot \bar{K})) \\
-&= \textsf{vec}(KPK + \epsilon KP \bar{K} + \epsilon \bar{K} PK + \epsilon^2 \bar{K} P \bar{K})
-\end{align*}
-
-Ableitung nach $\epsilon$ und Auswertung in $\epsilon = 0$ ergibt
-%
-\begin{align*}
-h'(0) = \frac{d}{d\epsilon} g(\textsf{vec}(K + \epsilon \bar{K})) \bigg|_{\epsilon = 0} = \textsf{vec}(KP\bar{K} + \bar{K}PK)
-= \textsf{vec}(KP\bar{K}) + \textsf{vec}(\bar{K}PK)
-\end{align*}
-
-Umschreiben als Matrix-Vektor-Produkt
-%
-\begin{align*}
-\textsf{vec}(KP \cdot \bar{K} \cdot 1) = (1 \otimes KP) \textsf{vec}(\bar{K}) \quad \textsf{vec}(1 \cdot \bar{K} \cdot PK) = ((PK)^T \otimes 1) \textsf{vec}(\bar{K})
-\end{align*}
-
-Wir erhalten als Ableitung 
-%
-\begin{align*}
-g'(x) = (1 \otimes KP) + ((PK)^T \otimes 1) \Rightarrow f'(x) = - (1 \otimes KP) - ((PK)^T \otimes 1) + (A^T \otimes 1) + (1 \otimes A^T)
-\end{align*}
-
-\subsubsection{Implementierung}
-
-\begin{minipage}{0.65\textwidth}
-\begin{lstlisting}
-def vec(X):
-    return X.reshape(-1, order='F')
-
-def unvec(v, n):
-    return v.reshape((n, n), order='F')
-\end{lstlisting}
-\end{minipage}
-%
-\begin{minipage}{0.35\textwidth}
-Hilfsfunktionen für die Vektorisierung
-\end{minipage}
-
-\begin{minipage}{0.65\textwidth}
-\begin{lstlisting}
-# Newton Kleinman Verfahren 
-def solv_CARE(A,B,R,Q,tol=1e-8,max_iter=50):
-	n = A.shape[0]
-	I = np.eye(n)
-	q = vec(Q)
-	L = np.kron(I, A.T) + np.kron(A.T, I)
-	P = B @ np.linalg.solve(R, B.T)
-	# Startwert K0 hier Einheitsmatrix
-	K = I
-	x = vec(K)	
-	
-	for i in range(max_iter):
-		X = K @ P #KP
-		vec_KPK = np.kron(I,X) @ x
-		f = q - vec_KPK + L @ x 
-		Dg = np.kron(I,X)+np.kron(X,I) 
-		Df = L - Dg
-		dx = np.linalg.solve(Df, -f)
-		x_new = x + dx
-		# Abbruch
-		if np.linalg.norm(dx) / np.linalg.norm(x_new) < tol:
-			x=x_new
-			break
-        
-        x = x_new
-        K = unvec(x, n)
-	return K
-\end{lstlisting}
-\end{minipage}
-%
-\begin{minipage}{0.35\textwidth}
-\rot{Erklärung des Codes}
-
-\blau{Stabilität der Startlösung hier Gershgorin kreise und Stabilität erklären}
-
-Für $Y$ mit $RY=B^T \Rightarrow Y = B^{-1}B^T$ und $B \cdot Y = P$
-\end{minipage}
-%
-
-
-
-
-%-----------------------------------------------------------------------------------
-\newpage
 \section{Linearisierung der Dynamik}
 
+Wir gehen analog zu \cite{ICIIECS2017} vor.
 % Arbeitsbereich
 Wir definieren den Zustand 
 $\textbf{x} = 
@@ -2172,6 +1805,426 @@ Für die Inverse der Massenmatrix gilt somit
     \draw[->, color = boxframe] (d.west) -- ++(-2.45cm,0cm);
     \draw[->, color = gruen] (a) -- (e);
 \end{tikzpicture}
+
+\subsection{Riccati Regler}
+
+Es gilt 
+%
+\begin{align*}
+F(K) := Q - KPK + KA + A^T K \Rightarrow F(K) = 0
+\end{align*}
+
+% Wichtige Grundbegriffe aus LA
+%----------------------------------------------------------------------------
+\begin{definition}
+Sei $X \in \mathbb{R}^{n \times n}$ dann definieren wir 
+%
+\begin{align*}
+\textsf{vec}(X) = 
+\begin{pmatrix}
+X_{11} & X_{21} & \cdots & X_{n1} & X_{12} & X_{22} & \cdots X_{nn}  
+\end{pmatrix}^T 
+\in 
+\mathbb{R}^{n^2}
+\end{align*}
+%
+Seien $A \in \mathbb{R}^{n \times m}, B \in \mathbb{R}^{p \times r}$, dann definieren wir 
+%
+\begin{align*}
+A \otimes B =
+\begin{pmatrix}
+A_{11} B 	& \cdots 	& A_{1m} B 	\\
+A_{12} B 	& \hdots 	& A_{2m} B	\\
+\vdots		& \ddots	& \vdots	\\
+A_{n1} B	& \cdots	& A_{nm} B
+\end{pmatrix}
+\in 
+\mathbb{R}^{mp \times nr}
+\end{align*}
+\end{definition}
+%----------------------------------------------------------------------------
+
+Es gilt die Formel
+%
+\begin{align*}
+\textsf{vec}(MXN) = (N^T \otimes M) \textsf{vec}(X)  
+\end{align*}
+
+Betrachten wir den Fall $M= 1$ und $N=A$ bzw. $N = 1$ und $M=A^T$ erhalten wir mit $X=K$ 
+%
+\begin{align*}
+\textsf{vec}(KA)= (A^T \otimes 1) \textsf{vec}(K) \quad \textsf{vec}(A^T K) = (1 \otimes A^T) \textsf{vec}(K)
+\end{align*}
+
+Anwendung auf unser Problem liefert
+%
+\begin{align*}
+\underbrace{\textsf{vec}(F(K))}_{f(x = \textsf{vec}(K))} = \underbrace{\textsf{vec}(Q)}_{q} - \underbrace{\textsf{vec}(KPK)}_{g(x = \textsf{vec}(K))} + \underbrace{\textsf{vec}(KA)}_{(A^T \otimes 1) \textsf{vec}(K)} + \underbrace{\textsf{vec}(A^T K)}_{(1 \otimes A^T) \textsf{vec}(K)}
+\end{align*}
+
+Durch Einführung von $x = \textsf{vec}(K) \in \mathbb{R}^{n^2}$ erhalten wir 
+%
+\begin{align*}
+f(x) = q - g(x)+ (A^T \otimes 1)x + (1 \otimes A^T)x
+\end{align*}
+
+Da $(KP)^T = KP$ gilt 
+% 
+\begin{align*}
+g(\textsf{vec}(K)) = \textsf{vec}(KPK) = (1 \otimes KP) \textsf{vec}(K) 
+\end{align*}
+
+% Hier arbeit 14.07
+%-----------------------------------------------------------------------------------
+
+Wir betrachten die Variation $K(\epsilon) = K + \epsilon \cdot \bar{K}$ und die Funktion $h:\mathbb{R} \to \mathbb{R}^{n^2}$ mit
+%
+\begin{align*}
+h(\epsilon) 
+:= g(\textsf{vec}(K(\epsilon))) 
+&= \textsf{vec}(K(\epsilon) P K(\epsilon)) \\
+&= \textsf{vec}((K + \epsilon \cdot \bar{K}) P (K + \epsilon \cdot \bar{K})) \\
+&= \textsf{vec}(KPK + \epsilon KP \bar{K} + \epsilon \bar{K} PK + \epsilon^2 \bar{K} P \bar{K})
+\end{align*}
+
+Ableitung nach $\epsilon$ und Auswertung in $\epsilon = 0$ ergibt
+%
+\begin{align*}
+h'(0) = \frac{d}{d\epsilon} g(\textsf{vec}(K + \epsilon \bar{K})) \bigg|_{\epsilon = 0} = \textsf{vec}(KP\bar{K} + \bar{K}PK)
+= \textsf{vec}(KP\bar{K}) + \textsf{vec}(\bar{K}PK)
+\end{align*}
+
+Umschreiben als Matrix-Vektor-Produkt
+%
+\begin{align*}
+\textsf{vec}(KP \cdot \bar{K} \cdot 1) = (1 \otimes KP) \textsf{vec}(\bar{K}) \quad \textsf{vec}(1 \cdot \bar{K} \cdot PK) = ((PK)^T \otimes 1) \textsf{vec}(\bar{K})
+\end{align*}
+
+Wir erhalten als Ableitung 
+%
+\begin{align*}
+g'(x) = (1 \otimes KP) + ((PK)^T \otimes 1) \Rightarrow f'(x) = - (1 \otimes KP) - ((PK)^T \otimes 1) + (A^T \otimes 1) + (1 \otimes A^T)
+\end{align*}
+
+\subsubsection{Implementierung}
+
+\begin{minipage}{0.65\textwidth}
+\begin{lstlisting}
+def vec(X):
+    return X.reshape(-1, order='F')
+
+def unvec(v, n):
+    return v.reshape((n, n), order='F')
+\end{lstlisting}
+\end{minipage}
+%
+\begin{minipage}{0.35\textwidth}
+Hilfsfunktionen für die Vektorisierung
+\end{minipage}
+
+\begin{minipage}{0.65\textwidth}
+\begin{lstlisting}
+# Newton Kleinman Verfahren 
+def solv_CARE(A,B,R,Q,tol=1e-8,max_iter=50):
+	n = A.shape[0]
+	I = np.eye(n)
+	q = vec(Q)
+	L = np.kron(I, A.T) + np.kron(A.T, I)
+	P = B @ np.linalg.solve(R, B.T)
+	# Startwert K0 hier Einheitsmatrix
+	K = I
+	x = vec(K)	
+	
+	for i in range(max_iter):
+		X = K @ P #KP
+		vec_KPK = np.kron(I,X) @ x
+		f = q - vec_KPK + L @ x 
+		Dg = np.kron(I,X)+np.kron(X,I) 
+		Df = L - Dg
+		dx = np.linalg.solve(Df, -f)
+		x_new = x + dx
+		# Abbruch
+		if np.linalg.norm(dx) / np.linalg.norm(x_new) < tol:
+			x=x_new
+			break
+        
+        x = x_new
+        K = unvec(x, n)
+	return K
+\end{lstlisting}
+\end{minipage}
+%
+\begin{minipage}{0.35\textwidth}
+\rot{Erklärung des Codes}
+
+\blau{Stabilität der Startlösung hier Gershgorin kreise und Stabilität erklären}
+
+Für $Y$ mit $RY=B^T \Rightarrow Y = B^{-1}B^T$ und $B \cdot Y = P$
+\end{minipage}
+%
+
+\newpage
+
+
+\section{Gradientenverfahren}
+
+\begin{satz}[Gradientenverfahren mit Linesearch ]
+Sei $f:\mathbb{R}^{n} \to \mathbb{R}$ differenzierbar, 
+%
+%
+\begin{align*}
+    \bm{x}_{\rot{k+1}} &= \bm{x}_{\rot{k}} - \alpha_{\gruen{j}} \cdot \nabla f(\bm{x}_{\rot{k}}) \quad
+    \min \left\{ \gruen{j}:  
+    \underbrace{
+    f(\bm{x}_{\rot{i}} - \alpha_{\gruen{j}} 
+    \nabla f(\bm{x}_{\rot{i}}))}
+    _{
+        \varphi(\alpha_{\gruen{j}})
+        }  \leq \underbrace{f(\bm{x}_{\rot{i}})}_{\varphi(0)} \underbrace{-  \blau{c} \cdot \alpha_{\gruen{j}}  \norm{ \nabla f(\bm{x}_{\rot{i}})}^2}_{\blau{c} \cdot \varphi'(0) \cdot \alpha_{\gruen{j}},  } \right\}  
+\end{align*}
+
+konvergiert für $\rot{k \to \infty}$ gegen die Lösung von $\min_x f(x)$.
+\end{satz}
+
+Ziel Berechnung des Gradienten $J'(\bm{u})$ für das Steuerungsproblem
+
+\begin{align*}
+    J^{aux}(\bm{u}) 	
+            &= \int_{t_0}^{t_f} 
+            L(t,\bm{x},\bm{u}) 
+            + \bm{p}(t) \cdot 
+            \left[
+                \vphantom{\int}
+                f(t,\bm{x},\bm{u}) - \dot{\bm{x}}(t)
+            \right] \dt 
+            + \Phi(\bm{x}(t_f)) \\
+			&= \int_{t_0}^{t_f} 
+            L(t,\bm{x},\bm{u}) + \bm{p}(t) \cdot f(t,\bm{x},\bm{u}) \dt 
+            -  \int_{t_0}^{t_f} \bm{p}(t) \dot{\bm{x}}(t) \dt 
+            + \Phi(\bm{x}(t_f)) \\
+            &= \int_{t_0}^{t_f} H[t] \dt 
+            - \left[
+                \vphantom{\int}
+                \bm{p}(t) \bm{x}(t) 
+                \right]_{t_0}^{t_f} 
+            + \int_{t_0}^{t_f} \dot{\bm{p}}(t) \bm{x}(t) \dt + \Phi(\bm{x}(t_f)) \\
+			&= \int_{t_0}^{t_f} H[t] + \dot{\bm{p}}(t) \bm{x}(t) \dt 
+            - \left[
+                \vphantom{\int}
+                \bm{p}(t) \bm{x}(t) 
+                \right]_{t_0}^{t_f} + \Phi(\bm{x}(t_f)) \\
+			&= \int_{t_0}^{t_f} H[t] + \dot{\bm{p}}(t) \bm{x}(t) \dt 
+            - \bm{p}(t_f) \bm{x}(t_f) +  \gelb{\bm{p}(t_0) \bm{x}(t_0)} + \Phi(\bm{x}(t_f))
+\end{align*}
+
+Der Term $\gelb{\bm{p}(t_0) \bm{x}(t_0)}$ ist unabhängig von $\bm{u}$ und fällt bei der Optimierung weg. 
+Bilden der Gateau Ableitung in $\bm{u}$ entlang $\bm{h}$ liefert  
+
+\begin{align*}
+DJ^{aux}(\bm{u},\bm{h}) 
+        &= \int_{t_0}^{t_f} H_x [t] \cdot S(t)  
+        + H_u [t] \cdot h(t)  
+        + \dot{\bm{p}}(t) S(t)  \dt - \bm{p}(t_f) S(t_f)  
+        + \Phi_x (\bm{x}(t_f)) S(1) \\
+		&= \int_{t_0}^{t_f} ( 
+                \underbrace{
+                    H_x [t] + \dot{\bm{p}}(t)
+                    }_{ = 0}
+                    ) 
+                \cdot S(t)  + H_u [t] \cdot h(t)  \dt  
+                + ( \underbrace{\Phi_x (\bm{x}(t_f)) - \bm{p}(t_f)}_{= 0} ) \cdot S(t_f)  \\
+		&= \int_0^T H_u [t] \cdot h(t) \dt
+\end{align*}
+
+Hierbei bezeichnet $S(t)$ die Sensitivity function von $\bm{x}$ in $\bm{u}$ in Richtung $\bm{h}$, also
+\begin{align*}
+S(t) = \frac{\partial \bm{x}(t)}{\partial \bm{u}} \cdot \bm{h}
+\end{align*}
+Wir erhalten somit $\nabla J(\bm{u}) = H_u [t]$
+
+\newpage
+
+\subsection{Gradientenverfahren für den two link revolute Manipulator}
+
+Wir betrachten das Steuerungsproblem 
+%
+\begin{align*}
+    \min_{\bm{u}} &\int_{t_0}^{t_f} L(\bm{x},\bm{u}) \dt + \Phi(\bm{x}(t_f)) \\
+    L(\bm{x},\bm{u}) 
+    &= 
+    (\bm{u} - \bm{u}_f)^T \cdot R \cdot (\bm{u} - \bm{u}_f) \\ 
+    \Phi(\bm{x}(t_f)) &= (\bm{q}(t_f) - \bm{q}_f)^T \cdot Q \cdot (\bm{q}(t_f) - \bm{q}_f) \\
+    \dot{\bm{x}} &= f(\bm{x},\bm{u}) =  
+    \begin{bmatrix}
+        \dot{\bm{q}} \\
+        M^{-1}(\bm{q}) \cdot ( - C(\bm{q},\dot{\bm{q}}) \cdot \dot{\bm{q}} - G(\bm{q}) + \bm{u} )
+    \end{bmatrix}
+    \\
+    \bm{x} 
+    &=
+    \begin{bmatrix}
+        \bm{q} \\
+        \dot{\bm{q}}
+    \end{bmatrix}
+    \quad
+    \bm{x}(t_0) =
+    \begin{bmatrix}
+        \bm{q}(t_0) \\
+        \dot{\bm{q}}(t_0)
+    \end{bmatrix}
+\end{align*}
+
+Für die adjungierte Gleichung gilt
+%
+\begin{align*}
+    \dot{\bm{p}} = - H_{\bm{x}} 
+    =
+    -
+    \begin{bmatrix}
+        \frac{\partial H}{\partial \bm{q}} \\[6pt]
+        \frac{\partial H}{\partial \dot{\bm{q}}}
+    \end{bmatrix},
+    \quad
+    \bm{p}(t_f) = \Phi_{\bm{x}}(\bm{x}(t_f))
+    = \begin{bmatrix}
+        2 Q (\bm{q}(t_f) - \bm{q}_f) \\
+        \bm{0}
+    \end{bmatrix}
+    \quad
+    H[t] = L(\bm{u}) + \bm{p}^T \cdot f(\bm{x},\bm{u})
+\end{align*}
+
+Für den Gradienten gilt
+%
+\begin{align*}
+\nabla J(\bm{u}) 
+&= 
+\frac{\partial H}{\partial \bm{u}}
+=
+2 R \cdot (\bm{u} - \bm{u}_f) +
+\frac{\partial f}{\partial \bm{u}}^T \cdot \bm{p} 
+\end{align*} 
+
+Wir nutzen die spezielle Struktur unseres Problems
+%
+\begin{align*}
+    \frac{\partial f}{\partial \bm{u}}
+    =
+    \begin{bmatrix}
+        \bm{0}_2 \\
+        M^{-1}(\bm{q})
+    \end{bmatrix}
+    \Rightarrow
+    \frac{\partial f}{\partial \bm{u}}^T \cdot
+    \begin{bmatrix}
+        \bm{p}_{\bm{q}} \\
+        \bm{p}_{\dot{\bm{q}}}
+    \end{bmatrix}
+    =
+    M^{-1}(\bm{q}) \cdot \bm{p}_{\dot{\bm{q}}}
+    \Rightarrow
+    \nabla J(\bm{u})
+    =
+    2 R \cdot (\bm{u} - \bm{u}_f) + M^{-1}(\bm{q}) \cdot \bm{p}_{\dot{\bm{q}}}
+\end{align*}
+ 
+% Hier konkrerte Schritte des Algorithmus
+\begin{itemize}
+    \item[1)] Foward Integration der State Equation: $\dot{\bm{x}}=f(\bm{x},\bm{u})$
+    %
+    \begin{align*}
+        \bm{x}_0 &= \bm{x}(t_0) \\
+        \bm{x}_{i+1} 
+        &=
+        \bm{x}_i + h \cdot
+        \begin{bmatrix}
+            \dot{\bm{q}}_i \\
+            M^{-1}(\bm{q}_i) \cdot ( - C(\bm{q}_i,\dot{\bm{q}}_i) \cdot \dot{\bm{q}}_i - G(\bm{q}_i) + \bm{u}_i )
+        \end{bmatrix}
+        \quad i = 0, \ldots, N-1
+    \end{align*}
+    %
+    Abspeichern Array $\bm{X} = [\bm{x}_0, \bm{x}_1, \ldots, \bm{x}_N]$
+    \item[2)] Backward Integration der Adjungierten Gleichung: 
+    $\dot{\bm{p}} = - H_{\bm{x}} = - \frac{\partial f}{\partial \bm{x}}$
+    %
+    \begin{align*}
+        \bm{p}_N 
+        &= \bm{p}(t_f) 
+        = 
+        \begin{bmatrix}
+            2 Q (\bm{q}(t_f) - \bm{q}_f) \\
+            \bm{0}
+        \end{bmatrix} \\
+        \bm{p}_{i-1} 
+        &= \bm{p}_{i} + h  \cdot
+        \begin{bmatrix}
+           \bm{0}_2 & I_2 \\
+            \frac{\partial \ddot{\bm{q}}}{\partial \bm{q}}
+           &
+           \frac{\partial \ddot{\bm{q}}}{\partial \dot{\bm{q}}}
+        \end{bmatrix}
+        \cdot \bm{p}_{i} \\
+        \frac{\partial \ddot{\bm{q}}}{\partial \bm{q}} 
+        &=
+        \frac{\partial}{\partial \bm{q}} 
+        \left( 
+            M^{-1}(\bm{q}_i) \cdot ( - C(\bm{q}_i,\dot{\bm{q}}_i) \cdot \dot{\bm{q}}_i 
+            - G(\bm{q}_i) + \bm{u}_i ) 
+            \right) 
+            \\
+        \frac{\partial \ddot{\bm{q}}}{\partial \bm{q}} &= 
+        \frac{\partial}{\partial \dot{\bm{q}}} \left( 
+            M^{-1}(\bm{q}_i) \cdot ( - C(\bm{q}_i,\dot{\bm{q}}_i) 
+            \cdot \dot{\bm{q}}_i - G(\bm{q}_i) + \bm{u}_i ) 
+            \right)
+    \end{align*}
+    %
+    \begin{itemize}
+        \item[2.1)] Finite Differenzen für $\frac{\partial \ddot{\bm{q}}}{\partial x_j}$ $j=1,2,3,4$
+        %
+        \begin{align*}
+            \bm{x}_{plus}  &= \bm{x} + \epsilon \cdot \bm{e}_j
+            \quad
+            \bm{x}_{minus}  = \bm{x} - \epsilon \cdot \bm{e}_j
+            \\
+            \ddot{\bm{q}}(\bm{x}) 
+            &= M^{-1}(\bm{q}) 
+            \cdot ( - C(\bm{q},\dot{\bm{q}}) \cdot \dot{\bm{q}} - G(\bm{q}) + \bm{u} ) \\
+            \frac{\partial \ddot{\bm{q}}}{\partial x_j}
+            &\approx
+            \frac{\ddot{\bm{q}}(\bm{x}_{plus}) - \ddot{\bm{q}}(\bm{x}_{minus})}{2 \epsilon}
+        \end{align*}
+    \end{itemize}
+    Abspeichern Array $\bm{P} = [\bm{p}_0, \bm{p}_1, \ldots, \bm{p}_N]$
+    \item[3)] Gradientenverfahren 
+    $\bm{u}_{i+1} = \bm{u}_i - \alpha_j \cdot \nabla J(\bm{u}_i)$
+    %   %
+    \begin{align*}
+        \bm{u}_{i+1} &= \bm{u}_i - \alpha_j \cdot 
+        \left[
+            2 R \cdot (\bm{u}_i - \bm{u}_f) + M^{-1}(\bm{q}_i) \cdot \bm{P}_{\dot{\bm{q}},i}
+        \right]
+        \quad i = 0, \ldots, N-1    
+    \end{align*}
+        \begin{itemize}
+            \item[3.1)] Berechnung der Schrittweite $\alpha_j$ über Linesearch
+            %
+            \begin{align*}
+                \alpha_{test} &= \beta^m \cdot \alpha_0 \\
+                \bm{u}_{test} &= \bm{u}_k - \alpha_{test} \cdot \nabla J(\bm{u}_k) \\
+                J_{test} &= J(\bm{u}_{test})  
+                \\
+                \text{IF } J_{test} &\leq J(\bm{u}_k) - c \cdot \alpha_{test} \cdot \|\nabla J(\bm{u}_k)\|^2: \\
+                    \alpha_k &= \alpha_{test} \\
+                    \Rightarrow &\text{Break}
+            \end{align*}
+        \end{itemize}
+\end{itemize}
+
+\newpage
+
+\printbibliography
 
 
 \end{document}

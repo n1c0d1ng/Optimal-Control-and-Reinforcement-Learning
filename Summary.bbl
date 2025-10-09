@@ -1,0 +1,177 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global/global}
+    \entry{gerdts2012}{book}{}{}
+      \name{author}{1}{}{%
+        {{hash=e73589d2a8155285660be6e2a502d477}{%
+           family={Gerdts},
+           familyi={G\bibinitperiod},
+           given={Matthias},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Berlin}%
+      }
+      \list{publisher}{1}{%
+        {De Gruyter}%
+      }
+      \strng{namehash}{e73589d2a8155285660be6e2a502d477}
+      \strng{fullhash}{e73589d2a8155285660be6e2a502d477}
+      \strng{fullhashraw}{e73589d2a8155285660be6e2a502d477}
+      \strng{bibnamehash}{e73589d2a8155285660be6e2a502d477}
+      \strng{authorbibnamehash}{e73589d2a8155285660be6e2a502d477}
+      \strng{authornamehash}{e73589d2a8155285660be6e2a502d477}
+      \strng{authorfullhash}{e73589d2a8155285660be6e2a502d477}
+      \strng{authorfullhashraw}{e73589d2a8155285660be6e2a502d477}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Optimal Control of ODEs and DAEs}
+      \field{year}{2012}
+    \endentry
+    \entry{ICIIECS2017}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=d6e7552c865637927e1649455d2326f4}{%
+           family={Kumar},
+           familyi={K\bibinitperiod},
+           given={Amit},
+           giveni={A\bibinitperiod}}}%
+        {{hash=f2ac58374cc16f0f208dea1f2307343d}{%
+           family={Kasera},
+           familyi={K\bibinitperiod},
+           given={Shrey},
+           giveni={S\bibinitperiod}}}%
+        {{hash=49a2228798f6e682eb2778d9ed9cc076}{%
+           family={Prasad},
+           familyi={P\bibinitperiod},
+           given={L.\bibnamedelimi B.},
+           giveni={L\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Gorakhpur, India}%
+      }
+      \strng{namehash}{4c6ba4b8c03b45508212b608613f66af}
+      \strng{fullhash}{4c6ba4b8c03b45508212b608613f66af}
+      \strng{fullhashraw}{4c6ba4b8c03b45508212b608613f66af}
+      \strng{bibnamehash}{4c6ba4b8c03b45508212b608613f66af}
+      \strng{authorbibnamehash}{4c6ba4b8c03b45508212b608613f66af}
+      \strng{authornamehash}{4c6ba4b8c03b45508212b608613f66af}
+      \strng{authorfullhash}{4c6ba4b8c03b45508212b608613f66af}
+      \strng{authorfullhashraw}{4c6ba4b8c03b45508212b608613f66af}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2017 International Conference on Innovations in Information Embedded and Communication Systems (ICIIECS)}
+      \field{title}{Optimal Control of 2-Link Underactuated Robot Manipulator}
+      \field{year}{2017}
+    \endentry
+    \entry{siciliano2010}{book}{}{}
+      \name{author}{4}{}{%
+        {{hash=38f7a70abf2d86e432d63826f560ab93}{%
+           family={Siciliano},
+           familyi={S\bibinitperiod},
+           given={Bruno},
+           giveni={B\bibinitperiod}}}%
+        {{hash=8ee631ade831cd9df4fdd3ecba074704}{%
+           family={Sciavicco},
+           familyi={S\bibinitperiod},
+           given={Lorenzo},
+           giveni={L\bibinitperiod}}}%
+        {{hash=ff3e3865edda89166207ec2d8a4c22aa}{%
+           family={Villani},
+           familyi={V\bibinitperiod},
+           given={Luigi},
+           giveni={L\bibinitperiod}}}%
+        {{hash=dcc89269b2eb1155024b2da9fd7c68eb}{%
+           family={Oriolo},
+           familyi={O\bibinitperiod},
+           given={Giuseppe},
+           giveni={G\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {London}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{87b7a62a01263043a997b937dfe79845}
+      \strng{fullhash}{ee90168e098b65fb796c51b65c7348da}
+      \strng{fullhashraw}{ee90168e098b65fb796c51b65c7348da}
+      \strng{bibnamehash}{87b7a62a01263043a997b937dfe79845}
+      \strng{authorbibnamehash}{87b7a62a01263043a997b937dfe79845}
+      \strng{authornamehash}{87b7a62a01263043a997b937dfe79845}
+      \strng{authorfullhash}{ee90168e098b65fb796c51b65c7348da}
+      \strng{authorfullhashraw}{ee90168e098b65fb796c51b65c7348da}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-1849964507}
+      \field{title}{Robotics: Modelling, Planning and Control}
+      \field{year}{2010}
+    \endentry
+    \entry{spong2004}{book}{}{}
+      \name{author}{3}{}{%
+        {{hash=1e0c4c9e500fcb5128a2bb73fbbe891a}{%
+           family={Spong},
+           familyi={S\bibinitperiod},
+           given={Mark\bibnamedelima W.},
+           giveni={M\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+        {{hash=8346db44e6189448a4dff197f5bc47bb}{%
+           family={Hutchinson},
+           familyi={H\bibinitperiod},
+           given={Seth},
+           giveni={S\bibinitperiod}}}%
+        {{hash=7175c3321a0269f1e715675f8629352e}{%
+           family={Vidyasagar},
+           familyi={V\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Hoboken, NJ}%
+      }
+      \list{publisher}{1}{%
+        {Wiley}%
+      }
+      \strng{namehash}{d6482215384c9e79f8244e09185e7fc5}
+      \strng{fullhash}{d6482215384c9e79f8244e09185e7fc5}
+      \strng{fullhashraw}{d6482215384c9e79f8244e09185e7fc5}
+      \strng{bibnamehash}{d6482215384c9e79f8244e09185e7fc5}
+      \strng{authorbibnamehash}{d6482215384c9e79f8244e09185e7fc5}
+      \strng{authornamehash}{d6482215384c9e79f8244e09185e7fc5}
+      \strng{authorfullhash}{d6482215384c9e79f8244e09185e7fc5}
+      \strng{authorfullhashraw}{d6482215384c9e79f8244e09185e7fc5}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{2nd}
+      \field{isbn}{978-0471649908}
+      \field{title}{Robot Dynamics and Control}
+      \field{year}{2004}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
