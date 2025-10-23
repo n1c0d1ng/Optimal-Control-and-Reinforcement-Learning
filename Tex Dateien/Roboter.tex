@@ -2621,22 +2621,31 @@ dass $Q^*$ der Fixpunkt der Abbildung $\mathcal{F}$ ist, also
 \end{align*}
 
 \begin{algorithm}
-\caption{Value Iteration}
-\begin{algorithmic}
-\State Initialize $V_0(s)$ arbitrarily for all $s \in \mathcal{S}$
-\State $k \gets 0$
-\Repeat
-\For{each $s \in \mathcal{S}$}
-\State $V_{k+1}(s) \gets \max_{a} \mathsf{E}_{s' \sim T_a(s)} 
-\left[ 
-    \vphantom{\int}
-    R_a(s, s') + \gamma V_k(s') 
-    \right]$
-\EndFor
-\State $k \gets k + 1$
-\Until{$|V_k - V_{k-1}| < \varepsilon$}
-\State \Return $V_k$
-\end{algorithmic}
+    \caption{Value Iteration}
+    \begin{algorithmic}
+        \State Initialize $V_0(s)$ arbitrarily for all $s \in \mathcal{S}$
+        \State $k \gets 0$
+        \Repeat
+        \For{each $s \in \mathcal{S}$}
+        \State $V_{k+1}(s) \gets \max_{a} 
+        \underbrace{
+            \mathsf{E}_{s' \sim T_a(s)} 
+            \left[ 
+                \vphantom{\int}
+                R_a(s, s') + \gamma V_k(s') 
+            \right]}_{Q_{k}(s,a)}
+            =
+            \max_a \sum_{s'} T_a(s,s') 
+            \left[ 
+                \vphantom{\int}
+                R_a(s,s') + \gamma V_k(s') 
+            \right]
+        $
+        \EndFor
+        \State $k \gets k + 1$
+        \Until{$|V_k - V_{k-1}| < \varepsilon$}
+        \State \Return $V_k$
+    \end{algorithmic}
 \end{algorithm}
 
 \newpage
