@@ -2224,6 +2224,430 @@ Wir nutzen die spezielle Struktur unseres Problems
 
 \newpage
 
+\section{Foundations of Reinforcement Learning}
+
+Wir folgen der Notation aus \cite{Plaat_RL}.
+%
+\begin{definition}
+    Wir definieren für den Markov decision process (MDP) mit 
+    Zustandsraum $\mathcal{S}$, 
+    Aktionsraum $\mathcal{A}$, 
+    Übergangswahrscheinlichkeiten $P:\mathcal{S} \times \mathcal{A} \times \mathcal{S} \to [0,1]$, 
+    Belohnungsfunktion $R:\mathcal{S} \times \mathcal{A} \times \mathcal{S} \to \mathbb{R}$ 
+    und Diskontfaktor $\gamma \in [0,1)$ die optimale Value-Funktion als
+    %
+\end{definition}
+
+
+\begin{definition}[Value-Funktion]
+    Wir definieren die Value-Funktion für eine Policy $\pi$ als
+    \begin{align*}
+        V^{\pi}(\bm{s}) 
+        = \mathsf{E} 
+        \left[
+            \sum_{i=0}^{\infty} \gamma^i \cdot r_{t+i+1} \mid \bm{s}_t = \bm{s}
+        \right]
+    \end{align*}
+\end{definition}
+
+% Herleitung V(s) = E(r_t+1 + gamma V(s_t+1) | s_t = s)
+\begin{align*}
+    V^{\pi}(\bm{s}) 
+    &= \mathsf{E} 
+    \left[
+        \sum_{i=0}^{\infty} \gamma^i \cdot r_{t+i+1} \mid \bm{s}_t = \bm{s}
+    \right]
+    \\
+    &= 
+    \mathsf{E} 
+    \left[
+        r_{t+1} \mid \bm{s}_t = \bm{s}
+    \right]
+    +
+    \rot{\gamma} \cdot
+    \mathsf{E} 
+    \left[
+        \sum_{i=0}^{\infty} \gamma^{i} \cdot r_{t+i+\rot{2}} \mid \bm{s}_t = \bm{s}
+    \right]
+    \\
+    &=
+    \mathsf{E} 
+    \left[
+        r_{t+1} \mid \bm{s}_t = \bm{s}
+    \right]
+    +
+    \rot{\gamma} \cdot
+    \mathsf{E} 
+    \left[
+        \underbrace{        
+            \mathsf{E}
+            \left[
+                \sum_{i=0}^{\infty} \gamma^{i} \cdot r_{t+i+\rot{2}} \mid \bm{s}_{t+1}
+            \right]
+            }_{
+                V^{\pi}(\bm{s}_{t+1})
+            }
+        \mid \bm{s}_t = \bm{s}
+    \right]
+    \\
+    \Rightarrow
+    V^{\pi}(\bm{s})
+    &=
+    \mathsf{E} 
+    \left[
+        r_{t+1} + \gamma \cdot V^{\pi}(\bm{s}_{t+1}) \mid \bm{s}_t = \bm{s}
+    \right] 
+\end{align*}
+
+Denn es gilt hier für die $\sigma$-Algebren, 
+dass $\sigma(\bm{s}_t ) \subseteq \sigma(\bm{s}_{t+1})$ gilt. 
+Explizit ausgeschrieben in Erwartungswerten ergibt sich:
+
+% Herleitung V(s) = E_a~pi [ E_s'~T_a [ R_a(s,s') + gamma V(s') ] ]
+\begin{align*}
+    V^{\pi}(\bm{s})
+    &= \mathsf{E} 
+        \left[ 
+            r_{t+1} + \gamma V^{\pi}(\bm{s}_{t+1}) \mid \bm{s}_t = \bm{s} 
+        \right] \\
+    &= \mathsf{E}_{a_t \sim \pi(\cdot|\bm{s})} 
+        \left[ 
+            \vphantom{\int}
+            \mathsf{E} 
+            \left[ 
+                r_{t+1} + \gamma V^{\pi}(\bm{s}_{t+1}) \mid \bm{s}_t = \bm{s}, a_t = a 
+            \right] 
+        \right] \\
+    &= \mathsf{E}_{a_t \sim \pi(\cdot|\bm{s})} 
+    \left[ 
+        \vphantom{\int}
+        \mathsf{E}_{\bm{s}_{t+1} \sim T_a(\bm{s})} 
+        \left[ 
+            R_{a_t}(\bm{s}_t, \bm{s}_{t+1}) + \gamma V^{\pi}(\bm{s}_{t+1}) 
+        \right] 
+    \right] \\
+    &= \mathsf{E}_{a \sim \pi(\cdot|\bm{s})} 
+        \left[ 
+            \vphantom{\int}
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})} 
+            \left[ 
+                R_{a}(\bm{s}, \bm{s}') + \gamma V^{\pi}(\bm{s}') 
+            \right] 
+        \right]
+\end{align*}
+
+% Definition der Q-Funktion
+\begin{definition}[Q-Function]
+    Wir definieren die Q-Function als
+    \begin{align*}
+        Q^{\pi}(\bm{s}, a) 
+        =
+        \mathsf{E}
+        \left[
+            \vphantom{\int}
+            \sum_{i=0}^{\infty} \gamma^i \cdot r_{t+i+1} 
+            \mid \bm{s}_t = \bm{s}, a_t = a
+        \right]
+    \end{align*}    
+\end{definition}
+
+Herleitung der Bellmann Gleichung für die Q-Funktion:
+%
+\begin{align*}
+    Q^{\pi}(\bm{s}, a) 
+    &= 
+    \mathsf{E}
+    \left[
+        \vphantom{\int}
+        \sum_{i=0}^{\infty} \gamma^i \cdot r_{t+i+1} 
+        \mid \bm{s}_t = \bm{s}, a_t = a
+    \right] \\
+    &=
+    \mathsf{E}
+    \left[  
+        \mathsf{E}
+        \left[
+            r_{t+1} + \sum_{i=1}^{\infty} \gamma^i \cdot r_{t+i+1} 
+            \mid \bm{s}_t = \bm{s}, a_t = a, \bm{s}_{t+1} = \bm{s}'
+            \right]
+            \mid \bm{s}_t = \bm{s}, a_t = a
+        \right] \\
+        &= 
+        \mathsf{E}
+        \left[
+            r_{t+1} + \gamma \cdot 
+            \underbrace{
+                \mathsf{E}
+                \left[
+                    \sum_{i=0}^{\infty} \gamma^{i} 
+                    \cdot r_{t+i+2} \mid \bm{s}_{t+1} = \bm{s}'
+                \right]
+            }_{
+                V^{\pi}(\bm{s}_{t+1})
+            } 
+            \mid \bm{s}_t = \bm{s}, a_t = a
+        \right] \\
+        &= 
+        \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            R_a(\bm{s}, \bm{s}') + \gamma V^{\pi}(\bm{s}') 
+        \right]
+        \\
+        &= 
+        \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            R_a(\bm{s}, \bm{s}') + \gamma 
+            \mathsf{E}_{a' \sim \pi(\cdot|\bm{s}')}
+            \left[
+                \vphantom{\int}
+                Q^{\pi}(\bm{s}', a')
+            \right]
+        \right]
+    \end{align*}
+
+    Wobei wir im letzten Schritt die folgende Beziehung genutzt haben:
+    % V(s) = E_a [Q(s,a)]
+    \begin{align*}
+        V^{\pi}(\bm{s})
+        &=
+        \mathsf{E}_{a \sim \pi(\cdot|\bm{s})}
+        \left[
+            Q^{\pi}(\bm{s}, a)
+        \right]
+    \end{align*}
+
+\subsection{Bellman Optimality Equations}
+
+\begin{satz}[Optimality Equation für $V$]
+    Die optimale Value-Funktion $V^*(\bm{s})$ erfüllt:
+    \begin{align*}
+        V^{*}(\bm{s})
+        =
+        \max_{a} \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            R_{a}(\bm{s}, \bm{s}') + \gamma V^{*}(\bm{s}')
+        \right]
+        \quad
+        \pi^*(\bm{s}) 
+        =
+        \arg\max_{a} \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            R_{a}(\bm{s}, \bm{s}') + \gamma V^{*}(\bm{s}')
+        \right]
+    \end{align*}
+\end{satz}
+
+\proof{
+    Wir setzen $V^* (\bm{s}) = \max_{\pi} V^{\pi}(\bm{s})$. 
+    Für jede Policy $\pi$ gilt nun $V^*(\bm{s}') \geq V^{\pi}(\bm{s}')$ und somit:
+    % Herleitung Bellman Optimality Equation
+    % V*(s) = max_pi V^pi(s) = max_a E_s'~T_a [ R_a(s,s') + gamma V*(s') ]
+    \begin{align*}
+        V^{*}(\bm{s})
+        &= \max_{\pi} 
+        \mathsf{E}_{a \sim \pi(\cdot|\bm{s})} 
+        \left[ 
+            \vphantom{\int}
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})} 
+            \left[ 
+                R_{a}(\bm{s}, \bm{s}') + \gamma \rot{V^{\pi}}(\bm{s}')
+            \right] 
+        \right] 
+        \rot{\leq}\;
+        \max_{\pi}
+        \mathsf{E}_{a \sim \pi(\cdot|\bm{s})}
+        \left[ 
+            \vphantom{\int}
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})} 
+            \left[
+                R_{a}(\bm{s}, \bm{s}') + \gamma V^{*}(\bm{s}')
+            \right]
+        \right]
+    \end{align*}
+
+    Das Maximum über alle Policies $\pi$ wird erreicht durch die Policy,
+    die in jedem Zustand $\bm{s}$ die Aktion $a$ auswählt, die das Maximum 
+    in der inneren Erwartung erreicht. Somit gilt:
+    %
+    \begin{align*}
+        V^{*}(\bm{s})
+        &\leq \max_{a} \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            R_{a}(\bm{s}, \bm{s}') + \gamma V^{*}(\bm{s}')
+        \right]
+    \end{align*}
+
+    Wir konstruieren nun die greedy Policy $\pi^*$ mittels:
+    % Definition pi* = argmax_a E_s'~T_a [ R_a(s,s') + gamma V*(s') ]
+    %
+    \begin{align*}
+        \pi^*(\bm{s}) 
+        =
+        \arg\max_{a} \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            R_{a}(\bm{s}, \bm{s}') + \gamma V^{*}(\bm{s}')
+        \right]
+    \end{align*}
+
+    Für diese Policy $\pi^*$ gilt nun:
+    % Herleitung V^{pi*}(s) = max_a E_s'~T_a [ R_a(s,s') + gamma V*(s') ]
+    %
+    \begin{align*}
+        V^{\pi^*}(\bm{s})
+        &= 
+        \max_{a} \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            R_{a}(\bm{s}, \bm{s}') + \gamma V^{*}(\bm{s}')
+        \right]
+        \geq V^{*}(\bm{s})
+        \Rightarrow
+        V^{\pi^*}(\bm{s}) = V^{*}(\bm{s})
+    \end{align*}
+}
+
+\begin{satz}[Optimality Equation für Q-Funktion]
+    Die optimale Q-Funktion $Q^*(\bm{s}, a)$ erfüllt:
+    %
+    \begin{align*}
+        Q^{*}(\bm{s}, a) =
+        \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            R_a(\bm{s}, \bm{s}') + \gamma 
+            \max_{a'} Q^{*}(\bm{s}', a')
+        \right]
+        \quad
+        \pi^{*}(\bm{s}) = \arg\max_{a} Q^{*}(\bm{s}, a)
+    \end{align*}
+\end{satz}
+
+\proof{
+    Für die optimale Q-Funktion gilt somit
+    % Q* = max_pi Q(a,s)
+    \begin{align*}
+        Q^{*}(\bm{s}, a) 
+        =
+        \max_{\pi} Q^{\pi}(\bm{s}, a)
+        \Rightarrow
+        Q^{*}(\bm{s}, a) =
+        \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            R_a(\bm{s}, \bm{s}') + \gamma 
+            \max_{a'} Q^{*}(\bm{s}', a')
+        \right]
+    \end{align*}
+
+    Für die optimale Policy gilt:
+    \begin{align*}
+        \pi^{*}(\bm{s}) = a^* = \arg\max_{a} Q^{*}(\bm{s}, a)
+    \end{align*}
+}
+
+% Definition der Trajektorie tau
+\begin{align*}
+    \tau_t^n :=
+    \{
+        \bm{s}_t, a_t, r_{t}, \bm{s}_{t+1}, \cdots, \bm{s}_{t+n}, a_{t+n}, r_{t+n}, \bm{s}_{t+n+1}
+    \} 
+    =
+    \left\{
+        \vphantom{\int}
+        \bm{s}_{t+i}, a_{t+i}, r_{t+i}, \bm{s}_{t+i+1} 
+    \right\}_{i=0,\ldots,n}
+\end{align*}
+
+Für die Wahrscheinlichkeit jeder Trajektorie gilt
+\begin{align*}
+    P(\tau_0) &= 
+    P(\bm{s}_0) \cdot 
+    \prod_{t=0}^{\infty} \pi(a_t|\bm{s}_t) \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+\end{align*}
+
+Wir folgen der Notation aus \cite{sutton_barto_2018} und definieren: 
+%
+% Definition Objective Function J = V^pi(s_0) 
+\begin{definition}[Objective Function]
+    Wir definieren die Objective Function als
+    %
+    \begin{align*}
+        J(\pi) 
+        =
+        V^{\pi}(\bm{s}_0)
+        =
+        \mathsf{E}_{\tau_0 \sim P(\tau_0 \mid \pi)} 
+        \left[
+            \vphantom{\int}
+            R(\tau_0)
+        \right]
+    \end{align*}
+    %
+    und die optimal policy $\pi^*$ als
+    \begin{align*}
+        \pi^* = \arg\max_{\pi} J(\pi)
+    \end{align*}
+\end{definition}
+
+
+\newpage
+
+\subsection{Value Iteration}
+
+Wir definieren die Abbildung $\mathcal{F}$ als
+\begin{align*}
+    \mathcal{F}[Q](\bm{s}, a)
+    &=
+    \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+    \left[
+        \vphantom{\int}
+        R_a(\bm{s}, \bm{s}') + \gamma 
+        \max_{a'} Q(\bm{s}', a')
+    \right]
+\end{align*}
+
+
+Die Bellmanngleichung sagt nun aus, 
+dass $Q^*$ der Fixpunkt der Abbildung $\mathcal{F}$ ist, also
+%
+\begin{align*}
+    Q_{k+1} = \mathcal{F}[Q_k]
+\end{align*}
+
+\begin{algorithm}
+\caption{Value Iteration}
+\begin{algorithmic}
+\State Initialize $V_0(s)$ arbitrarily for all $s \in \mathcal{S}$
+\State $k \gets 0$
+\Repeat
+\For{each $s \in \mathcal{S}$}
+\State $V_{k+1}(s) \gets \max_{a} \mathsf{E}_{s' \sim T_a(s)} 
+\left[ 
+    \vphantom{\int}
+    R_a(s, s') + \gamma V_k(s') 
+    \right]$
+\EndFor
+\State $k \gets k + 1$
+\Until{$|V_k - V_{k-1}| < \varepsilon$}
+\State \Return $V_k$
+\end{algorithmic}
+\end{algorithm}
+
+\newpage
+
+\subsection{Q-Learning}
+
+\subsection{SARSA}
+
+
+\newpage
+
 \printbibliography
 
 
