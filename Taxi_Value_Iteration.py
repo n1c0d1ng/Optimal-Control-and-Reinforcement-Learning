@@ -3,13 +3,13 @@
 import gym
 import numpy as np
 
-def iterate_value_function(v_inp, gamma, env):
+def iterate_value_function(V_k, gamma, env):
     ret = np.zeros(env.nS)
     for sid in range(env.nS):
         temp_v = np.zeros(env.nA)
         for action in range(env.nA):
             for (prob, dst_state, reward, is_final) in env.P[sid][action]:
-                temp_v[action] += prob*(reward + gamma*v_inp[dst_state]*(not is_final))
+                temp_v[action] += prob*(reward + gamma*V_k[dst_state]*(not is_final))
         ret[sid] = max(temp_v)
     return ret
 

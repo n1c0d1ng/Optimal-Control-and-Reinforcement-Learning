@@ -2340,19 +2340,27 @@ Explizit ausgeschrieben in Erwartungswerten ergibt sich:
 \begin{definition}[Q-Function]
     Wir definieren die Q-Function als
     \begin{align*}
-        Q^{\pi}(\bm{s}, a) 
+        Q^{\pi}(\bm{s}, \gruen{a}) 
         =
         \mathsf{E}
         \left[
             \vphantom{\int}
             \sum_{i=0}^{\infty} \gamma^i \cdot r_{t+i+1} 
-            \mid \bm{s}_t = \bm{s}, a_t = a
+            \mid \bm{s}_t = \bm{s}, \gruen{a_t = a}
+        \right]
+        \Rightarrow
+        V^{\pi}(\bm{s})
+        =
+        \mathsf{E}_{\gruen{a} \sim \pi(\cdot|\bm{s})}
+        \left[
+            Q^{\pi}(\bm{s}, \gruen{a})
         \right]
     \end{align*}    
 \end{definition}
 
 Herleitung der Bellmann Gleichung für die Q-Funktion:
-%
+% Q(s,a) = E_s'~T_a [ R_a(s,s') + gamma E_a'~pi [ Q(s',a') ] ]
+% Q(s,a) = E_s'~T_a [ R_a(s,s') + gamma V(s') ]
 \begin{align*}
     Q^{\pi}(\bm{s}, a) 
     &= 
@@ -2405,7 +2413,7 @@ Herleitung der Bellmann Gleichung für die Q-Funktion:
                 Q^{\pi}(\bm{s}', a')
             \right]
         \right]
-    \end{align*}
+\end{align*}
 
     Wobei wir im letzten Schritt die folgende Beziehung genutzt haben:
     % V(s) = E_a [Q(s,a)]
