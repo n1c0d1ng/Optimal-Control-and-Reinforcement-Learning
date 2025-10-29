@@ -2227,7 +2227,7 @@ Wir nutzen die spezielle Struktur unseres Problems
 \section{Foundations of Reinforcement Learning}
 
 Wir folgen der Notation aus \cite{Plaat_RL}.
-%
+% Grundbegriffe R, MDP, Policy, Value-Funktion
 \begin{definition}
     Wir definieren für den Markov decision process (MDP) mit 
     Zustandsraum $\mathcal{S}$, 
@@ -2238,7 +2238,7 @@ Wir folgen der Notation aus \cite{Plaat_RL}.
     %
 \end{definition}
 
-
+% Definition der Value-Funktion
 \begin{definition}[Value-Funktion]
     Wir definieren die Value-Funktion für eine Policy $\pi$ als
     \begin{align*}
@@ -2428,7 +2428,9 @@ Herleitung der Bellmann Gleichung für die Q-Funktion:
 
 \subsection{Bellman Optimality Equations}
 
-\begin{satz}[Optimality Equation für $V$]
+% Bellmann Optimality Equations 
+% V* = max_a E_s'~T_a [ R_a(s,s') + gamma V*(s') ]
+\begin{satz}[Optimality Equation für $V$] \label{Bellman_Optimality_V}
     Die optimale Value-Funktion $V^*(\bm{s})$ erfüllt:
     \begin{align*}
         V^{*}(\bm{s})
@@ -2608,25 +2610,98 @@ Wir folgen der Notation aus \cite{sutton_barto_2018} und definieren:
 
 \subsection{Value Iteration}
 
-Wir definieren die Abbildung $\mathcal{F}$ als
+Wir definieren die Abbildung $\mathcal{T}$ als
 \begin{align*}
-    \mathcal{F}[Q](\bm{s}, a)
-    &=
+    \mathcal{T}[V](\bm{s}, a)
+    &:=
+    \max_{a}
     \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
     \left[
         \vphantom{\int}
         R_a(\bm{s}, \bm{s}') + \gamma 
-        \max_{a'} Q(\bm{s}', a')
+        V(\bm{s}', a')
     \right]
 \end{align*}
 
-
-Die Bellmanngleichung sagt nun aus, 
-dass $Q^*$ der Fixpunkt der Abbildung $\mathcal{F}$ ist, also
+Die Bellmann Optimalitätsgleichung \ref{Bellman_Optimality_V} sagt nun aus, 
+dass $V^*$ der Fixpunkt der Abbildung $\mathcal{T}$ ist, 
+also $\mathcal{T}[V^*] = V^*$ gilt. 
+Die Fixpunktiteration $V_{k+1} = \mathcal{T}[V_k]$ konvergiert somit gegen $V^*$.
 %
-\begin{align*}
-    Q_{k+1} = \mathcal{F}[Q_k]
-\end{align*}
+
+\proof{
+    Wir zeigen zunächst, dass $\mathcal{T}$ eine Kontraktion ist:
+    % T(V) - T(U) <= gamma ||V-U||_infty
+    \begin{align*}
+        \left| \mathcal{T}[V] - \mathcal{T}[U] \right|
+        &=
+        \left|
+            \lila{\max_{a}}
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+            \left[
+                \vphantom{\int}
+                R_a(\bm{s}, \bm{s}') + \gamma 
+                V(\bm{s}')
+            \right]
+            -
+            \lila{\max_{a}}
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+            \left[
+                \vphantom{\int}
+                R_a(\bm{s}, \bm{s}') + \gamma 
+                U(\bm{s}')
+            \right]
+        \right| \\
+        &\leq
+        \lila{\max_{a}}
+        \left|
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+            \left[
+                \vphantom{\int}
+                R_a(\bm{s}, \bm{s}') + \gamma 
+                V(\bm{s}')
+            \right]
+            -
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+            \left[
+                \vphantom{\int}
+                R_a(\bm{s}, \bm{s}') + \gamma 
+                U(\bm{s}')
+            \right]
+        \right|
+        \\
+        &=
+        \max_{a}
+        \left|
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+            \left[
+                \vphantom{\int}
+                \gamma
+                (V(\bm{s}') - U(\bm{s}'))
+            \right]
+        \right|
+        \\
+        &\leq
+        \max_{a}
+        \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+        \left[
+            \vphantom{\int}
+            \gamma
+            \cdot
+            \underbrace{
+                \rot{\sup_{\bm{s}'} |} V(\bm{s}') - U(\bm{s}') \rot{|}
+            }_{
+                \|V - U\|_{\infty}
+            }
+        \right]
+        \\
+        &=
+        \gamma \|V - U\|_{\infty}
+    \end{align*}
+
+    Nach dem Fixpunktsatz von Banach \cite{sutton_barto_2018}
+    konvergiert die Iteration $V_{k+1} = \mathcal{T}(V_k)$ gegen $V^*$ für $k \to \infty$.
+}
 
 \begin{algorithm}
     \caption{Value Iteration}
