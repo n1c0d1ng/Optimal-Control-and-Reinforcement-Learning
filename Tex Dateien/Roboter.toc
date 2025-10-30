@@ -20,5 +20,8 @@
 \contentsline {subsection}{\numberline {5.1}Bellman Optimality Equations}{22}{subsection.5.1}%
 \contentsline {subsection}{\numberline {5.2}Value Iteration}{24}{subsection.5.2}%
 \contentsline {subsection}{\numberline {5.3}Q-Learning}{25}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}SARSA}{25}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.4}SARSA}{26}{subsection.5.4}%
+\contentsline {section}{\numberline {6}Reinforcement Learning in Optimal Control}{27}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Deep Deterministic Policy Gradient}{27}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Two-Link-Revolute Manipulator}{27}{subsection.6.2}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

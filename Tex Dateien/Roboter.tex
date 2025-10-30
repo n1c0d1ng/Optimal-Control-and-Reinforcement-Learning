@@ -2735,19 +2735,71 @@ Die Fixpunktiteration $V_{k+1} = \mathcal{T}[V_k]$ konvergiert somit gegen $V^*$
 
 \subsection{Q-Learning}
 
+Wir definieren die $\epsilon$-Greedy-Policy:
+%
+\begin{align*}
+    \pi_{\epsilon}(a, \bm{s})
+    &:=
+    \begin{cases}
+        1- \epsilon + \frac{\varepsilon}{|\mathcal{A}|} & \text{if } a = \arg\max_{a'} Q[\bm{s}, a'] \\
+        \frac{\varepsilon}{|\mathcal{A}|} & \text{else}
+    \end{cases}
+\end{align*}
+
 \begin{algorithm}
     \caption{Q-Learning}
     \begin{algorithmic}
         \State Given Environment, 
         learning rate $\alpha \in (0,1]$, 
-        discount factor $\gamma \in [0,1)$
-        \State $Q(Terminal) = 0$
+        discount factor $\gamma \in [0,1)$,
+        exploration rate $\epsilon \in (0,1)$
+        \State Initialize $Q(s,a)$ arbitrarily for all $s \in \mathcal{S}, a \in \mathcal{A}$
+        \State $Q(\text{terminal}, \cdot) = 0$ \Comment{\lila{Terminale Zustände haben Wert 0}}
+        \For{each episode}
+            \State Initialize state $s$
+            \While{state $s$ is not terminal}
+                \State Choose action $a = \epsilon$-greedy$(Q[s,\cdot],\epsilon)$
+                \State $(s',r) = Environment(s,a)$
+                \State $Q[s,a] \leftarrow (1-\alpha) \cdot Q[s,a] 
+                + \alpha \cdot (r + \gamma \cdot \max_{a'} Q[s',a'])$
+                \State $s \leftarrow s'$
+            \EndWhile
+        \EndFor
     \end{algorithmic}
 \end{algorithm}
 
+\newpage
 
 \subsection{SARSA}
 
+\begin{algorithm}
+    \caption{SARSA}
+    \begin{algorithmic}
+        \State Given Environment, 
+        learning rate $\alpha \in (0,1]$, 
+        discount factor $\gamma \in [0,1)$,
+        exploration rate $\epsilon \in (0,1)$
+        \State $Q(Terminal) = 0$
+        \For{each episode}
+            \State Initialize state $s$
+            \State Choose action $a = \epsilon$-greedy$(Q[s,\cdot],\epsilon)$
+            \While{state $s$ is not terminal}
+                \State $(s',r) = Environment(s,a)$
+                \State $Q[s,a] = (1-\alpha) \cdot Q[s,a] + \alpha \cdot (r + \gamma \cdot Q[s',a'])$
+                \State $s = s'$
+                \State Choose action $a' = \epsilon$-greedy$(Q[s,\cdot],\epsilon)$
+            \EndWhile
+        \EndFor
+    \end{algorithmic}
+\end{algorithm}
+
+\newpage
+
+\section{Reinforcement Learning in Optimal Control}
+
+\subsection{Deep Deterministic Policy Gradient}
+
+\subsection{Two-Link-Revolute Manipulator}
 
 \newpage
 
