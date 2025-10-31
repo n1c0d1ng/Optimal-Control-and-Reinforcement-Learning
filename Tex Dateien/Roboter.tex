@@ -2521,8 +2521,9 @@ Herleitung der Bellmann Gleichung für die Q-Funktion:
         V^{\pi^*}(\bm{s}) = V^{*}(\bm{s})
     \end{align*}
 }
-
-\begin{satz}[Optimality Equation für Q-Funktion]
+% Bellmann Optimality Equations for Q-function
+% Q*(s,a) = E_s'~T_a [ R_a(s,s') + gamma max_a' Q*(s',a') ]
+\begin{satz}[Optimality Equation für Q-Funktion] \label{Bellman_Optimality_Q}
     Die optimale Q-Funktion $Q^*(\bm{s}, a)$ erfüllt:
     %
     \begin{align*}
@@ -2560,53 +2561,6 @@ Herleitung der Bellmann Gleichung für die Q-Funktion:
         \pi^{*}(\bm{s}) = a^* = \arg\max_{a} Q^{*}(\bm{s}, a)
     \end{align*}
 }
-
-% Definition der Trajektorie tau
-\begin{align*}
-    \tau_t^n :=
-    \{
-        \bm{s}_t, a_t, r_{t}, \bm{s}_{t+1}, \cdots, \bm{s}_{t+n}, a_{t+n}, r_{t+n}, \bm{s}_{t+n+1}
-    \} 
-    =
-    \left\{
-        \vphantom{\int}
-        \bm{s}_{t+i}, a_{t+i}, r_{t+i}, \bm{s}_{t+i+1} 
-    \right\}_{i=0,\ldots,n}
-\end{align*}
-
-Für die Wahrscheinlichkeit jeder Trajektorie gilt
-\begin{align*}
-    P(\tau_0) &= 
-    P(\bm{s}_0) \cdot 
-    \prod_{t=0}^{\infty} \pi(a_t|\bm{s}_t) \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
-\end{align*}
-
-Wir folgen der Notation aus \cite{sutton_barto_2018} und definieren: 
-%
-% Definition Objective Function J = V^pi(s_0) 
-\begin{definition}[Objective Function]
-    Wir definieren die Objective Function als
-    %
-    \begin{align*}
-        J(\pi) 
-        =
-        V^{\pi}(\bm{s}_0)
-        =
-        \mathsf{E}_{\tau_0 \sim P(\tau_0 \mid \pi)} 
-        \left[
-            \vphantom{\int}
-            R(\tau_0)
-        \right]
-    \end{align*}
-    %
-    und die optimal policy $\pi^*$ als
-    \begin{align*}
-        \pi^* = \arg\max_{\pi} J(\pi)
-    \end{align*}
-\end{definition}
-
-
-\newpage
 
 \subsection{Value Iteration}
 
@@ -2735,17 +2689,39 @@ Die Fixpunktiteration $V_{k+1} = \mathcal{T}[V_k]$ konvergiert somit gegen $V^*$
 
 \subsection{Q-Learning}
 
-Wir definieren die $\epsilon$-Greedy-Policy:
+Wir betrachten die Optimalitätsgleichung für die Q-Funktion \ref{Bellman_Optimality_Q}:
 %
 \begin{align*}
-    \pi_{\epsilon}(a, \bm{s})
-    &:=
-    \begin{cases}
-        1- \epsilon + \frac{\varepsilon}{|\mathcal{A}|} & \text{if } a = \arg\max_{a'} Q[\bm{s}, a'] \\
-        \frac{\varepsilon}{|\mathcal{A}|} & \text{else}
-    \end{cases}
+    Q^{*}(\bm{s}, a) =
+    \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+    \left[
+        \vphantom{\int}
+        R_a(\bm{s}, \bm{s}') + \gamma 
+        \max_{a'} Q^{*}(\bm{s}', a')
+    \right]
 \end{align*}
 
+und definieren erneut den Operator $\mathcal{T}$ als
+%
+\begin{align*}
+    \mathcal{T}[Q](\bm{s}, a)
+    &:=
+    \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+    \left[
+        \vphantom{\int}
+        R_a(\bm{s}, \bm{s}') + \gamma 
+        \max_{a'} Q(\bm{s}', a')
+    \right]
+\end{align*}
+
+und erhalten erneut die Fixpunktgleichung $\mathcal{T}[Q^*] = Q^*$. Die Fixpunktiteration
+$Q_{k+1} = \mathcal{T}[Q_k]$ konvergiert somit gegen $Q^*$, 
+allerdings ist die Berechnung der Erwartungswerte nicht möglich, 
+da wir das Modell $\bm{s}' = T_a(\bm{s})$ nicht kennen.
+%
+
+% Hier konkreter Q-Learning Algorithmus
+%--------------------------------------------------------------
 \begin{algorithm}
     \caption{Q-Learning}
     \begin{algorithmic}
@@ -2758,15 +2734,145 @@ Wir definieren die $\epsilon$-Greedy-Policy:
         \For{each episode}
             \State Initialize state $s$
             \While{state $s$ is not terminal}
-                \State Choose action $a = \epsilon$-greedy$(Q[s,\cdot],\epsilon)$
+                \State Choose action $a = \epsilon$-greedy$(Q[s,\cdot],\epsilon)$ 
+                \Comment{\gruen{Exploration vs. Exploitation}}
                 \State $(s',r) = Environment(s,a)$
                 \State $Q[s,a] \leftarrow (1-\alpha) \cdot Q[s,a] 
                 + \alpha \cdot (r + \gamma \cdot \max_{a'} Q[s',a'])$
+                \Comment{\rot{Bootstrapping und TD-Learning}}
                 \State $s \leftarrow s'$
             \EndWhile
         \EndFor
     \end{algorithmic}
 \end{algorithm}
+
+\proof{
+    Wir prüfen die Vorraussetzungen für die Konvergenz von 
+    Q-Learning aus \cite{tsitsiklis1992asynchronous} und folgern die 
+    Konvergenz gegen $Q^*$ fast sicher.
+    %
+    \begin{itemize}
+        \item Der Beweis, dass $\mathcal{T}$ eine Kontraktion ist,
+        verläuft analog zum Beweis für die Value-Funktion.
+    %
+        \begin{align*}
+            \left| \mathcal{T}[Q] - \mathcal{T}[U] \right|
+            &=
+            \left|
+                \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+                \left[
+                    \vphantom{\int}
+                    R_a(\bm{s}, \bm{s}') + \gamma 
+                    \max_{a'} Q(\bm{s}', a')
+                \right]
+                -
+                \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+                \left[
+                    \vphantom{\int}
+                    R_a(\bm{s}, \bm{s}') + \gamma 
+                    \max_{a'} U(\bm{s}', a')
+                \right]
+            \right| \\
+            &=
+            \left|
+                \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+                \left[
+                    \vphantom{\int}
+                    \gamma
+                    \left(
+                        \max_{a'} Q(\bm{s}', a') - \max_{a'} U(\bm{s}', a')
+                    \right)
+                \right]
+            \right| \\
+            &\leq
+            \gamma
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+            \left[
+                \vphantom{\int}
+                \gamma
+                \cdot
+                \underbrace{
+                    \rot{\max_{a'} |} Q(\bm{s}', a') - U(\bm{s}', a') \rot{|}
+                }_{
+                    \leq \|Q - U\|_{\infty}
+                }
+            \right]
+            \\
+            &\leq
+            \gamma \|Q - U\|_{\infty}
+        \end{align*}
+        %
+        \item Wir verwenden folgende Update-Regel, um die Q-Funktion zu approximieren:
+    %
+        \begin{align*}
+            Q_{k+1}(\bm{s}, a) 
+            &=  Q_k(\bm{s}, a)
+            + \alpha \cdot 
+            \left[
+                \underbrace{
+                    R_a(\bm{s},\bm{s}') + \gamma \cdot \max_{a'} Q_k(\bm{s}', a')
+                    }_{\text{Sample of }T[Q_k]} 
+                - Q_k(\bm{s}, a)
+            \right]
+            \\
+            &=
+            Q_k(\bm{s}, a)
+            + \alpha \cdot
+            \left[
+                \rot{\mathcal{T}[Q_k](\bm{s}, a)} - Q_k(\bm{s}, a) +
+                \underbrace{
+                    R_a(\bm{s},\bm{s}') + \gamma \cdot \max_{a'} Q_k(\bm{s}', a')
+                    \rot{- \mathcal{T}[Q_k](\bm{s}, a)}}_{
+                        \eta_k
+                    }
+            \right]
+            \\
+            &=  Q_k(\bm{s}, a)
+            + \alpha \cdot
+            \left[
+                \vphantom{\int}
+                \mathcal{T}[Q_k](\bm{s}, a) - Q_k(\bm{s}, a)
+                + \eta_k
+            \right]
+        \end{align*}
+        %
+        Für den Erwartungswert des Rauschterms $\eta_k$ gilt:
+        %
+        \begin{align*}
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+            \left[
+                \eta_k \mid Q_k
+            \right]
+            &=
+            \mathsf{E}_{\bm{s}' \sim T_a(\bm{s})}
+            \left[
+                R_a(\bm{s},\bm{s}') + \gamma \cdot \max_{a'} Q_k(\bm{s}', a')
+                - 
+                \underbrace{\mathcal{T}[Q_k](\bm{s}, a)}_{
+                    \text{deterministic}
+                }
+                \mid Q_k
+            \right]
+            = 0
+        \end{align*}
+        %
+        \item Wir definieren die $\epsilon$-Greedy-Policy:
+    %
+        \begin{align*}
+            \pi_{\epsilon}(a, \bm{s})
+            &:=
+            \begin{cases}
+                1- \epsilon + \frac{\varepsilon}{|\mathcal{A}|} & \text{if } a = \arg\max_{a'} Q[\bm{s}, a'] \\
+                \frac{\varepsilon}{|\mathcal{A}|} & \text{else}
+            \end{cases}
+            =
+            (1-\epsilon) \cdot \mathds{1}_{a = \arg\max_{a'} Q[\bm{s}, a']} 
+            + \frac{\epsilon}{|A|}
+        \end{align*}
+\end{itemize}
+
+
+}
 
 \newpage
 
@@ -2796,6 +2902,131 @@ Wir definieren die $\epsilon$-Greedy-Policy:
 \newpage
 
 \section{Reinforcement Learning in Optimal Control}
+
+% Definition der Trajektorie tau
+\begin{align*}
+    \tau_t^n :=
+    \{
+        \bm{s}_t, a_t, r_{t}, \bm{s}_{t+1}, \cdots, \bm{s}_{t+n}, a_{t+n}, r_{t+n}, \bm{s}_{t+n+1}
+    \} 
+    =
+    \left\{
+        \vphantom{\int}
+        \bm{s}_{t+i}, a_{t+i}, r_{t+i}, \bm{s}_{t+i+1} 
+    \right\}_{i=0,\ldots,n}
+\end{align*}
+
+Für die Wahrscheinlichkeit jeder Trajektorie gilt
+\begin{align*}
+    p(\tau | \theta) &= 
+    p(\bm{s}_0) \cdot 
+    \prod_{t=0}^{\infty} \pi_{\theta}(a_t|\bm{s}_t) \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+\end{align*}
+
+Wir folgen der Notation aus \cite{sutton_barto_2018} und definieren: 
+%
+% Definition Objective Function J = V^pi(s_0) 
+\begin{definition}[Objective Function]
+    Wir definieren die Objective Function als
+    %
+    \begin{align*}
+        J(\theta) 
+        =
+        V^{\pi}(\bm{s}_0)
+        =
+        \mathsf{E}_{\tau \sim \pi_{\theta}} 
+        \left[
+            \vphantom{\int}
+            R(\tau)
+        \right]
+    \end{align*}
+\end{definition}
+
+Für die Gradienten der Objective Function gilt:
+% Policy Gradient Theorem
+\begin{satz}[Policy Gradient Theorem]
+    Für die Gradienten der Objective Function gilt:
+    %
+    \begin{align*}
+    \nabla_{\theta} J(\theta) 
+    = \nabla_{\theta} \mathsf{E}_{\tau \sim p(\tau|\theta)} \left[ R(\tau) \right] 
+    = \mathsf{E}_{\tau \sim p(\tau|\theta)} \left[ \nabla_{\theta} R(\tau) \right]
+    \end{align*}    
+\end{satz}
+
+\proof{
+    \begin{itemize}
+        \item Direkte Ableitung der Objective Function:
+        %
+            \begin{align*}
+                \nabla_{\theta} J(\theta)
+                &=
+                \nabla_{\theta} \int R(\tau) \cdot p(\tau|\theta) \mathrm{d}\tau \\
+                &=
+                \int R(\tau) \cdot \nabla_{\theta} p(\tau|\theta) \mathrm{d}\tau \\
+                &=
+                \int R(\tau) \cdot p(\tau|\theta) \cdot 
+                \frac{\nabla_{\theta} p(\tau|\theta)}{p(\tau|\theta)} \mathrm{d}\tau \\
+                &=
+                \int R(\tau) \cdot p(\tau|\theta) \cdot 
+                \nabla_{\theta} \log p(\tau|\theta) \mathrm{d}\tau \\
+                &=
+                \mathsf{E}_{\tau \sim p(\tau|\theta)} 
+                \left[ 
+                    R(\tau) \cdot \nabla_{\theta} \log p(\tau|\theta) 
+                \right]        
+            \end{align*}
+            %
+            \item  Wir berechnen nun $\nabla_{\theta} \log p(\tau|\theta)$:
+    %
+                \begin{align*}
+                    \nabla_{\theta} \log p(\tau|\theta)
+                    &=
+                    \nabla_{\theta} \log 
+                    \left[
+                        p(\bm{s}_0) \cdot 
+                        \prod_{t=0}^{T-1} \pi_{\theta}(a_t|\bm{s}_t) 
+                        \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+                    \right] \\
+                    &=
+                    \nabla_{\theta} 
+                    \left[
+                        \log p(\bm{s}_0) + 
+                        \sum_{t=0}^{T-1} 
+                        \log \pi_{\theta}(a_t|\bm{s}_t) +
+                        \log T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+                    \right] \\
+                    &=
+                    \sum_{t=0}^{T-1} 
+                    \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+                \end{align*}
+            %
+            \item  Wir erhalten somit: 
+    %           %
+                \begin{align*}
+                    \nabla_{\theta} J(\theta) 
+                    &= 
+                    \mathsf{E}_{\tau \sim p(\tau|\theta)} 
+                    \left[ 
+                        R(\tau) \cdot \nabla_{\theta} \log p(\tau|\theta) 
+                    \right]
+                    =
+                    \mathsf{E}_{\tau \sim p(\tau|\theta)} 
+                    \left[ 
+                        R(\tau) \cdot 
+                        \sum_{t=0}^{T-1} 
+                        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+                    \right]
+                \end{align*}
+    \end{itemize}
+}
+
+\begin{align*}
+    R &\leftarrow \sum_{k=t}^{T-1} \gamma^{k-t} r_{k} \\
+    \theta &\leftarrow \theta + \alpha 
+    \cdot R \cdot \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+\end{align*}
+
 
 \subsection{Deep Deterministic Policy Gradient}
 
