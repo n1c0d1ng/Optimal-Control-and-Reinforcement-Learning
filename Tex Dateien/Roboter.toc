@@ -22,6 +22,7 @@
 \contentsline {subsection}{\numberline {5.3}Q-Learning}{24}{subsection.5.3}%
 \contentsline {subsection}{\numberline {5.4}SARSA}{26}{subsection.5.4}%
 \contentsline {section}{\numberline {6}Reinforcement Learning in Optimal Control}{27}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Deep Deterministic Policy Gradient}{28}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Two-Link-Revolute Manipulator}{28}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.1}Policy-Based Algorithms}{27}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Deep Deterministic Policy Gradient}{29}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Two-Link-Revolute Manipulator}{29}{subsection.6.3}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

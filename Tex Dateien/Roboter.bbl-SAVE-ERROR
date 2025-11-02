@@ -229,6 +229,33 @@
       \field{title}{Reinforcement Learning: An Introduction}
       \field{year}{2018}
     \endentry
+    \entry{tsitsiklis1992asynchronous}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=c68e0327319b548306afacf417d06ebf}{%
+           family={Tsitsiklis},
+           familyi={T\bibinitperiod},
+           given={John\bibnamedelima N.},
+           giveni={J\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Kluwer Academic Publishers}%
+      }
+      \strng{namehash}{c68e0327319b548306afacf417d06ebf}
+      \strng{fullhash}{c68e0327319b548306afacf417d06ebf}
+      \strng{fullhashraw}{c68e0327319b548306afacf417d06ebf}
+      \strng{bibnamehash}{c68e0327319b548306afacf417d06ebf}
+      \strng{authorbibnamehash}{c68e0327319b548306afacf417d06ebf}
+      \strng{authornamehash}{c68e0327319b548306afacf417d06ebf}
+      \strng{authorfullhash}{c68e0327319b548306afacf417d06ebf}
+      \strng{authorfullhashraw}{c68e0327319b548306afacf417d06ebf}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Machine Learning}
+      \field{title}{Asynchronous Stochastic Approximation and Q-Learning}
+      \field{year}{1992}
+    \endentry
   \enddatalist
 \endrefsection
 \endinput

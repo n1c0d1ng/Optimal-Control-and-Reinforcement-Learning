@@ -2903,6 +2903,8 @@ da wir das Modell $\bm{s}' = T_a(\bm{s})$ nicht kennen.
 
 \section{Reinforcement Learning in Optimal Control}
 
+Wir folgen den Notationen aus \cite{Plaat_RL}.
+Für eine gegebene Trajektorie $\tau$ des MDPs gilt:
 % Definition der Trajektorie tau
 \begin{align*}
     \tau_t^n :=
@@ -2916,31 +2918,88 @@ da wir das Modell $\bm{s}' = T_a(\bm{s})$ nicht kennen.
     \right\}_{i=0,\ldots,n}
 \end{align*}
 
-Für die Wahrscheinlichkeit jeder Trajektorie gilt
+In einem unendlichen Zeithorizont notieren wir $\tau_t^\infty = \tau_t$. 
+Für die Verteilung der Trajektorien gilt:
+% Definition der Trajektorie Verteilung p(tau|pi)
 \begin{align*}
-    p(\tau | \theta) &= 
-    p(\bm{s}_0) \cdot 
-    \prod_{t=0}^{\infty} \pi_{\theta}(a_t|\bm{s}_t) \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
-\end{align*}
+    p(\tau_0 \mid \rot{\pi})
+    = p(\bm{s}_0) \cdot 
+    \prod_{t=0}^{\infty} \rot{\pi}(a_t|\bm{s}_t) 
+    \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+\end{align*}     
 
-Wir folgen der Notation aus \cite{sutton_barto_2018} und definieren: 
+Für das Zielfunktional definieren wir:
 %
 % Definition Objective Function J = V^pi(s_0) 
 \begin{definition}[Objective Function]
     Wir definieren die Objective Function als
     %
-    \begin{align*}
-        J(\theta) 
+    \begin{align*} 
+        J(\rot{\pi}) 
+        :=
+        V^{\rot{\pi}}(\bm{s}_0)
         =
-        V^{\pi}(\bm{s}_0)
-        =
-        \mathsf{E}_{\tau \sim \pi_{\theta}} 
+        \mathsf{E}_{\tau_0 \sim p(\tau_0| \rot{\pi})}
+        \left[
+            \vphantom{\int}
+            R(\tau_0)
+        \right]
+        \Rightarrow
+        \pi^* (a | \bm{s}) = \arg\max_{\pi} V^{\rot{\pi}}(\bm{s}_0)
+    \end{align*}
+\end{definition}
+
+
+\subsection{Policy-Based Algorithms}
+% Nun Schritt von pi zu pi_theta
+
+Wir betrachten nun nachfolgend eine Familie von parametrisierten Policies
+$\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
+
+\begin{center}
+    \begin{tabular}{l |l| l}
+        & Unendlichdimensionales Problem & Parametrisiertes Problem \\
+        \hline
+        Policy 
+        & $\pi: S \to p(A)$ 
+        & $\theta \rightarrow \pi_{\theta}$ mit $\pi_{\theta}(a|\bm{s})$ 
+        \\
+        $J(\pi)$ 
+        &
+        $\displaystyle J(\pi) = \mathsf{E}_{\tau \sim p(\tau \mid \rot{\pi})}
         \left[
             \vphantom{\int}
             R(\tau)
-        \right]
-    \end{align*}
-\end{definition}
+        \right]$
+        & 
+        $\displaystyle J(\blau{\theta}) 
+        = \mathsf{E}_{\tau \sim p(\tau \mid \blau{\theta})}
+        \left[
+            \vphantom{\int}
+            R(\tau)
+        \right]$ 
+        \\ 
+        $p(\tau_0)$ 
+        & $ \displaystyle p(\tau_0 \mid \rot{\pi})
+            = p(\bm{s}_0) \cdot 
+            \prod_{t=0}^{T-1} \rot{\pi}(a_t|\bm{s}_t) 
+            \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})$ 
+        & $ \displaystyle p(\tau_0 \mid \blau{\theta}) = 
+            p(\bm{s}_0) \cdot 
+            \prod_{t=0}^{T-1} \pi_{\blau{\theta}}(a_t|\bm{s}_t) 
+            \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})$ 
+        \\
+        $\nabla J$ 
+        & $\displaystyle \nabla J(\pi)=$ 
+        & $\displaystyle \nabla J(\blau{\theta}) 
+        = \mathsf{E}_{\tau \sim p(\tau \mid \blau{\theta})} 
+            \left[ 
+                R(\tau) \cdot 
+                \sum_{t=0}^{T-1} 
+                \nabla_{\theta} \log \pi_{\blau{\theta}}(a_t|\bm{s}_t)
+            \right]$ \\
+\end{tabular}
+\end{center}
 
 Für die Gradienten der Objective Function gilt:
 % Policy Gradient Theorem
@@ -3027,6 +3086,131 @@ Für die Gradienten der Objective Function gilt:
     \cdot R \cdot \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
 \end{align*}
 
+\proof{
+    Es gilt $\pi_\epsilon = \pi + \epsilon \cdot h$
+    %
+    \begin{align*}
+        \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
+        &=
+        \frac{d}{d \epsilon}
+        \mathsf{E}_{\tau \sim p(\tau|\pi_\epsilon)}
+        \left[
+            R(\tau)
+        \right]
+        \mid_{\epsilon=0} \\
+        &=
+        \frac{d}{d \epsilon}
+        \int R(\tau) \cdot p(\tau|\pi_\epsilon) \mathrm{d}\tau
+        \mid_{\epsilon=0} \\
+        &=
+        \int R(\tau) \cdot
+        \underbrace{
+            \frac{d}{d \epsilon} p(\tau|\pi_\epsilon)
+        }_{
+            p(\tau|\pi_\epsilon) \cdot \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
+        } \mathrm{d}\tau
+        \mid_{\epsilon=0} \\
+        &=
+        \int R(\tau) \cdot p(\tau|\pi) \cdot
+        \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
+        \mid_{\epsilon=0} \mathrm{d}\tau 
+    \end{align*}
+
+    Wir berechnen nun $\frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)$:
+    % 
+    \begin{align*}
+        \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
+        &=
+        \frac{d}{d \epsilon} \log
+        \left[
+            p(\bm{s}_0) \cdot 
+            \prod_{t=0}^{T-1} \pi_\epsilon(a_t|\bm{s}_t) 
+            \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+        \right] \\
+        &=
+        \frac{d}{d \epsilon}
+        \left[
+            \log p(\bm{s}_0) + 
+            \sum_{t=0}^{T-1} 
+            \log \pi_\epsilon(a_t|\bm{s}_t) +
+            \log T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+        \right] \\
+        &=
+        \sum_{t=0}^{T-1} 
+        \frac{d}{d \epsilon} \log 
+        \left( 
+            \vphantom{int}
+            \pi(a_t|\bm{s}_t) + \epsilon \cdot h(a_t|\bm{s}_t)
+        \right) 
+        \\
+        &=
+        \sum_{t=0}^{T-1} 
+        \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t) + \epsilon \cdot h(a_t|\bm{s}_t)} 
+        \overset{\epsilon = 0}{=}
+        \sum_{t=0}^{T-1} 
+        \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+    \end{align*}
+
+    Wir erhalten somit:
+    %
+    \begin{align*}
+        \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
+        &=
+        \int R(\tau) \cdot p(\tau|\pi) \cdot
+        \sum_{t=0}^{T-1} 
+        \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+        \mathrm{d}\tau \\
+        &=
+        \mathsf{E}_{\tau \sim p(\tau|\pi)}
+        \left[
+            R(\tau) \cdot 
+            \sum_{t=0}^{T-1} 
+            \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+        \right]
+        \\
+        &=
+        \sum_{t=0}^{T-1}
+        \mathsf{E}_{\tau \sim p(\tau|\pi)}
+        \left[
+            R(\tau) \cdot 
+            \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+        \right]
+    \end{align*}
+
+    Für jeden festen Zeitschritt $t$ gilt somit:
+    %
+    \begin{align*}
+        \mathsf{E}_{\tau \sim p(\tau|\pi)}
+        \left[
+            R(\tau) \cdot 
+            \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+        \right]
+        &=
+        \mathsf{E}_{\bm{s}_t,a_t}
+        \left[
+            \mathsf{E}_{\tau \sim p(\tau|\bm{s}_t,a_t)}
+            \left[
+                R(\tau) \cdot 
+                \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+            \right]
+        \right]
+        \\
+        &=
+        \mathsf{E}_{\bm{s}_t,a_t}
+        \left[
+            \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\pi, \bm{s}_t)}
+            \cdot
+            \underbrace{
+                \mathsf{E}_{\tau \sim p(\tau | \pi)}
+                \left[
+                    R(\tau) \mid \bm{s}_t,a_t
+                \right]
+            }_{
+                = Q^{\pi}(\bm{s}_t,a_t)
+            }
+        \right]
+    \end{align*}
+}
 
 \subsection{Deep Deterministic Policy Gradient}
 
