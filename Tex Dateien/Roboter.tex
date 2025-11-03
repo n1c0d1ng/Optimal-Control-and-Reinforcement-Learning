@@ -2874,30 +2874,6 @@ da wir das Modell $\bm{s}' = T_a(\bm{s})$ nicht kennen.
 
 }
 
-\newpage
-
-\subsection{SARSA}
-
-\begin{algorithm}
-    \caption{SARSA}
-    \begin{algorithmic}
-        \State Given Environment, 
-        learning rate $\alpha \in (0,1]$, 
-        discount factor $\gamma \in [0,1)$,
-        exploration rate $\epsilon \in (0,1)$
-        \State $Q(Terminal) = 0$
-        \For{each episode}
-            \State Initialize state $s$
-            \State Choose action $a = \epsilon$-greedy$(Q[s,\cdot],\epsilon)$
-            \While{state $s$ is not terminal}
-                \State $(s',r) = Environment(s,a)$
-                \State $Q[s,a] = (1-\alpha) \cdot Q[s,a] + \alpha \cdot (r + \gamma \cdot Q[s',a'])$
-                \State $s = s'$
-                \State Choose action $a' = \epsilon$-greedy$(Q[s,\cdot],\epsilon)$
-            \EndWhile
-        \EndFor
-    \end{algorithmic}
-\end{algorithm}
 
 \newpage
 
@@ -2956,12 +2932,13 @@ Für das Zielfunktional definieren wir:
 Wir betrachten nun nachfolgend eine Familie von parametrisierten Policies
 $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
 
+% J(pi_theta) vs J(pi) im Vergleich:
 \begin{center}
     \begin{tabular}{l |l| l}
         & Unendlichdimensionales Problem & Parametrisiertes Problem \\
         \hline
         Policy 
-        & $\pi: S \to p(A)$ 
+        & $\pi: \mathcal{\bm{S}} \to p(\mathcal{A})$ 
         & $\theta \rightarrow \pi_{\theta}$ mit $\pi_{\theta}(a|\bm{s})$ 
         \\
         $J(\pi)$ 
@@ -2979,238 +2956,430 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
             R(\tau)
         \right]$ 
         \\ 
-        $p(\tau_0)$ 
-        & $ \displaystyle p(\tau_0 \mid \rot{\pi})
+        $p(\tau)$ 
+        & $ \displaystyle p(\tau \mid \rot{\pi})
             = p(\bm{s}_0) \cdot 
             \prod_{t=0}^{T-1} \rot{\pi}(a_t|\bm{s}_t) 
             \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})$ 
-        & $ \displaystyle p(\tau_0 \mid \blau{\theta}) = 
+        & $ \displaystyle p(\tau \mid \blau{\theta}) = 
             p(\bm{s}_0) \cdot 
             \prod_{t=0}^{T-1} \pi_{\blau{\theta}}(a_t|\bm{s}_t) 
             \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})$ 
         \\
         $\nabla J$ 
-        & $\displaystyle \nabla J(\pi)=$ 
+        & $\displaystyle \nabla J(\rot{\pi})= 
+        \sum_{t=0}^{T-1} p(\bm{s}_t = \bm{s}) 
+        \cdot Q^{\rot{\pi}}(\bm{s}, a)$
         & $\displaystyle \nabla J(\blau{\theta}) 
-        = \mathsf{E}_{\tau \sim p(\tau \mid \blau{\theta})} 
-            \left[ 
-                R(\tau) \cdot 
-                \sum_{t=0}^{T-1} 
+        = \displaystyle 
+            \mathsf{E}_{\tau \sim p(\tau|\blau{\theta})}
+            \left[
+                \sum_{t=0}^{T-1}
+                Q^{\pi_{\blau{\theta}}}(\bm{s}_t, a_t) \cdot 
                 \nabla_{\theta} \log \pi_{\blau{\theta}}(a_t|\bm{s}_t)
             \right]$ \\
 \end{tabular}
 \end{center}
 
-Für die Gradienten der Objective Function gilt:
-% Policy Gradient Theorem
-\begin{satz}[Policy Gradient Theorem]
-    Für die Gradienten der Objective Function gilt:
-    %
-    \begin{align*}
-    \nabla_{\theta} J(\theta) 
-    = \nabla_{\theta} \mathsf{E}_{\tau \sim p(\tau|\theta)} \left[ R(\tau) \right] 
-    = \mathsf{E}_{\tau \sim p(\tau|\theta)} \left[ \nabla_{\theta} R(\tau) \right]
-    \end{align*}    
-\end{satz}
-
+% Beweis Policy Gradient Theorem
 \proof{
     \begin{itemize}
         \item Direkte Ableitung der Objective Function:
         %
-            \begin{align*}
-                \nabla_{\theta} J(\theta)
-                &=
-                \nabla_{\theta} \int R(\tau) \cdot p(\tau|\theta) \mathrm{d}\tau \\
-                &=
-                \int R(\tau) \cdot \nabla_{\theta} p(\tau|\theta) \mathrm{d}\tau \\
-                &=
-                \int R(\tau) \cdot p(\tau|\theta) \cdot 
-                \frac{\nabla_{\theta} p(\tau|\theta)}{p(\tau|\theta)} \mathrm{d}\tau \\
-                &=
-                \int R(\tau) \cdot p(\tau|\theta) \cdot 
-                \nabla_{\theta} \log p(\tau|\theta) \mathrm{d}\tau \\
-                &=
-                \mathsf{E}_{\tau \sim p(\tau|\theta)} 
-                \left[ 
-                    R(\tau) \cdot \nabla_{\theta} \log p(\tau|\theta) 
-                \right]        
-            \end{align*}
-            %
-            \item  Wir berechnen nun $\nabla_{\theta} \log p(\tau|\theta)$:
-    %
-                \begin{align*}
-                    \nabla_{\theta} \log p(\tau|\theta)
-                    &=
-                    \nabla_{\theta} \log 
-                    \left[
-                        p(\bm{s}_0) \cdot 
-                        \prod_{t=0}^{T-1} \pi_{\theta}(a_t|\bm{s}_t) 
-                        \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
-                    \right] \\
-                    &=
-                    \nabla_{\theta} 
-                    \left[
-                        \log p(\bm{s}_0) + 
-                        \sum_{t=0}^{T-1} 
-                        \log \pi_{\theta}(a_t|\bm{s}_t) +
-                        \log T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
-                    \right] \\
-                    &=
-                    \sum_{t=0}^{T-1} 
+        \begin{align*}
+            \nabla_{\theta} J(\theta)
+            &=
+            \nabla_{\theta} \int R(\tau) \cdot p(\tau|\theta) \mathrm{d}\tau \\
+            &=
+            \int R(\tau) \cdot \nabla_{\theta} p(\tau|\theta) \mathrm{d}\tau \\
+            &=
+            \int R(\tau) \cdot p(\tau|\theta) \cdot 
+            \frac{\nabla_{\theta} p(\tau|\theta)}{p(\tau|\theta)} \mathrm{d}\tau \\
+            &=
+            \int R(\tau) \cdot p(\tau|\theta) \cdot 
+            \nabla_{\theta} \log p(\tau|\theta) \mathrm{d}\tau \\
+            &=
+            \mathsf{E}_{\tau \sim p(\tau|\theta)} 
+            \left[ 
+                R(\tau) \cdot \nabla_{\theta} \log p(\tau|\theta) 
+            \right]        
+        \end{align*}
+        %
+        \item  Wir berechnen nun $\nabla_{\theta} \log p(\tau|\theta)$:
+        %
+        \begin{align*}
+            \nabla_{\theta} \log p(\tau|\theta)
+            &=
+            \nabla_{\theta} \log 
+            \left[
+                p(\bm{s}_0) \cdot 
+                \prod_{t=0}^{T-1} \pi_{\theta}(a_t|\bm{s}_t) 
+                \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+            \right] \\
+            &=
+            \nabla_{\theta} 
+            \left[
+                \log p(\bm{s}_0) + 
+                \sum_{t=0}^{T-1} 
+                \log \pi_{\theta}(a_t|\bm{s}_t) +
+                \log T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+            \right] \\
+            &=
+            \sum_{t=0}^{T-1} 
+            \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+        \end{align*}
+        %
+        \item  Anwendung der Tower Property 
+        $\mathsf{E}_\tau [f(\tau)] 
+        = \mathsf{E}_{\bm{s}_t,a_t} 
+        [\mathsf{E}_{\tau} [f(\tau) \mid \bm{s}_t , a_t]]$: 
+        %           %
+        \begin{align*}
+            \nabla_{\theta} J(\theta) 
+            &= 
+            \mathsf{E}_{\tau \sim p(\tau|\theta)} 
+            \left[ 
+                R(\tau) \cdot 
+                \sum_{t=0}^{T-1} 
+                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+            \right]
+            \\
+            &=
+            \sum_{t=0}^{T-1}
+            \mathsf{E}_{\tau \sim p(\tau|\theta)}
+            \left[
+                R(\tau) \cdot 
+                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+            \right]
+            \\
+            &=
+            \sum_{t=0}^{T-1}
+            \mathsf{E}_{\bm{s}_t,a_t}
+            \left[
+                \mathsf{E}_{\tau \sim p(\tau|\bm{s}_t,a_t)}
+                \left[
+                    R(\tau) \cdot 
                     \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-                \end{align*}
-            %
-            \item  Wir erhalten somit: 
-    %           %
-                \begin{align*}
-                    \nabla_{\theta} J(\theta) 
-                    &= 
-                    \mathsf{E}_{\tau \sim p(\tau|\theta)} 
-                    \left[ 
-                        R(\tau) \cdot \nabla_{\theta} \log p(\tau|\theta) 
-                    \right]
-                    =
-                    \mathsf{E}_{\tau \sim p(\tau|\theta)} 
-                    \left[ 
-                        R(\tau) \cdot 
-                        \sum_{t=0}^{T-1} 
-                        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-                    \right]
-                \end{align*}
-    \end{itemize}
-}
+                    \mid \bm{s}_t , a_t
+                \right]
+            \right]
+            \\
+            &=
+            \sum_{t=0}^{T-1}
+            \mathsf{E}_{\tau \sim p(\tau|\theta)}
+            \left[
+                \underbrace{
+                    Q^{\pi_{\theta}}(\bm{s}_t, a_t) \cdot 
+                    \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+                }_{
+                    = g(\bm{s}_t, a_t) = g(\tau)
+                }
+            \right]
+        \end{align*}
+        %
+        \item Es gilt $\pi_\epsilon = \pi + \epsilon \cdot h$
+        %
+        \begin{align*}
+            \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
+            &=
+            \frac{d}{d \epsilon}
+            \mathsf{E}_{\tau \sim p(\tau|\pi_\epsilon)}
+            \left[
+                R(\tau)
+            \right]
+            \mid_{\epsilon=0} \\
+            &=
+            \frac{d}{d \epsilon}
+            \int R(\tau) \cdot p(\tau|\pi_\epsilon) \mathrm{d}\tau
+            \mid_{\epsilon=0} \\
+            &=
+            \int R(\tau) \cdot
+            \underbrace{
+                \frac{d}{d \epsilon} p(\tau|\pi_\epsilon)
+            }_{
+                p(\tau|\pi_\epsilon) \cdot \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
+            } \mathrm{d}\tau
+            \mid_{\epsilon=0} \\
+            &=
+            \int R(\tau) \cdot p(\tau|\pi) \cdot
+            \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
+            \mid_{\epsilon=0} \mathrm{d}\tau 
+        \end{align*}
 
-\begin{align*}
-    R &\leftarrow \sum_{k=t}^{T-1} \gamma^{k-t} r_{k} \\
-    \theta &\leftarrow \theta + \alpha 
-    \cdot R \cdot \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-\end{align*}
-
-\proof{
-    Es gilt $\pi_\epsilon = \pi + \epsilon \cdot h$
-    %
-    \begin{align*}
-        \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
-        &=
-        \frac{d}{d \epsilon}
-        \mathsf{E}_{\tau \sim p(\tau|\pi_\epsilon)}
-        \left[
-            R(\tau)
-        \right]
-        \mid_{\epsilon=0} \\
-        &=
-        \frac{d}{d \epsilon}
-        \int R(\tau) \cdot p(\tau|\pi_\epsilon) \mathrm{d}\tau
-        \mid_{\epsilon=0} \\
-        &=
-        \int R(\tau) \cdot
-        \underbrace{
-            \frac{d}{d \epsilon} p(\tau|\pi_\epsilon)
-        }_{
-            p(\tau|\pi_\epsilon) \cdot \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
-        } \mathrm{d}\tau
-        \mid_{\epsilon=0} \\
-        &=
-        \int R(\tau) \cdot p(\tau|\pi) \cdot
-        \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
-        \mid_{\epsilon=0} \mathrm{d}\tau 
-    \end{align*}
-
-    Wir berechnen nun $\frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)$:
-    % 
-    \begin{align*}
-        \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
-        &=
-        \frac{d}{d \epsilon} \log
-        \left[
-            p(\bm{s}_0) \cdot 
-            \prod_{t=0}^{T-1} \pi_\epsilon(a_t|\bm{s}_t) 
-            \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
-        \right] \\
-        &=
-        \frac{d}{d \epsilon}
-        \left[
-            \log p(\bm{s}_0) + 
+        \item Wir berechnen nun $\frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)$:
+        % 
+        \begin{align*}
+            \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
+            &=
+            \frac{d}{d \epsilon} \log
+            \left[
+                p(\bm{s}_0) \cdot 
+                \prod_{t=0}^{T-1} \pi_\epsilon(a_t|\bm{s}_t) 
+                \cdot T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+            \right] \\
+            &=
+            \frac{d}{d \epsilon}
+            \left[
+                \log p(\bm{s}_0) + 
+                \sum_{t=0}^{T-1} 
+                \log \pi_\epsilon(a_t|\bm{s}_t) +
+                \log T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
+            \right] \\
+            &=
             \sum_{t=0}^{T-1} 
-            \log \pi_\epsilon(a_t|\bm{s}_t) +
-            \log T_{a_t}(\bm{s}_t, \bm{s}_{t+1})
-        \right] \\
-        &=
-        \sum_{t=0}^{T-1} 
-        \frac{d}{d \epsilon} \log 
-        \left( 
-            \vphantom{int}
-            \pi(a_t|\bm{s}_t) + \epsilon \cdot h(a_t|\bm{s}_t)
-        \right) 
-        \\
-        &=
-        \sum_{t=0}^{T-1} 
-        \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t) + \epsilon \cdot h(a_t|\bm{s}_t)} 
-        \overset{\epsilon = 0}{=}
-        \sum_{t=0}^{T-1} 
-        \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
-    \end{align*}
-
-    Wir erhalten somit:
-    %
-    \begin{align*}
-        \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
-        &=
-        \int R(\tau) \cdot p(\tau|\pi) \cdot
-        \sum_{t=0}^{T-1} 
-        \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
-        \mathrm{d}\tau \\
-        &=
-        \mathsf{E}_{\tau \sim p(\tau|\pi)}
-        \left[
-            R(\tau) \cdot 
+            \frac{d}{d \epsilon} \log 
+            \left( 
+                \vphantom{int}
+                \pi(a_t|\bm{s}_t) + \epsilon \cdot h(a_t|\bm{s}_t)
+            \right) 
+            \\
+            &=
+            \sum_{t=0}^{T-1} 
+            \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t) + \epsilon \cdot h(a_t|\bm{s}_t)} 
+            \overset{\epsilon = 0}{=}
             \sum_{t=0}^{T-1} 
             \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
-        \right]
-        \\
-        &=
-        \sum_{t=0}^{T-1}
-        \mathsf{E}_{\tau \sim p(\tau|\pi)}
-        \left[
-            R(\tau) \cdot 
-            \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
-        \right]
-    \end{align*}
+        \end{align*}
 
-    Für jeden festen Zeitschritt $t$ gilt somit:
-    %
-    \begin{align*}
-        \mathsf{E}_{\tau \sim p(\tau|\pi)}
-        \left[
-            R(\tau) \cdot 
+        \item Wir erhalten somit:
+        %
+        \begin{align*}
+            \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
+            &=
+            \int R(\tau) \cdot p(\tau|\pi) \cdot
+            \sum_{t=0}^{T-1} 
             \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
-        \right]
-        &=
-        \mathsf{E}_{\bm{s}_t,a_t}
-        \left[
-            \mathsf{E}_{\tau \sim p(\tau|\bm{s}_t,a_t)}
+            \mathrm{d}\tau \\
+            &=
+            \mathsf{E}_{\tau \sim p(\tau|\pi)}
+            \left[
+                R(\tau) \cdot 
+                \sum_{t=0}^{T-1} 
+                \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+            \right]
+            \\
+            &=
+            \sum_{t=0}^{T-1}
+            \mathsf{E}_{\tau \sim p(\tau|\pi)}
             \left[
                 R(\tau) \cdot 
                 \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
             \right]
-        \right]
-        \\
-        &=
-        \mathsf{E}_{\bm{s}_t,a_t}
-        \left[
-            \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\pi, \bm{s}_t)}
+        \end{align*}
+        %
+        \item Für jeden festen Zeitschritt $t$ gilt somit:
+        %
+        \begin{align*}
+            \mathsf{E}_{\tau \sim p(\tau|\pi)}
+            \left[
+                R(\tau) \cdot 
+                \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+            \right]
+            &=
+            \mathsf{E}_{\bm{s}_t,a_t}
+            \left[
+                \mathsf{E}_{\tau \sim p(\tau|\bm{s}_t,a_t)}
+                \left[
+                    R(\tau) \cdot 
+                    \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+                \right]
+            \right]
+            \\
+            &=
+            \mathsf{E}_{\bm{s}_t,\lila{a_t}}
+            \left[
+                \frac{h(a_t|\bm{s}_t)}{\pi(a_t| \bm{s}_t)}
+                \cdot
+                \underbrace{
+                    \mathsf{E}_{\tau \sim p(\tau | \pi)}
+                    \left[
+                        R(\tau) \mid \bm{s}_t,a_t
+                    \right]
+                }_{
+                    = Q^{\pi}(\bm{s}_t,a_t)
+                }
+            \right]
+            \\
+            &=
+            \mathsf{E}_{\bm{s}_t}
+            \left[
+                \lila{\int_{\mathcal{A}}}
+                \lila{\pi(a_t = a \mid \bm{s}_t)} \cdot
+                \frac{h(a_t|\bm{s}_t)}{\pi(a_t = a| \bm{s}_t)}
+                \cdot
+                Q^{\pi}(\bm{s}_t,a_t = a)
+                \lila{\mathrm{d}a}
+            \right]
+            \\
+            &=
+            \mathsf{E}_{\bm{s}_t}
+            \left[
+                \lila{\int_{\mathcal{A}}}
+                h(a|\bm{s}_t) \cdot
+                Q^{\pi}(\bm{s}_t,a)
+                \lila{\mathrm{d}a}
+            \right]
+        \end{align*}
+        %
+        \item Wir erhalten somit insgesamt:
+        %
+        \begin{align*}
+            \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
+            &=
+            \sum_{t=0}^{T-1}
+            \mathsf{E}_{\blau{\bm{s}_t}}
+            \left[
+                \int_{\mathcal{A}}
+                h(a|\bm{s}_t) \cdot
+                Q^{\pi}(\bm{s}_t,a)
+                \mathrm{d}a
+            \right]
+            \\
+            &=
+            \blau{\int_{\mathcal{S}}} \int_{\mathcal{A}}
+            \sum_{t=0}^{T-1}
+            p(\bm{s}_t = \bm{s}) \cdot
+            h(a |\bm{s}) \cdot
+            Q^{\pi}(\bm{s},a)
+            \mathrm{d}a \; 
+            \blau{\mathrm{d}\bm{s}}
+            \\
+            \Rightarrow \nabla_{\pi} J(\pi(a | \bm{s})) 
+            &= 
+            \underbrace{
+                \sum_{t=0}^{T-1}
+                p(\bm{s}_t = \bm{s})
+            }_{
+                = d^{\pi}(\bm{s})
+            }
+            \cdot Q^{\pi}(\bm{s},a)
+            =
+            d^{\pi}(\bm{s}) \cdot Q^{\pi}(\bm{s},a)
+        \end{align*}
+
+        \item Bilden der Ableitung nach $\theta$ ergibt:
+        %
+        \begin{align*}
+            \nabla_{\theta} J(\pi_{\theta}) 
+            &=
+            \int_{\mathcal{S}} \int_{\mathcal{A}}
+            \underbrace{
+                \sum_{t=0}^{T-1} p(\bm{s}_t = \bm{s}) \cdot
+                Q^{\pi_{\theta}}(\bm{s},a)}_{
+                    \nabla_{\pi} J(\pi_{\theta}(a | \bm{s}))
+                }
             \cdot
             \underbrace{
-                \mathsf{E}_{\tau \sim p(\tau | \pi)}
+                \pi_{\theta}(a|\bm{s}) 
+                \cdot \nabla_{\theta} \log \pi_{\theta}(a|\bm{s})
+            }_{
+                \nabla_{\theta} \pi_{\theta}(a|\bm{s})
+            }
+            \mathrm{d}a \; \mathrm{d}\bm{s} \\
+            &=
+            \sum_{t=0}^{T-1}
+            \int_{\mathcal{S}} 
+            \int_{\mathcal{A}}
+            \underbrace{
+                \mathsf{E}_{\tau \sim p(\tau|\theta)}
                 \left[
-                    R(\tau) \mid \bm{s}_t,a_t
+                    \vphantom{\int}
+                    R(\tau) \mid \bm{s}_t, a_t 
                 \right]
             }_{
-                = Q^{\pi}(\bm{s}_t,a_t)
+                Q^{\pi_{\theta}}(\bm{s},a)
             }
-        \right]
-    \end{align*}
+            \cdot
+            \underbrace{
+                p(\bm{s}_t = \bm{s}) \cdot
+                \pi_{\theta}(a|\bm{s}) 
+            }_{
+                p_{\theta}(\bm{s}_t = \bm{s},a_t = a)
+            }
+            \cdot \nabla_{\theta} \log \pi_{\theta}(a|\bm{s})
+            \mathrm{d}a \; \mathrm{d}\bm{s} \\
+            &=
+            \sum_{t=0}^{T-1}
+            \mathsf{E}_{(\bm{s}_t, a_t) \sim p_{\theta}}
+                \left[
+                    \vphantom{\int}
+                    \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                    \left[
+                        \vphantom{\int}
+                        R(\tau) \mid \bm{s}_t, a_t
+                    \right]
+                    \cdot
+                    \underbrace{
+                        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+                    }_{
+                        \sigma(\bm{s}_t, a_t)-\text{messbar}
+                    }
+                \right]
+                \\
+            &=
+            \sum_{t=0}^{T-1}
+            \underbrace{
+                \mathsf{E}_{(\rot{\bm{s}_t, a_t}) \sim p_{\theta}}
+                \left[
+                    \vphantom{\int}
+                    \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                    \left[
+                        R(\tau) 
+                        \cdot
+                        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t) \mid \rot{\bm{s}_t, a_t}
+                    \right]
+                \right]
+            }_{
+                \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                \left[ 
+                    R(\tau) \cdot 
+                    \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+                \right],
+                \text{ Tower Property: }
+                \mathsf{E}[X] = \mathsf{E}_{\rot{Y}}[\mathsf{E}[X|\rot{Y}]]
+            }
+                \\
+            &=
+            \mathsf{E}_{\tau \sim p(\tau|\theta)} 
+            \left[ 
+                R(\tau) \cdot 
+                \sum_{t=0}^{T-1} 
+                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+            \right]
+        \end{align*}
+    \end{itemize}
 }
+
+\begin{algorithm}
+    \caption{Policy Gradient Algorithm - Monte Carlo \cite[p.110]{Plaat_RL}}
+    \begin{algorithmic}
+        \State Differentiable Policy $\pi_{\theta}$, Learning Rate $\alpha > 0$, 
+        threshold $\epsilon > 0$
+        \State Initialize parameters $\theta \in \mathbb{R}^d$ arbitrarily
+        \While{$\|\nabla_{\theta} J(\pi_{\theta})\|_2 > \epsilon$}
+            \State Generate Trace $\tau$ following $\pi_{\theta}$
+            \For{$t \in 0, \cdots , T-1$}
+                \State $R_t \leftarrow \sum_{k=t}^{T-1} \gamma^{k-t} r_{k}$
+                \Comment{
+                    $R_t
+                    \approx
+                    Q^{\pi_{\theta}}(\bm{s}_t, a_t)
+                    $
+                    }
+                \State $\theta \leftarrow \theta + \alpha \cdot 
+                R_t \cdot \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)$
+                \Comment{Wir zerlegen die Summe
+                $\sum_{t=0}^{T-1} Q^{\pi_{\theta}}(\bm{s}_t, a_t) 
+                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+                \approx
+                $}
+            \EndFor
+        \EndWhile
+    \end{algorithmic}
+\end{algorithm}
+
+
+
 
 \subsection{Deep Deterministic Policy Gradient}
 
