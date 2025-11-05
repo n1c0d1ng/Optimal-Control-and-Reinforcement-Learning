@@ -1,88 +1,74 @@
-# Implementierung von Beispiel 3.1
+# Implementierung von
 # min int_0^1 x+u^2 dt x'=x+u+1 x(0) = 0
 #--------------------------------------------------------------------------------------------------
-import Functions
+import ControlProblem as OCP
 import matplotlib.pyplot as plt
 import numpy as np
 
+problem = OCP.ControlProblem(N=100)
+problem.gradient_descent(max_iter=1000, tol=1e-6)
 
-# Meine Standardfarben für Darkmode
-custom_background_dark = (53/255, 62/255, 69/255)  
-custom_background_light = (255/255, 255/255, 255/255)
-custom_red = (255/255, 94/255, 77/255)
-custom_blau = (70/255, 130/255, 255/255)
-custom_orange = (255/255,127/255,80/255)
+# Policy Gradient
+theta = np.array([0.0, 0.0, 0.0])  # Initiale Parameter [theta_0, theta_1]
+sigma = 1  # Standardabweichung für die Rauschkomponente
+alpha = 0.0001  # Lernrate
 
+num_episodes = 100000000
+for episode in range(num_episodes):
+    x, t = 0.0, 0.0
+    trajectory = []
+    rewards = []
+    actions = []
+    trajectory.append((t, x))
+    actions.append(0)
 
+    for step in range(100):
+        mu = theta[0] + theta[1]*t + theta[2]*x
+        # u sim pi(u|t,x) = N(mu, sigma^2)
+        u = np.clip(np.random.normal(mu, sigma), -10, 10)
+        x_next = x + (1/100)*(x + u + 1)
+        t_next = t + (1/100)
+        r = -(x + u**2)*(1/100)  # Sofortige Belohnung
 
-def p_analytic(t):
-    return -1 + np.exp(-t + 1)
+        trajectory.append((t, x))
+        rewards.append(r)
+        actions.append(u)
+        t, x = t_next, x_next
 
-def u_analytic(t):
-    return 0.5 * (1 - np.exp(-t + 1))
+    # Gradientenschritt basierend auf dieser einen trajektorie
+    rewards.append(-x**2)  # Endterm als Reward (negativ, da Minimierung)
+    R = np.zeros(100)
 
-def x_analytic(t):
-    return -1.5 + (np.exp(-t + 1) / 4) + 1.5 * np.exp(t) - (np.exp(t + 1) / 4)
+    for i in range(100):
+        R[i] = sum(rewards[i:])  # Gesamtrückgabe ab Zeit 
+        
+    grad = np.zeros(3)
+    for k in range(100):
+        # mu = theta_0 + theta_1*t_k + theta_2*x_k
+        mu = theta[0] + theta[1]*trajectory[k][0] + theta[2]*trajectory[k][1]
 
-def plot_comparison(t1, x1, u1, t2, x2, u2):
-    # Analytische Lösungen
-    t_analytic = np.linspace(0, 1, 1000)
-    x_ana = x_analytic(t_analytic)
-    u_ana = u_analytic(t_analytic)
+        # pi = N(mu, sigma^2) -> log pi = -0.5*log(2pi*sigma^2) - (u - mu)^2/(2*sigma^2)
+        # grad log(pi) = (u - mu) / sigma^2 * [1, t_k, x_k]
+        # da mu_theta = [1, t_k, x_k]
+        grad_logp = (actions[k] - mu) / sigma**2 * np.array([1, trajectory[k][0], trajectory[k][1]])
+        grad += R[k] * grad_logp
+    sigma = max(0.2, sigma * 0.998)  # Exploration reduzieren
+    if np.linalg.norm(grad) > 1:
+        grad = grad/np.linalg.norm(grad)  # Normalisieren
+        
+    theta += alpha * grad
+    theta = np.clip(theta, -100, 100)
 
-    plt.figure(figsize=(15, 5), facecolor= custom_background_dark)
-
-
-    # Vergleich für x(t)
-    ax1 = plt.subplot(1, 2, 1)
-    ax1.plot(t_analytic, x_ana, label="Analytisch: x(t)", color=custom_red, linewidth=1)
-    ax1.plot(t1, x1, label="Numerisch (N=100): x(t)", color=custom_blau, linestyle="-")
-    ax1.plot(t2, x2, label="Numerisch (N=1000): x(t)", color=custom_orange, linestyle="-")
-    #ax1.set_title("Zustand x(t)")
-    #ax1.set_xlabel("t")
-    #ax1.set_ylabel("x")
-
-    # Anpassung der Achsenlinien
-    ax1.spines['top'].set_visible(False)  # Obere Linie ausblenden
-    ax1.spines['right'].set_visible(False)  # Rechte Linie ausblenden
-    ax1.spines['bottom'].set_color(custom_background_light)  # Untere Linie 
-    ax1.spines['left'].set_color(custom_background_light)  # Linke Linie 
-    ax1.tick_params(axis='x', colors=custom_background_light)  # X-Ticks 
-    ax1.tick_params(axis='y', colors=custom_background_light)  # Y-Ticks 
-
-    # Vergleich für u(t)
-    ax2 = plt.subplot(1, 2, 2)
-    ax2.plot(t_analytic, u_ana, label="Analytisch: u(t)", color=custom_red, linewidth=1)
-    ax2.plot(t1, u1, label="Numerisch (N=100): u(t)", color=custom_blau, linestyle="-")
-    ax2.plot(t2, u2, label="Numerisch (N=1000): u(t)", color=custom_orange, linestyle="-")
-    #ax2.set_title("Steuerung u(t)")
-    #ax2.set_xlabel("t")
-    #ax2.set_ylabel("u")
-
-    # Anpassung der Achsenlinien
-    ax2.spines['top'].set_visible(False)  # Obere Linie ausblenden
-    ax2.spines['right'].set_visible(False)  # Rechte Linie ausblenden
-    ax2.spines['bottom'].set_color(custom_background_light)  # Untere Linie 
-    ax2.spines['left'].set_color(custom_background_light)  # Linke Linie 
-    ax2.tick_params(axis='x', colors=custom_background_light)  # X-Ticks 
-    ax2.tick_params(axis='y', colors=custom_background_light)  # Y-Ticks 
-
-    ax1.set_facecolor(custom_background_dark)
-    ax2.set_facecolor(custom_background_dark)
-
-    # Layout anpassen und Plot anzeigen
-    plt.tight_layout()
-    plt.savefig("plot.pdf", format="pdf", bbox_inches="tight")
-    plt.show()
+results = np.array(trajectory)
+control = np.array(actions)
+plt.plot(results[:, 0], results[:, 1], label="Trajektorie")
+plt.plot(results[:, 0], control, label="u numerisch")
 
 
+#plt.plot(problem.t, problem.x, label="x numerisch")
+plt.plot(problem.t, problem.x_analytic(), label="x analytisch")
+#plt.plot(problem.t, problem.u, label="u numerisch")
+plt.plot(problem.t, problem.u_analytic(), label="u analytisch")
+plt.legend()
+plt.show()
 
-
-
-# Berechnung der numerischen Lösungen
-u_num, x_num, t = Functions.gradient_descent(100, 100, 0.00001)
-u_num2, x_num2, t2 = Functions.gradient_descent(100, 500, 0.00001)
-
-
-# Vergleich in einem einzigen Plot
-plot_comparison(t, x_num, u_num, t2, x_num2, u_num2)
