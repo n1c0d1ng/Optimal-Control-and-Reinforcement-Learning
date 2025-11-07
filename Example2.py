@@ -1,19 +1,19 @@
 # Implementierung von
-# min int_0^1 x+u^2 dt + x(1)^2  mit x'=x+u+1 x(0) = 0
+# min int_0^1 u^2 dt + (x(1)-1)^2  mit x'=u x(0) = 0
 #--------------------------------------------------------------------------------------------------
 import ControlProblem as OCP
 import matplotlib.pyplot as plt
 import numpy as np
 
-problem = OCP.ControlProblem(N=100)
-problem.gradient_descent(max_iter=1000, tol=1e-6)
+problem = OCP.SimpleControlProblem(N=100)
+#problem.gradient_descent(max_iter=1000, tol=1e-6)
 
 # Policy Gradient
-theta = np.array([-1.0, 1.0, 0.5])  # Initiale Parameter [theta_0, theta_1]
-sigma = 1  # Standardabweichung für die Rauschkomponente
-alpha = 0.001  # Lernrate
+theta = np.array([0.0])  # Initiale Parameter [theta_0]
+sigma = 1.0  # Standardabweichung für die Rauschkomponente
+alpha = 0.0001  # Lernrate
 
-num_episodes = 100000
+num_episodes = 50000
 for episode in range(num_episodes):
     x, t = 0.0, 0.0
     trajectory = []
@@ -21,62 +21,66 @@ for episode in range(num_episodes):
     actions = []
 
     for step in range(100):
-        # Lineare Policy:
-        #mu = theta[0] + theta[1]*t + theta[2]*x
-
-        # Policy aus dem theoretischen Setting: u = A * exp(-B*t) + C
-        mu = theta[0]* np.exp(-theta[1]*t) + theta[2]
+        # Policy aus dem theoretischen Setting: u = A
+        mu = theta[0]
         
         # u sim pi(u|t,x) = N(mu, sigma^2)
         u = np.clip(np.random.normal(mu, sigma), -10, 10)
-        r = -(x + u**2)*(1/100)  # Sofortige Belohnung
+        r = -(u**2)*(1/100)  # Sofortige Belohnung
 
         trajectory.append((t, x))
         rewards.append(r)
         actions.append(u)
 
         # Das kennt der Algorithmus nicht
-        x_next = x + (1/100)*(x + u + 1)
+        x_next = x + (1/100)*(u)
         t_next = t + (1/100)
         t, x = t_next, x_next
 
     # Gradientenschritt basierend auf dieser einen trajektorie
-    rewards.append(-x**2)  # Endterm als Reward (negativ, da Minimierung)
+    rewards.append(-(x-1)**2)  # Endterm als Reward (negativ, da Minimierung)
     trajectory.append((t, x))
-    actions.append(u)
+    #actions.append(u)
 
     R = np.zeros(100)
 
     for i in range(100):
         R[i] = sum(rewards[i:])  # Gesamtrückgabe ab Zeit i
         
-    grad = np.zeros(3)
+    grad = np.zeros(1)
     for k in range(100):
-        # mu = theta_0 * exp(- theta_1 *t) + theta_2
-        mu = theta[0]* np.exp(-theta[1]*trajectory[k][0]) + theta[2]
+        # mu = theta_0
+        mu = theta[0]
 
         # pi = 1/(sqrt(2pi)*sigma)* exp[-(u - mu)^2/(2*sigma^2)] 
         # -> log pi = -0.5*log(2pi*sigma^2) - (u - mu_theta)^2/(2*sigma^2)
         # grad_theta log(pi) = (u - mu) / sigma^2 * (dmu/dtheta)
-        # dmu/dtheta = [exp(- theta_1 *t) , -theta_0*t*exp(- theta_1 *t), 1]
-        grad_logp = (actions[k] - mu) / sigma**2 * \
-              np.array(
-                    [
-                        np.exp(-theta[1]*trajectory[k][0]),
-                        -theta[0]*trajectory[k][0]*np.exp(-theta[1]*trajectory[k][0]),
-                        1
-                    ]
-                )
+        # dmu/dtheta = [1]
+        grad_logp = (actions[k] - mu) / sigma**2 * np.array([1.0])
         grad += R[k] * grad_logp
     sigma = max(0.2, sigma * 0.9998)  # Exploration reduzieren
-    if np.linalg.norm(grad) > 1:
-        grad = grad/np.linalg.norm(grad)  # Normalisieren
         
     theta += alpha * grad
     theta = np.clip(theta, -100, 100)
 
-results = np.array(trajectory)
-control = np.array(actions)
+# Ausgabe der gelernten Parameter
+# Teste die gelernte Policy OHNE Exploration
+x_test, t_test = 0.0, 0.0
+trajectory_learned = []
+u_learned = [] 
+
+
+for step in range(100):
+    u_optimal = theta[0]  # Kein Rauschen - deterministisch!
+    x_test = x_test + (1/100) * u_optimal
+    t_test = t_test + (1/100)
+    
+    trajectory_learned.append((t_test, x_test))
+    u_learned.append(u_optimal)
+
+
+results = np.array(trajectory_learned)
+control = np.array(u_learned)
 plt.plot(results[:, 0], results[:, 1], label="Trajektorie")
 plt.plot(results[:, 0], control, label="u numerisch")
 
@@ -87,4 +91,3 @@ plt.plot(problem.t, problem.x_analytic(), label="x analytisch")
 plt.plot(problem.t, problem.u_analytic(), label="u analytisch")
 plt.legend()
 plt.show()
-

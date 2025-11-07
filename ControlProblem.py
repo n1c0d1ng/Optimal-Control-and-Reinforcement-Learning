@@ -1,10 +1,10 @@
-# Wir behandeln folgendes Steuerungsproblem
-# min \int_0^1 (x + u^2) dt + x(1)^2
-# mit der Zustandsgleichung x' = x + u + 1, x(0) = 0
+# Diese Datei dient zur Definition simpler Steuerungsprobleme
 #-------------------------------------------------------------------------------------------------
 import numpy as np
 
 class ControlProblem:
+# min \int_0^1 (x + u^2) dt + x(1)^2
+# mit der Zustandsgleichung x' = x + u + 1, x(0) = 0
     def __init__(self, N=100):
         self.N = N
         self.T = 1
@@ -82,3 +82,52 @@ class ControlProblem:
 
     def get_next_state(self, x, u):
         return x + self.h * (x + u + 1)
+
+class SimpleControlProblem:
+# min \int_0^1 u^2 dt + (x(1)-1)^2
+# mit der Zustandsgleichung x' = u, x(0) = 0
+# H = u^2 + p*u -> H_u = 2u + p , H_x = 0 -> p' = 0
+
+    def __init__(self, N=100):
+        self.N = N
+        self.T = 1
+        self.h = self.T / N
+        self.t = np.linspace(0, self.T, N + 1)
+        self.u = np.zeros(N + 1)  # Initiale Steuerung
+        self.x = np.zeros(N + 1)  # Initialer Zustand
+
+    def forward_integration(self, u):
+        x  = np.zeros(self.N + 1)
+        for i in range(self.N):
+            x[i + 1] = x[i] + self.h * (u[i])
+        return x
+
+    # p'=-H_x = 0 -> p = const -> p_k = p_{k+1}
+    def backward_integration(self):
+        p = np.zeros(self.N + 1)
+        p[self.N] = 2 * self.x[self.N]  # Endwert
+        for i in range(self.N):
+            p[self.N -i -1] = p[self.N - i]  # da p' = 0
+        return p
+    
+    # Gradient H_u = 2u + p 
+    def compute_gradient(self, p):
+        return -2 * self.u - p
+    
+    def compute_running_cost(self,x, u):
+        return self.h* np.sum(u**2) + x[self.N]**2
+    
+    def compute_terminal_cost(self,x, u):
+        return x[self.N]**2
+    
+    # x'=u=-p/2 -> x(t) = -(p/2)*t -> x(1) = -(p(1)/2)-> x(t)=t/2
+    def x_analytic(self):
+        return 0.5*self.t
+
+    # p'=-H_x =0 -> p(t)=p(1)=2(x(1)-1)=2(-p(1)/2 -1)-> p(t)=-1
+    def p_analytic(self):
+        return -1.0*np.ones(self.N + 1)
+    
+    # H_u = 2u+p = 0 -> u = -p/2 -> u = 1/2
+    def u_analytic(self):
+        return 0.5*np.ones(self.N + 1)
