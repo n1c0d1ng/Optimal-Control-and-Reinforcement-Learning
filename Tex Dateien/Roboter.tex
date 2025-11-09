@@ -2985,22 +2985,23 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
 \proof{
     \begin{itemize}
         \item Direkte Ableitung der Objective Function:
-        %
+        % nabla J(theta) = E_tau~p(tau|theta) [ R(tau) * nabla_theta log p(tau|theta) ]
         \begin{align*}
             \nabla_{\theta} J(\theta)
             &=
-            \nabla_{\theta} \int R(\tau) \cdot p(\tau|\theta) \mathrm{d}\tau \\
-            &=
-            \int R(\tau) \cdot \nabla_{\theta} p(\tau|\theta) \mathrm{d}\tau \\
-            &=
+            \int R(\tau) \cdot \nabla_{\theta} p(\tau|\theta) \mathrm{d}\tau 
+            =
             \int R(\tau) \cdot p(\tau|\theta) \cdot 
-            \frac{\nabla_{\theta} p(\tau|\theta)}{p(\tau|\theta)} \mathrm{d}\tau \\
-            &=
-            \int R(\tau) \cdot p(\tau|\theta) \cdot 
-            \nabla_{\theta} \log p(\tau|\theta) \mathrm{d}\tau \\
-            &=
+            \underbrace{
+                \frac{\nabla_{\theta} p(\tau|\theta)}{p(\tau|\theta)}
+            }_{
+                \nabla_{\theta} \log p(\tau|\theta)
+            }
+            \mathrm{d}\tau 
+            =
             \mathsf{E}_{\tau \sim p(\tau|\theta)} 
             \left[ 
+                \vphantom{\int}
                 R(\tau) \cdot \nabla_{\theta} \log p(\tau|\theta) 
             \right]        
         \end{align*}
@@ -3030,52 +3031,210 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
         \end{align*}
         %
         \item  Anwendung der Tower Property 
-        $\mathsf{E}_\tau [f(\tau)] 
-        = \mathsf{E}_{\bm{s}_t,a_t} 
-        [\mathsf{E}_{\tau} [f(\tau) \mid \bm{s}_t , a_t]]$: 
         %           %
         \begin{align*}
-            \nabla_{\theta} J(\theta) 
-            &= 
             \mathsf{E}_{\tau \sim p(\tau|\theta)} 
             \left[ 
-                R(\tau) \cdot 
-                \sum_{t=0}^{T-1} 
-                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-            \right]
-            \\
+                \vphantom{\int}
+                R(\tau) \cdot  
+                \underbrace{
+                    \nabla_{\theta} \log p(\tau|\theta)
+                }_{
+                    = \sum_{t=0}^{T-1} \log \pi_{\theta}(a_t|\bm{s}_t)
+                }
+            \right]   
             &=
-            \sum_{t=0}^{T-1}
+            % Linearität Erwartungswert: Summe rausziehen
+            \sum_{t=0}^{T-1} 
             \mathsf{E}_{\tau \sim p(\tau|\theta)}
             \left[
                 R(\tau) \cdot 
                 \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-            \right]
+            \right] 
             \\
             &=
-            \sum_{t=0}^{T-1}
-            \mathsf{E}_{\bm{s}_t,a_t}
-            \left[
-                \mathsf{E}_{\tau \sim p(\tau|\bm{s}_t,a_t)}
+            % Tower Property
+            \sum_{t=0}^{T-1} 
+            \mathsf{E}_{\tau \sim p(\tau|\theta)} 
+            \left[ 
+                \vphantom{\int}
+                \mathsf{E}_{\tau \sim p(\tau|\theta)}
                 \left[
                     R(\tau) \cdot 
-                    \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+                    \underbrace{
+                        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t) 
+                    }_{
+                        \sigma(a_t,s_t)\text{- messbar}
+                    }
                     \mid \bm{s}_t , a_t
                 \right]
-            \right]
+            \right]    
             \\
-            &=
+            &= 
+            % nabla log pi aus innerer Erwartung rausziehen
             \sum_{t=0}^{T-1}
             \mathsf{E}_{\tau \sim p(\tau|\theta)}
             \left[
-                \underbrace{
-                    Q^{\pi_{\theta}}(\bm{s}_t, a_t) \cdot 
-                    \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-                }_{
-                    = g(\bm{s}_t, a_t) = g(\tau)
-                }
+                \vphantom{\int}
+                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t) \cdot
+                \mathsf{E}_{\tau \sim p(\tau |\theta)}
+                \left[
+                    R(\tau) \mid \bm{s}_t , a_t
+                \right]
             \right]
         \end{align*}
+        %
+        \item Wir Zerlegen die Reward Funktion in vergangene und zukünftige Rewards:
+        % Def R(tau) = R_past(t) + R_future(t)
+        \begin{align*}
+            R(\tau) := \sum_{k=0}^{T-1} \gamma^{k} r_{k+1}(a_k,\bm{s}_k) 
+            = 
+            \underbrace{
+                \sum_{k=0}^{t-1} \gamma^{k} r_{k+1}(a_k,\bm{s}_k)
+            }_{
+                \text{Past Rewards}
+            }
+            + \underbrace{
+                \sum_{k=t}^{T-1} \gamma^{k} r_{k+1}(a_k,\bm{s}_k)
+            }_{
+                \text{Future Rewards}
+            }
+            = R_{\text{past}}(t) + R_{t}
+        \end{align*}
+        %
+        \item Wir nutzen die Unabhängigkeit der vergangenen Rewards von $a_t$:
+        % Definition Y:= nabla log pi E[(R_past + R_future)| s_t, a_t]
+        \begin{align*}
+            \mathsf{E}_{\tau \sim p(\tau|\theta)}
+            \left[
+                \vphantom{\int}
+                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t) \cdot
+                \left(
+                    \underbrace{
+                        \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                        \left[
+                            R_{\text{past}}(t)  \mid \bm{s}_t , \rot{a_t}
+                        \right]
+                    }_{
+                        \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                        \left[
+                            R_{\text{past}}(t)  \mid \bm{s}_t
+                        \right]
+                    }
+                    +
+                    \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                    \left[
+                        R_{t} \mid \bm{s}_t , a_t
+                    \right]
+                \right)
+            \right]
+            := \mathsf{E}_{\tau \sim p(\tau|\theta)}[Y]
+        \end{align*}
+
+        \item Die Zufallsvariable $Y$ hängt ausschließlich von $\bm{s}_t$ und $a_t$ ab. 
+        Die Vertelung von $\tau$ ist ein Produkt der Transitionen und der Policy also gilt
+        %
+        \begin{align*}
+            \mathsf{E}_{\tau \sim p(\tau|\theta)}[Y]
+            &=
+            \mathsf{E}_{
+                \bm{s}_t \sim p(\bm{s}_t \mid \theta)
+                }
+            \left[
+                \vphantom{\int}
+                \mathsf{E}_{a_t \sim \pi_\theta(a_t|\bm{s}_t)}[Y] 
+            \right]
+            \quad
+            p(\bm{s}_t \mid \theta) = 
+            \sum_{\bm{s}_0, \cdots , \bm{s}_{t-1}} 
+            \sum_{a_0, \cdots, a_{t-1}} p(\tau|\theta)
+        \end{align*}
+        %
+        \item Wir erhalten nun für den Term mit den 
+        vergangenen Rewards $a_t \sim \pi_\theta(a_t|\bm{s}_t)$:
+        %
+        \begin{align*}
+            &\mathsf{E}_{a_t}
+            \left[
+                \vphantom{\int}
+                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t) 
+            \right]
+            =
+            \int_{\mathcal{A}} \pi_{\theta}(a|\bm{s}_t) \cdot
+            \underbrace{
+                \nabla_{\theta} \log \pi_{\theta}(a |\bm{s}_t)
+            }_{
+                \frac{\nabla_{\theta} \pi_{\theta}(a |\bm{s}_t)}{\pi_{\theta}(a |\bm{s}_t)}
+            } \mathrm{d}a
+            =
+            \nabla_{\theta}
+            \underbrace{
+                \int_{\mathcal{A}} \pi_{\theta}(a |\bm{s}_t) \mathrm{d}a
+            }_{=1}
+            = 0 
+            \\
+            &\Rightarrow \mathsf{E}_{a_t}
+            \left[
+                \vphantom{\int}
+                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t) \cdot
+                \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                \left[
+                    R_{\text{past}}(t)  \mid \bm{s}_t
+                \right]
+            \right]
+            =
+            \mathsf{E}_{\tau \sim p(\tau|\theta)}
+            \left[
+                R_{\text{past}}(t)  \mid \bm{s}_t
+            \right] \cdot
+            \underbrace{
+                \mathsf{E}_{a_t}
+                \left[
+                    \vphantom{\int}
+                    \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+                \right]
+            }_{=0}
+            = 0
+        \end{align*}
+        %
+        \item Somit verbleibt nur der Term mit den zukünftigen Rewards:
+        %
+        \begin{align*}
+            \nabla_{\theta} J(\theta)
+            &=
+            \sum_{t=0}^{T-1}
+            \underbrace{
+                \mathsf{E}_{\bm{s}_t \sim p(\bm{s}_t \mid \theta)}
+                \left[
+                    \mathsf{E}_{a_t \sim \pi_\theta(a_t|\bm{s}_t)}
+                    \left[
+                        \vphantom{\int}
+                        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t) \cdot
+                        \underbrace{
+                            \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                            \left[
+                                R_{t}  \mid \bm{s}_t , a_t
+                            \right]
+                        }_{
+                            = Q^{\pi_{\theta}}(\bm{s}_t , a_t)
+                        }
+                    \right]
+                \right]
+            }_{
+                \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                \left[
+                    \vphantom{\int}
+                    \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t) \cdot
+                    Q^{\pi_{\theta}}(\bm{s}_t , a_t)
+                \right]
+            }
+        \end{align*}
+    \end{itemize}
+}
+
+% Policy Gradient Theorem im stetigen Fall
+\proof{
+    \begin{itemize}
         %
         \item Es gilt $\pi_\epsilon = \pi + \epsilon \cdot h$
         %
