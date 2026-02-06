@@ -1,10 +1,9 @@
-# Diese Datei dient zur Definition simpler Steuerungsprobleme
-#-------------------------------------------------------------------------------------------------
+# Enthält verschiedene determistische Steuerungsprobleme
 import numpy as np
 
-class ControlProblem:
+class OCP:
 # min \int_0^1 (x + u^2) dt + x(1)^2
-# mit der Zustandsgleichung x' = x + u + 1, x(0) = 0
+# x' = x + u + 1, x(0) = 0
     def __init__(self, N=100):
         self.N = N
         self.T = 1
@@ -23,12 +22,16 @@ class ControlProblem:
     # p' = -(1+p) p(1) =  -> p_k = p_{k+1} - (- h*(1+p_{k+1}))
     def backward_integration(self):
         p = np.zeros(self.N + 1)
-        p[self.N] = self.x[self.N]  # Endwert
+        p[self.N] = 2*self.x[self.N]  # Endwert
         for i in range(self.N):
         #for i in range(self.N - 1, -1, -1):
             p[self.N -i -1] = p[self.N - i] + self.h * (1 + p[self.N - i])
             #p[i] = p[i + 1] + self.h * (1 + p[i + 1])
         return p
+    
+    # J(u) = h * sum_i=0^´N-1 (x_i + u_i^2) + (x_N)^2
+    def compute_cost(self, x, u):
+        return self.h* np.sum(x + u**2) + x[self.N]**2
     
     # Gradient H_u = 2u + p
     def compute_gradient(self, p):
@@ -45,12 +48,8 @@ class ControlProblem:
             if J_new <= J_old - c*(beta**m)*np.linalg.norm(d)**2:
                 break
         return beta**m
-    
-    # J(u) = h * sum_i=0^´N-1 (x_i + u_i^2) + (x_N)^2
-    def compute_cost(self,x, u):
-        return self.h* np.sum(x + u**2) + x[self.N]**2
 
-    def gradient_descent(self, max_iter=100, tol=1e-6):
+    def gradient_descent(self, max_iter=1000, tol=1e-6):
         for k in range(max_iter):
             x = self.forward_integration(self.u)
             p = self.backward_integration()
@@ -64,6 +63,16 @@ class ControlProblem:
             self.u = self.u + alpha * d
             self.x = self.forward_integration(self.u)
 
+    # Interaktion mit Environment für den RL Algorithmus
+    def direct_reward(self, x, u):
+        return - (self.h * (x + u**2))
+
+    def terminal_reward(self, x):
+        return - (x**2)
+
+    def get_next_state(self, x, u):
+        return x + self.h * (x + u + 1)
+    
     # p' = -(1+p), p(1) = 2x(1) -> p(t) = -1 + A exp(-t) -> A = 1 + 2x(1) exp(1)
     # p = (6e^2 -4e/ e^2 + 1) exp(-t) -1
     def p_analytic(self):
@@ -80,8 +89,7 @@ class ControlProblem:
         return ((3 + 2 * np.exp(1)) * np.exp(self.t) + (3 * np.exp(2) - 2 * np.exp(1)) * np.exp(-self.t)) \
             / (2 * (np.exp(2) + 1)) - 1.5
 
-    def get_next_state(self, x, u):
-        return x + self.h * (x + u + 1)
+
 
 class SimpleControlProblem:
 # min \int_0^1 u^2 dt + (x(1)-1)^2

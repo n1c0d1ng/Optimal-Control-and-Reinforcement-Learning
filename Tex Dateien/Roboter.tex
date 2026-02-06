@@ -638,22 +638,36 @@ $T(\textbf{q}, \dot{\textbf{q}}) = \frac{1}{2} \dot{\textbf{q}}^T M(\textbf{q}) 
 Für die zeitlichen Ableitungen der Größen gilt 
 % Ableitung d/dt dT/d theta_1'
 \begin{align*}
-\frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \gruen{\theta_{1}'}} 
-&=
-\underbrace{\frac{\mathrm{d}}{\dt} M_{\gruen{1 1}}}_{\frac{\partial M_{11}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial M_{11}}{\partial \theta_{2}} \theta_{2}'} \cdot \gruen{\theta_{1}'} + M_{\gruen{1 1}} \gruen{\theta_{1}''} + \underbrace{\frac{\mathrm{d}}{\dt} M_{\gruen{1}\dunkelrot{2}}}_{\frac{\partial M_{12}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial M_{12}}{\partial \theta_{2}} \theta_{2}'} \cdot \dunkelrot{\theta_{2}'} + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} 
-\\
-&= \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
- + \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
- +  M_{\gruen{1 1}} \gruen{\theta_{1}''} 
- + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
- + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
- + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} \\
-&=
-\frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
- + \left[ \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \right] \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
- + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
- +  M_{\gruen{1 1}} \gruen{\theta_{1}''} 
-    + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''}
+    \frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \gruen{\theta_{1}'}} 
+    &=
+    \underbrace{
+        \frac{\mathrm{d}}{\dt} M_{\gruen{1 1}}
+    }_{
+        \frac{\partial M_{11}}{\partial \theta_{1}} \theta_{1}' 
+        + \frac{\partial M_{11}}{\partial \theta_{2}} \theta_{2}'
+        } 
+    \cdot \gruen{\theta_{1}'} + M_{\gruen{1 1}} \gruen{\theta_{1}''} + 
+    \underbrace{
+        \frac{\mathrm{d}}{\dt} M_{\gruen{1}\dunkelrot{2}}
+        }_{
+            \frac{\partial M_{12}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial M_{12}}{\partial \theta_{2}} \theta_{2}'
+            } 
+        \cdot \dunkelrot{\theta_{2}'} + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} 
+    \\
+    &= \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
+    + \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
+    +  M_{\gruen{1 1}} \gruen{\theta_{1}''} 
+    + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+    + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
+    + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} \\
+    &=
+    \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
+    + \left[ 
+        \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} 
+        \right] 
+    \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
+    + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
+    + M_{\gruen{1 1}} \gruen{\theta_{1}''} + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''}
 \end{align*}
 
 % Ableitung d/dt dT/d theta_2'
@@ -1049,76 +1063,77 @@ Wir halten uns an die Definitionen in \cite{gerdts2012}
 Wir betrachten ein Steuerungsproblem und definieren die Value-Function $V$ mittels
 %
 \begin{align*}
-V(x(t),\dunkelgelb{t}) := \min_{\dunkelrot{u}} \left\{ \int_{\dunkelgelb{t}}^{t_f} L(s,x(s),\dunkelrot{u}(s)) \ds + \Phi(x(t_f)) \right\}
+    V(x(t),\dunkelgelb{t}) := \min_{\dunkelrot{u}} \left\{ \int_{\dunkelgelb{t}}^{t_f} L(s,x(s),\dunkelrot{u}(s)) \ds + \Phi(x(t_f)) \right\}
 \end{align*}
 
 \begin{satz}[Hamilton-Jacobi-Bellman Gleichung]
-Die Value-Function erfüllt
-%
-\begin{align*}
-0 = \frac{\partial V(x, t)}{\partial t} + \min_{u} \left[ L(t,x, u) + \frac{\partial V(x,t)}{\partial x} \cdot f(t,x,u) \right], \quad x \in \mathbb{R}^n, \, t_0 \leq t \leq t_f
-\end{align*}
-%
-mit den Randbedingungen
-%
-\begin{align*}
-V(x, \lila{t_f}) = \Phi(x(\lila{t_f})) \quad V(x, \dunkelgelb{t_0} ) = \min_u \int_{\dunkelgelb{t_0}}^{t_f} L(t,x(t),u(t)) \dt + \Phi(x(t_f)) 
-\end{align*}
+    Die Value-Function erfüllt
+    %
+    \begin{align*}
+        0 = \frac{\partial V(x, t)}{\partial t} 
+        + \min_{u} \left[ L(t,x, u) + \frac{\partial V(x,t)}{\partial x} \cdot f(t,x,u) \right], 
+        \quad x \in \mathbb{R}^n, \, t_0 \leq t \leq t_f
+    \end{align*}
+    %
+    mit den Randbedingungen
+    %
+    \begin{align*}
+        V(x, \lila{t_f}) = \Phi(x(\lila{t_f})) 
+        \quad 
+        V(x, \dunkelgelb{t_0} ) = \min_u \int_{\dunkelgelb{t_0}}^{t_f} L(t,x(t),u(t)) \dt + \Phi(x(t_f)) 
+    \end{align*}
 \end{satz}
 
-%------------------------------------------------------------------------------------------------------------
+
 \proof{ 
+    Die Value-Function $V(x,t)$ beschreibt die minimalen Kosten von Zustand $x$ zum Endzeitpunkt $t_f$.  Für $s \in [t,t_f]$ gilt
+    %
+    \begin{itemize}
+        \item Systemdynamik
+        %
+        \begin{align*}
+            x'(s) = f(x(s), u(s)), \quad x(t) = x
+        \end{align*}
 
-Die Value-Function $V(x,t)$ beschreibt die minimalen Kosten von Zustand $x$ zum Endzeitpunkt $t_f$.  Für $s \in [t,t_f]$ gilt
-%
-\begin{itemize}
-\item Systemdynamik
-%
-\begin{align*}
-x'(s) = f(x(s), u(s)), \quad x(t) = x
-\end{align*}
+        \item Kostenfunktional
+        %
+        \begin{align*}
+            J(u) = \int_t^{t_f} L(s,x(s),u(s)) \ds + \Phi(x(t_f))
+        \end{align*}
+    \end{itemize}
 
-\item Kostenfunktional
-%
-\begin{align*}
-J(u) = \int_t^{t_f} L(s,x(s),u(s)) \ds + \Phi(x(t_f))
-\end{align*}
-\end{itemize}
+    Angenommen, wir wechseln zum Zeitpunkt $t+h$ zu einer optimalen Steuerung, dann gilt für unser Zielfunktional 
+    %
+    \begin{align*}
+        J(u) 
+        &= \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{\int_{t+h}^{t_f} L(s,x(s),u(s)) \ds + \Phi(x(t_f)) } \\
+        &= \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} 
+    \end{align*}
 
-Angenommen, wir wechseln zum Zeitpunkt $t+h$ zu einer optimalen Steuerung, dann gilt für unser Zielfunktional 
-%
-\begin{align*}
-J(u) 
-&= \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{\int_{t+h}^{t_f} L(s,x(s),u(s)) \ds + \Phi(x(t_f)) } \\
-&= \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} 
-\end{align*}
+    Da $V(x(t), t)$ die minimalen Kosten vom Zustand $x$ zur Zeit $t$ angibt, gilt:
+    %
+    \begin{align*}
+        V(x(t),t) 
+        &\leq \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} \\
+        \Rightarrow 0 &\leq \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} - V(x(t),t) 
+    \end{align*}
 
-Da $V(x(t), t)$ die minimalen Kosten vom Zustand $x$ zur Zeit $t$ angibt, gilt:
-%
-\begin{align*}
-V(x(t),t) 
-&\leq \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} \\
-\Rightarrow 0 &\leq \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} - V(x(t),t) 
-\end{align*}
+    Im Grenzübergang $h \to 0$ erhalten wir
+    %
+    \begin{align*}
+        0 &\leq \gruen{\lim_{h \to 0}  \frac{1}{h}  \int_{t}^{t+h} L(s,x(s),u(s)) \ds} + \dunkelrot{\lim_{h \to 0} \frac{ V(x(t+h),t+h) - V(x,t) }{h}} \\
+        &= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\mathrm{d}}{\dt} V(x(t),t)} \\
+        &= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\partial V}{\partial t}  + \frac{\partial V}{\partial x} \cdot x'(t)} \\
+        &= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\partial V}{\partial t}  + \frac{\partial V}{\partial x} \cdot f(t,x(t), u(t))}
+    \end{align*}
 
-Im Grenzübergang $h \to 0$ erhalten wir
-%
-\begin{align*}
-0 &\leq \gruen{\lim_{h \to 0}  \frac{1}{h}  \int_{t}^{t+h} L(s,x(s),u(s)) \ds} + \dunkelrot{\lim_{h \to 0} \frac{ V(x(t+h),t+h) - V(x,t) }{h}} \\
-&= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\mathrm{d}}{\dt} V(x(t),t)} \\
-&= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\partial V}{\partial t}  + \frac{\partial V}{\partial x} \cdot x'(t)} \\
-&= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\partial V}{\partial t}  + \frac{\partial V}{\partial x} \cdot f(t,x(t), u(t))}
-\end{align*}
-
-Durch Minimierung bezüglich $u$ erhalten wir die Gleichheit und somit
-%
-\begin{align*}
-0 &= \frac{\partial V}{\partial t} + \orange{\min_{u} \left[L(t,x(t),u(t)) +  \frac{\partial V}{\partial x} \cdot f(t,x(t), u(t))   \right]} \\
-&= \frac{\partial V}{\partial t} + \orange{\textsf{H}\left(t,x(t) , \frac{\partial V}{\partial x}(t,x(t)) \right)}
-\end{align*}
+    Durch Minimierung bezüglich $u$ erhalten wir die Gleichheit und somit
+    %
+    \begin{align*}
+        0 &= \frac{\partial V}{\partial t} + \orange{\min_{u} \left[L(t,x(t),u(t)) +  \frac{\partial V}{\partial x} \cdot f(t,x(t), u(t))   \right]} \\
+        &= \frac{\partial V}{\partial t} + \orange{\textsf{H}\left(t,x(t) , \frac{\partial V}{\partial x}(t,x(t)) \right)}
+    \end{align*}
 }
-%------------------------------------------------------------------------------------------------------------
-
 
 \subsection{Herleitung des Minimumprinzips}
 
@@ -2870,8 +2885,6 @@ da wir das Modell $\bm{s}' = T_a(\bm{s})$ nicht kennen.
             + \frac{\epsilon}{|A|}
         \end{align*}
 \end{itemize}
-
-
 }
 
 
@@ -2978,9 +2991,23 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
                 Q^{\pi_{\blau{\theta}}}(\bm{s}_t, a_t) \cdot 
                 \nabla_{\theta} \log \pi_{\blau{\theta}}(a_t|\bm{s}_t)
             \right]$ \\
-\end{tabular}
+    \end{tabular}
 \end{center}
 
+\begin{satz}{Policy Gradient Theorem}
+    Für die Objective Function $J(\theta)$ gilt:
+    %
+    \begin{align*}
+        \nabla J(\theta)
+        &=
+        \mathsf{E}_{\tau \sim p(\tau|\theta)}
+        \left[
+            \sum_{t=0}^{T-1}
+            Q^{\pi_{\theta}}(\bm{s}_t, a_t) \cdot 
+            \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+        \right]
+    \end{align*}
+\end{satz}
 % Beweis Policy Gradient Theorem
 \proof{
     \begin{itemize}
@@ -3232,37 +3259,47 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
     \end{itemize}
 }
 
+\begin{satz}{Policy Gradient Theorem}
+    Für die Objective Function $J(\pi)$ gilt:
+    %
+    \begin{align*}
+        \nabla_{\pi} J(\pi)
+        &=
+        \sum_{t=0}^{T-1}
+        p(\bm{s}_t = \bm{s}) 
+        \cdot Q^{\pi}(\bm{s}, a_t)
+    \end{align*}
+\end{satz}
+
 % Policy Gradient Theorem im stetigen Fall
 \proof{
     \begin{itemize}
         %
-        \item Es gilt $\pi_\epsilon = \pi + \epsilon \cdot h$
+        \item Wir nutzen den Variationsansatz $\pi_\epsilon = \pi + \epsilon \cdot h$
         %
         \begin{align*}
             \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
             &=
-            \frac{d}{d \epsilon}
-            \mathsf{E}_{\tau \sim p(\tau|\pi_\epsilon)}
-            \left[
-                R(\tau)
-            \right]
-            \mid_{\epsilon=0} \\
-            &=
-            \frac{d}{d \epsilon}
-            \int R(\tau) \cdot p(\tau|\pi_\epsilon) \mathrm{d}\tau
-            \mid_{\epsilon=0} \\
-            &=
             \int R(\tau) \cdot
             \underbrace{
-                \frac{d}{d \epsilon} p(\tau|\pi_\epsilon)
-            }_{
                 p(\tau|\pi_\epsilon) \cdot \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
+            }_{
+                \frac{d}{d \epsilon} p(\tau|\pi_\epsilon)
             } \mathrm{d}\tau
-            \mid_{\epsilon=0} \\
-            &=
-            \int R(\tau) \cdot p(\tau|\pi) \cdot
-            \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
-            \mid_{\epsilon=0} \mathrm{d}\tau 
+            \mid_{\epsilon=0} 
+            =
+            \underbrace{
+                \int R(\tau) \cdot p(\tau|\pi) \cdot
+                \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
+                \mid_{\epsilon=0} \mathrm{d}\tau
+            }_{
+                \mathsf{E}_{\tau \sim p(\tau|\pi)}
+                \left[
+                    R(\tau) \cdot 
+                    \frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)
+                    \mid_{\epsilon=0}
+                \right]
+            }
         \end{align*}
 
         \item Wir berechnen nun $\frac{d}{d \epsilon} \log p(\tau|\pi_\epsilon)$:
@@ -3300,15 +3337,10 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
             \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
         \end{align*}
 
-        \item Wir erhalten somit:
+        \item Wir erhalten somit analog zum parametrisierten Fall:
         %
         \begin{align*}
             \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
-            &=
-            \int R(\tau) \cdot p(\tau|\pi) \cdot
-            \sum_{t=0}^{T-1} 
-            \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
-            \mathrm{d}\tau \\
             &=
             \mathsf{E}_{\tau \sim p(\tau|\pi)}
             \left[
@@ -3316,8 +3348,7 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
                 \sum_{t=0}^{T-1} 
                 \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
             \right]
-            \\
-            &=
+            =
             \sum_{t=0}^{T-1}
             \mathsf{E}_{\tau \sim p(\tau|\pi)}
             \left[
@@ -3326,7 +3357,7 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
             \right]
         \end{align*}
         %
-        \item Für jeden festen Zeitschritt $t$ gilt somit:
+        \item Für jeden festen Zeitschritt $t$ verwenden wir die Turmeigenschaft:
         %
         \begin{align*}
             \mathsf{E}_{\tau \sim p(\tau|\pi)}
@@ -3335,85 +3366,126 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
                 \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
             \right]
             &=
-            \mathsf{E}_{\bm{s}_t,a_t}
+            \mathsf{E}_{\tau \sim p(\tau|\pi)}
             \left[
                 \mathsf{E}_{\tau \sim p(\tau|\bm{s}_t,a_t)}
                 \left[
-                    R(\tau) \cdot 
-                    \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+                    \underbrace{
+                        \left( R_{\text{past}}(t) + R_{\text{future}}(t) \right)
+                    }_{
+                         R(\tau)
+                    } \cdot 
+                    \underbrace{
+                        \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)}
+                    }_{
+                        \sigma(\bm{s}_t,a_t)\text{- messbar}
+                    }
+                    \mid \bm{s}_t,a_t
+                \right]
+            \right]
+        \end{align*}
+        %
+        \item Da $\pi_\epsilon$ eine Dichtefunktion ist, 
+        gilt ist das Integral für jedes feste $\bm{s}_t$ gleich $1$:
+        %
+        \begin{align*}
+            1 
+            &= \int_{\mathcal{A}} \pi(a|\bm{s}_t) + \epsilon \cdot h(a|\bm{s}_t) \mathrm{d}a
+            = 
+            \underbrace{
+                \int_{\mathcal{A}} \pi(a|\bm{s}_t) \mathrm{d}a
+            }_{=1}
+            + \epsilon \cdot
+            \underbrace{\int_{\mathcal{A}} h(a|\bm{s}_t) \mathrm{d}a}_{=0}
+            \\
+            \Rightarrow &
+            \mathsf{E}_{a_t \sim \pi(a_t|\bm{s}_t)}
+            \left[
+                \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+            \right]
+            =
+            \int_{\mathcal{A}} 
+            \underbrace{
+                \pi(a|\bm{s}_t) \cdot \frac{h(a|\bm{s}_t)}{\pi(a|\bm{s}_t)}
+            }_{
+                = h(a|\bm{s}_t)
+            }
+            \mathrm{d}a
+            = 0
+            \\
+            \Rightarrow & \mathsf{E}_{a_t \sim \pi(a_t|\bm{s}_t)}
+            \left[
+                \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} \cdot 
+                \underbrace{
+                    \mathsf{E}_{\tau \sim p(\tau|\pi)}
+                    \left[
+                        R_{\text{past}}(t)  
+                        \mid \bm{s}_t
+                    \right]
+                }_{
+                    \text{unabhängig von } a_t
+                }
+            \right]
+            =
+            \mathsf{E}_{\tau \sim p(\tau|\pi)}
+                \left[
+                    R_{\text{past}}(t)  
+                    \mid \bm{s}_t
+                \right]
+            \cdot 
+            \mathsf{E}_{a_t \sim \pi(a_t|\bm{s}_t)}
+            \left[
+                \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} 
+            \right]
+            = 0
+        \end{align*}
+        %
+        \item Wie isolieren den Gradienten aus der Richtungsableitung:
+        %
+        \begin{align*}
+            \frac{\mathrm{d}}{\mathrm{d} \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
+            &=
+            \sum_{t=0}^{T-1}
+            \mathsf{E}_{\bm{s}_t \sim p(\bm{s}_t|\pi)}  
+            \left[
+                \mathsf{E}_{a_t \sim \pi(a_t|\bm{s}_t)}
+                \left[
+                    \vphantom{\int}
+                    \frac{h(a_t|\bm{s}_t)}{\pi(a_t|\bm{s}_t)} \cdot
+                    \underbrace{
+                        \mathsf{E}_{\tau \sim p(\tau|\pi)}
+                        \left[
+                            R_{t}  \mid \bm{s}_t , a_t
+                        \right]
+                    }_{
+                        = Q^{\pi}(\bm{s}_t , a_t)
+                    }
                 \right]
             \right]
             \\
             &=
-            \mathsf{E}_{\bm{s}_t,\lila{a_t}}
-            \left[
-                \frac{h(a_t|\bm{s}_t)}{\pi(a_t| \bm{s}_t)}
-                \cdot
-                \underbrace{
-                    \mathsf{E}_{\tau \sim p(\tau | \pi)}
-                    \left[
-                        R(\tau) \mid \bm{s}_t,a_t
-                    \right]
-                }_{
-                    = Q^{\pi}(\bm{s}_t,a_t)
-                }
-            \right]
-            \\
-            &=
-            \mathsf{E}_{\bm{s}_t}
-            \left[
-                \lila{\int_{\mathcal{A}}}
-                \lila{\pi(a_t = a \mid \bm{s}_t)} \cdot
-                \frac{h(a_t|\bm{s}_t)}{\pi(a_t = a| \bm{s}_t)}
-                \cdot
-                Q^{\pi}(\bm{s}_t,a_t = a)
-                \lila{\mathrm{d}a}
-            \right]
-            \\
-            &=
-            \mathsf{E}_{\bm{s}_t}
-            \left[
-                \lila{\int_{\mathcal{A}}}
-                h(a|\bm{s}_t) \cdot
-                Q^{\pi}(\bm{s}_t,a)
-                \lila{\mathrm{d}a}
-            \right]
-        \end{align*}
-        %
-        \item Wir erhalten somit insgesamt:
-        %
-        \begin{align*}
-            \frac{d}{d \epsilon} J(\pi_\epsilon) \mid_{\epsilon=0}
-            &=
             \sum_{t=0}^{T-1}
-            \mathsf{E}_{\blau{\bm{s}_t}}
+            \mathsf{E}_{\bm{s}_t \sim p(\bm{s}_t|\pi)}  
             \left[
                 \int_{\mathcal{A}}
-                h(a|\bm{s}_t) \cdot
-                Q^{\pi}(\bm{s}_t,a)
+                \pi(a|\bm{s}_t) \cdot
+                \frac{h(a|\bm{s}_t)}{\pi(a|\bm{s}_t)} \cdot
+                Q^{\pi}(\bm{s}_t , a)
                 \mathrm{d}a
             \right]
             \\
             &=
-            \blau{\int_{\mathcal{S}}} \int_{\mathcal{A}}
-            \sum_{t=0}^{T-1}
-            p(\bm{s}_t = \bm{s}) \cdot
-            h(a |\bm{s}) \cdot
-            Q^{\pi}(\bm{s},a)
-            \mathrm{d}a \; 
-            \blau{\mathrm{d}\bm{s}}
-            \\
-            \Rightarrow \nabla_{\pi} J(\pi(a | \bm{s})) 
-            &= 
+            \int_{\mathcal{S}}
+            \int_{\mathcal{A}}
+            h(a|\bm{s}) \cdot
             \underbrace{
                 \sum_{t=0}^{T-1}
-                p(\bm{s}_t = \bm{s})
+                p(\bm{s}_t = \bm{s}) \cdot Q^{\pi}(\bm{s},a)
             }_{
-                = d^{\pi}(\bm{s})
+                \nabla_{\pi} J(\pi(a | \bm{s}))
             }
-            \cdot Q^{\pi}(\bm{s},a)
-            =
-            d^{\pi}(\bm{s}) \cdot Q^{\pi}(\bm{s},a)
+            \mathrm{d}a
+            \mathrm{d}\bm{s}
         \end{align*}
 
         \item Bilden der Ableitung nach $\theta$ ergibt:
@@ -3424,7 +3496,8 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
             \int_{\mathcal{S}} \int_{\mathcal{A}}
             \underbrace{
                 \sum_{t=0}^{T-1} p(\bm{s}_t = \bm{s}) \cdot
-                Q^{\pi_{\theta}}(\bm{s},a)}_{
+                Q^{\pi_{\theta}}(\bm{s},a)
+                }_{
                     \nabla_{\pi} J(\pi_{\theta}(a | \bm{s}))
                 }
             \cdot
@@ -3443,7 +3516,7 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
                 \mathsf{E}_{\tau \sim p(\tau|\theta)}
                 \left[
                     \vphantom{\int}
-                    R(\tau) \mid \bm{s}_t, a_t 
+                    R_t \mid \bm{s}_t, a_t 
                 \right]
             }_{
                 Q^{\pi_{\theta}}(\bm{s},a)
@@ -3452,57 +3525,28 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
             \underbrace{
                 p(\bm{s}_t = \bm{s}) \cdot
                 \pi_{\theta}(a|\bm{s}) 
+                \cdot \nabla_{\theta} \log \pi_{\theta}(a|\bm{s})
             }_{
-                p_{\theta}(\bm{s}_t = \bm{s},a_t = a)
+                \sigma(\bm{s}_t, a_t)\text{- messbar}
             }
-            \cdot \nabla_{\theta} \log \pi_{\theta}(a|\bm{s})
             \mathrm{d}a \; \mathrm{d}\bm{s} \\
             &=
             \sum_{t=0}^{T-1}
-            \mathsf{E}_{(\bm{s}_t, a_t) \sim p_{\theta}}
+            \mathsf{E}_{\bm{s}_t \sim p(\bm{s}_t|\theta)}
                 \left[
-                    \vphantom{\int}
-                    \mathsf{E}_{\tau \sim p(\tau|\theta)}
+                    \mathsf{E}_{a \sim \pi_{\theta}(a|\bm{s}_t)}
                     \left[
-                        \vphantom{\int}
-                        R(\tau) \mid \bm{s}_t, a_t
-                    \right]
-                    \cdot
-                    \underbrace{
-                        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-                    }_{
-                        \sigma(\bm{s}_t, a_t)-\text{messbar}
-                    }
-                \right]
-                \\
-            &=
-            \sum_{t=0}^{T-1}
-            \underbrace{
-                \mathsf{E}_{(\rot{\bm{s}_t, a_t}) \sim p_{\theta}}
-                \left[
-                    \vphantom{\int}
-                    \mathsf{E}_{\tau \sim p(\tau|\theta)}
-                    \left[
-                        R(\tau) 
+                        Q^{\pi_{\theta}}(\bm{s}_t, a_t)
                         \cdot
-                        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t) \mid \rot{\bm{s}_t, a_t}
+                        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
                     \right]
                 \right]
-            }_{
-                \mathsf{E}_{\tau \sim p(\tau|\theta)}
-                \left[ 
-                    R(\tau) \cdot 
-                    \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-                \right],
-                \text{ Tower Property: }
-                \mathsf{E}[X] = \mathsf{E}_{\rot{Y}}[\mathsf{E}[X|\rot{Y}]]
-            }
                 \\
             &=
             \mathsf{E}_{\tau \sim p(\tau|\theta)} 
             \left[ 
-                R(\tau) \cdot 
                 \sum_{t=0}^{T-1} 
+                Q^{\pi_{\theta}}(\bm{s}_t, a_t) \cdot
                 \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
             \right]
         \end{align*}
@@ -3527,18 +3571,824 @@ $\pi_{\theta}(a|\bm{s})$ mit den Parametern $\theta \in \mathbb{R}^d$.
                     }
                 \State $\theta \leftarrow \theta + \alpha \cdot 
                 R_t \cdot \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)$
-                \Comment{Wir zerlegen die Summe
-                $\sum_{t=0}^{T-1} Q^{\pi_{\theta}}(\bm{s}_t, a_t) 
-                \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-                \approx
-                $}
+                \Comment{
+                    $\nabla_{\theta} J(\theta) 
+                    \approx 
+                    \frac{1}{M} \sum_{i=1}^{M} 
+                    \sum_{t=0}^{T-1} R_t^{(i)} 
+                    \nabla_{\theta} \log \pi_{\theta}(a_t^{(i)}|\bm{s}_t^{(i)})$
+                }
             \EndFor
         \EndWhile
     \end{algorithmic}
 \end{algorithm}
 
+\newpage
+
+% Lösung eines Steuerungsproblems mit Policy Gradient
+\begin{beispiel}[Optimal Control Problem]
+    Wir betrachten das optimale Steuerungsproblem:
+    %
+    \begin{align*}
+        \min_{u} \int_0^1 x(t)+u(t)^2  \dt + x(1)^2  
+        \quad 
+        \dot{x} = x(t) + u(t) + 1, 
+        \quad x(0) = 0
+    \end{align*}
+
+    \begin{itemize}
+        \item[1.] Diskretisierung mit dem expliziten Euler-Verfahren
+        %
+        \begin{align*}
+            \min_{u} \int_0^1 x(t)+u(t)^2  \dt + x(1)^2 
+            \approx
+            \max_{u} - \frac{1}{N} \sum_{i=0}^{N-1} x_i + u_i^2 - x_N^2
+        \end{align*}
+
+        \item[2.] Formulierung als MDP
+        %
+        \begin{align*}
+            a_t \sim \pi_\theta(a_t | s_t) &=
+            \mathcal{N} \left(
+                \mu(t, \theta) , \sigma^2
+            \right) 
+            \Rightarrow
+            P\left[
+                a_t \in A
+            \right]
+            = 
+            \int_A \frac{1}{\sqrt{2\pi}\sigma} 
+            \exp\left[
+                -\frac{(x - \mu(t,\theta))^2}{2\sigma^2}
+            \right] \dx 
+        \end{align*}
+        \item[3.] Formulierung des Policy Gradient Algorithmus:
+        %
+        \begin{align*}
+            \nabla J(\theta)
+            \approx
+            \frac{1}{M} \sum_{i=1}^{M} 
+            \sum_{t=0}^{T-1} 
+            \nabla_{\theta} \log \pi_{\theta}(a_t^{(i)}|\bm{s}_t^{(i)})
+            \cdot R_t^{(i)}
+            =
+            \frac{1}{M} \sum_{i=1}^{M} 
+            \sum_{t=0}^{T-1} 
+            \frac{a_t^{(i)} - \mu_\theta}{\sigma^2} \cdot \frac{d \mu_\theta}{d \theta}
+            \cdot R_t^{(i)} 
+        \end{align*}
+
+        \item[4.] Wahl des Lösungsraums: 
+        %
+        $\mu(t,\theta) = \theta_0 \cdot e^{\theta_1 \cdot t} + \theta_2$ und $u(t) = a_t$ mit $M=1$
+        %
+        \begin{align*}
+            \frac{\mathrm{d} \mu_\theta}{\mathrm{d} \theta}
+            =
+            \begin{bmatrix}
+                e^{\theta_1 \cdot t} \\
+                \theta_0 \cdot t \cdot e^{\theta_1 \cdot t}\\ 
+                1
+            \end{bmatrix}
+            \Rightarrow
+            \nabla J(\theta)
+            \approx
+            \sum_{t=0}^{T-1} 
+            \frac{a_t - \mu_\theta}{\sigma^2} 
+            \cdot
+            \begin{bmatrix}
+                e^{\theta_1 \cdot t} \\
+                \theta_0 \cdot t \cdot e^{\theta_1 \cdot t}\\ 
+                1
+            \end{bmatrix}
+            \cdot R_t
+        \end{align*}
+
+        \item[5.] Simulation basierend auf einem Startwert $\theta = (0,0,0)^T$ und der Environment:
+        %
+        \begin{align*}
+            \mu(t_i,\theta) &= \theta_0 \cdot e^{\theta_1 \cdot t_i} + \theta_2  
+            \Rightarrow 
+            u(t_i) \sim \mathcal{N}(\mu(t_i,\theta), \sigma^2)
+            \\
+            r_i &= - \frac{1}{N} (x_i + u_i^2), r_N = - x_N^{2} 
+            \Rightarrow
+            R_i = \sum_{k=i}^{N} r_k \\
+            \begin{bmatrix}
+                x_{i+1} \\
+                t_{i+1}
+            \end{bmatrix}
+            &=
+            \begin{bmatrix}
+                x_i + \Delta t \cdot (x_i + u_i + 1) \\
+                t_i + \Delta t
+            \end{bmatrix}
+            , 
+            \quad
+            \begin{bmatrix}
+                x_0 \\
+                t_0
+            \end{bmatrix}
+            =
+            \begin{bmatrix}
+                0 \\
+                0
+            \end{bmatrix}
+            \quad
+            \textsf{Environment}
+        \end{align*}
+
+        \item[6.] Formulierung des Gradientenverfahrens:
+        %
+        \begin{align*}
+            \theta_{k+1} &= \theta_k + \alpha_k \cdot \nabla J(\theta_k) \\
+            \sigma  &\leftarrow \sigma \cdot 0.99998
+            \quad
+            \textsf{Exploration zu Exploitation}
+        \end{align*}
+    \end{itemize}
+
+\end{beispiel}
 
 
+\newpage
+
+\subsection{Neuronal Networks}
+
+In der einfachsten Form betrachten wir ein Hidden-Layer $\bm{W}_1$ 
+und ein Outer-Layer $\bm{W}_N$ mit dem Bias $\bm{b}_1$ und $\bm{b}_N$.
+Wir betrachten zunächst die Approximation einer Value-Function
+$V:[0,T] \times \mathbb{R} \to \mathbb{R}$.
+
+% W_1 = n x 2 b = n x 1
+\begin{align*}
+    \bm{W}_1 
+    =
+    \begin{bmatrix}
+        w_{11}^{(1)} & w_{12}^{(1)} \\
+        w_{21}^{(1)} & w_{22}^{(1)}  \\
+        \vdots & \vdots \\
+        w_{n1}^{(1)} & w_{n2}^{(1)}
+    \end{bmatrix}
+    \in \mathbb{R}^{n \times 2}
+    \quad
+    \bm{b}_1
+    =
+    \begin{bmatrix}
+        b_1^{(1)} \\
+        b_2^{(1)} \\
+        \vdots \\
+        b_{n}^{(1)}
+    \end{bmatrix}
+    \in \mathbb{R}^{n}
+\end{align*}
+
+Wir verwenden als Aktivierungsfunktion $\tanh: \mathbb{R} \to (-1,1)$:
+% z_1 = W_1 * [t x] + b_1 a_1=tanh(z_1)
+\begin{align*}
+    \bm{z}_1 
+    &=
+    \bm{W}_1
+    \cdot
+    \begin{bmatrix}
+        t \\ x
+    \end{bmatrix}
+    +
+    \bm{b}_1
+    =
+    \begin{bmatrix}
+        w_{11}^{(1)} t + w_{12}^{(1)} x + b_1^{(1)} \\
+        w_{21}^{(1)} t + w_{22}^{(1)} x + b_2^{(1)} \\
+        \vdots \\
+        w_{n1}^{(1)} t + w_{n2}^{(1)} x + b_n^{(1)}
+    \end{bmatrix}
+    \\
+    \bm{a}_1
+    &=
+    \tanh(\bm{z}_1)
+    =
+    \tanh
+    \left(
+        \bm{W}_1
+        \cdot
+        \begin{bmatrix}
+            t \\ x
+        \end{bmatrix}
+        + 
+        \bm{b}_1
+    \right)
+\end{align*}
+
+Für das Outer-Layer gilt:
+% z_2 = W_2 * a_1 + b_2 
+\begin{align*}
+        \bm{W}_{N}
+        &=
+        \begin{bmatrix}
+            w_{1}^{(N)} & w_{2}^{(N)} & \ldots & w_{n}^{(N)}
+        \end{bmatrix}
+        \in \mathbb{R}^{1 \times n},
+        \quad
+        b_{N}
+        \in \mathbb{R}
+        \\
+        \bm{z}_N
+        &=
+        \bm{W}_N
+        \cdot
+        \bm{a}_1
+        +
+        b_N
+        =
+        \sum_{j=1}^{n}
+        w_{j}^{(N)} a_{j}^{(1)}
+        +
+        b_N
+\end{align*}
+
+Für die Darstellung von $V$ durch $\bm{z}_2$ benötigt man $4n+1$ Parameter:
+% z_2 = W_2 tanh(W_1 * [t x] + b_1) + b_2
+\begin{align*}
+    V_{\phi}(t,x) 
+    &=
+    \underbrace{
+        \sum_{j=1}^{n}
+        w_{j}^{(N)} \cdot
+        \tanh
+        \overbrace{
+            \left(
+                w_{j1}^{(1)} \cdot
+                t
+                +
+                w_{j2}^{(1)} \cdot
+                x
+                +
+                b_j^{(1)}
+            \right)
+        }^{
+            \text{Neuron $j$ im Hidden-Layer}
+        }
+        +
+        b_2
+    }_{
+        \text{Output-Layer}
+    }
+    \\
+    \text{Parameter } & \phi 
+    = \{  w_{j1}^{(1)}, w_{j2}^{(1)}, b_j^{(1)}, w_j^{(N)}, b^{(N)} \},
+    \quad
+    j = 1, \ldots, n
+\end{align*}
+
+Für den Gradienten $\nabla_{\phi} V_{\phi} \in \mathbb{R}^{4n+1}$ nach den Parametern gilt:
+% nabla_phi V
+\begin{align*}
+    \frac{\partial V}{\partial w_j^{(N)}}
+    &=
+    \tanh
+    \left(
+        w_{j1}^{(1)} \cdot
+        t
+        +
+        w_{j2}^{(1)} \cdot
+        x
+        +
+        b_j^{(1)}
+    \right)
+    = \bm{a}_j^{(1)}
+    \Rightarrow
+    \frac{\partial V}{\partial \bm{W}^{(N)}}
+    =
+    \bm{a}^{(1)}
+    \\
+    \frac{\partial V}{\partial \bm{z}_k^{(1)}}
+    &=
+    \frac{\partial V}{\partial \bm{a}_k^{(1)}}
+    \cdot 
+    \frac{\partial \bm{a}_k^{(1)}}{\partial \bm{z}_k^{(1)}}
+    =
+    w_{k}^{(N)} \cdot
+    \left[
+        1 - \left( \bm{a}^{(1)}_k \right)^2
+    \right]
+    \Rightarrow
+    \frac{\partial V}{\partial \bm{z}^{(1)}}
+    =
+    \bm{W}^{(N)} \circ 
+    \left[
+        1 - \left( \bm{a}^{(1)} \right)^2
+    \right]
+    :=
+    \bm{\delta}^{(1)}
+    \\
+    \frac{\partial V}{\partial w_{ij}^{(1)}}
+    &=
+    \frac{\partial V}{\partial \bm{z}_{i}^{(1)}} \cdot 
+    \frac{\partial \bm{z}_i^{(1)}}{\partial w_{ij}^{(1)}}
+    =
+    \begin{cases}
+        \bm{\delta}_i^{(1)} \cdot t , & j=1 \\
+        \bm{\delta}_i^{(1)} \cdot x , & j=2
+    \end{cases}
+    \Rightarrow
+    \frac{\partial V}{\partial \bm{W}^{(1)}}
+    =
+    \left(\bm{\delta}^{(1)}\right)^T
+    \cdot
+    \begin{bmatrix}
+        t & x
+    \end{bmatrix}
+    \\
+    \frac{\partial V}{\partial \bm{b}_i^{(1)}}
+    &=
+    \frac{\partial V}{\partial \bm{z}_i^{(1)}} \cdot 
+    \frac{\partial \bm{z}_i^{(1)}}{\partial \bm{b}_i^{(1)}}
+    =
+    \bm{\delta}_i^{(1)} \cdot 1 
+    \Rightarrow
+    \frac{\partial V}{\partial \bm{b}^{(1)}} = \bm{\delta}^{(1)}
+\end{align*}
+
+\begin{algorithm}
+    \caption{Backpropagation in Neural Networks $1$ Hidden-Layers}
+    \begin{algorithmic}
+        \State Given $\bm{W}^{(1)}, \bm{W}^{(N)} , \bm{b}^{(1)}, b^{(N)}, 
+        \begin{bmatrix} t_i & X_{t_i} \end{bmatrix}^T$ 
+
+        \State Foward Computation
+        %
+        \begin{align*}
+            \bm{z}^{(1)} &= \bm{W}^{(1)} \cdot 
+            \begin{bmatrix}
+                t_i \\
+                X_{t_i}
+            \end{bmatrix}
+            + 
+            \bm{b}^{(1)}
+            \\
+            \bm{a}^{(1)} &= \tanh\left(\bm{z}^{(1)}\right)
+            \\
+            V 
+            &=
+            \bm{W}^{(N)} \cdot \bm{a}^{(1)} + b^{(N)}
+        \end{align*}
+        %
+        \State Backpropagation
+        %
+        \begin{align*}
+            \bm{\delta}^{(1)} &=
+            \bm{W}^{(N)} \circ 
+            \left[
+                1 - \left( \bm{a}^{(1)} \right)^2
+            \right]
+            \\
+            \frac{\partial V}{\partial \bm{W}^{(N)}}
+            &=
+            \bm{a}^{(1)}
+            \\
+            \frac{\partial V}{\partial b_N} 
+            &= 1
+            \\
+            \frac{\partial V}{\partial \bm{W}^{(1)}}
+            &=
+            \left(\bm{\delta}^{(1)} \right)^T
+            \cdot
+            \begin{bmatrix}
+                t_i & X_{t_i}
+            \end{bmatrix}
+            \\
+            \frac{\partial V}{\partial \bm{b}^{(1)}}
+            &=
+            \left(\bm{\delta}^{(1)} \right)^T
+        \end{align*}
+
+        \Return 
+        %
+        \begin{align*}
+            \nabla_\phi V =
+            \begin{bmatrix}
+                \left(\bm{\delta}^{(1)} \right)^T \cdot t_i \\
+                \left(\bm{\delta}^{(1)} \right)^T \cdot X_{t_i}
+                \\
+                \left(\bm{\delta}^{(1)}\right)^T
+                \\
+                \bm{a}^{(1)}
+                \\
+                1
+            \end{bmatrix}
+            \quad
+            \phi
+            =
+            \begin{bmatrix}
+                \bm{W}^{(1)} \cdot \begin{bmatrix} 1 & 0 \end{bmatrix}^T \\
+                \bm{W}^{(1)}  \cdot \begin{bmatrix} 0 & 1 \end{bmatrix}^T \\
+                \bm{b}^{(1)} \\
+                \left(\bm{W}^{(N)}\right)^T \\
+                b^{(N)}
+            \end{bmatrix}
+        \end{align*}
+    \end{algorithmic}
+\end{algorithm}
+
+Als nächstes Betrachten wir ein Neuronales Netz mit zwei Hidden-Layer $\bm{W}_1, \bm{W}_2$ 
+und den zugehörigen Bias $\bm{b}_1, \bm{b}_2$. 
+% W_1 in n_1 x 2, W_2 in n_2 x n_1 
+\begin{align*}
+    \bm{W}_1 
+    =
+    \underbrace{
+        \begin{bmatrix}
+            w_{11}^{(1)} & w_{12}^{(1)} \\
+            w_{21}^{(1)} & w_{22}^{(1)}  \\
+            \vdots & \vdots \\
+            w_{n_1 1}^{(1)} & w_{n_1 2}^{(1)}
+        \end{bmatrix}
+    }_{
+        \in \mathbb{R}^{n_1 \times 2}
+    }
+    \quad
+    \bm{b}_1
+    =
+    \underbrace{
+        \begin{bmatrix}
+            b_1^{(1)} \\
+            b_2^{(1)} \\
+            \vdots \\
+            b_{n_1}^{(1)}
+        \end{bmatrix}
+    }_{
+        \in \mathbb{R}^{n_1}
+    }
+    \quad
+    \bm{W}_2
+    =
+    \underbrace{
+        \begin{bmatrix}
+            w_{11}^{(2)} & \cdots   & w_{1 n_1}^{(2)} \\
+            w_{21}^{(2)} & \cdots   & w_{2 n_1}^{(2)}  \\
+            \vdots & \ddots &  \vdots\\
+            w_{n_2 1}^{(2)} & \cdots  & w_{n_2 n_1}^{(2)}
+        \end{bmatrix}
+    }_{
+        \in \mathbb{R}^{n_2 \times n_1} 
+    }
+    \quad
+    \bm{b}_2
+    =
+    \underbrace{
+        \begin{bmatrix}
+            b_1^{(2)} \\
+            b_2^{(2)} \\
+            \vdots \\
+            b_{n_2}^{(2)}
+        \end{bmatrix}
+    }_{
+        \in \mathbb{R}^{n_2}
+    }
+\end{align*}
+
+Für die Struktur basierend auf einem zweidimensionalen Input lautet somit: 
+% Hidden-Layer Struktur a_2 = tanh(W_2 tanh(W_1 [t x] + b_1) + b_2)
+\begin{align*}
+    \bm{z}_1 
+    &=
+    \bm{W}_1
+    \cdot
+    \begin{bmatrix}
+        t \\ x
+    \end{bmatrix}
+    +
+    \bm{b}_1
+    \\
+    \bm{a}_1
+    &=
+    \tanh(\bm{z}_1)
+    \\
+    \bm{z}_2
+    &=
+    \bm{W}_2 
+    \cdot 
+    \bm{a}_1
+    + 
+    \bm{b}_2
+    =
+    \bm{W}_2 \cdot 
+    \tanh
+    \left(
+        \bm{W}_1 \cdot  
+        \begin{bmatrix}
+            t \\ x
+        \end{bmatrix}
+        +
+        \bm{b}_1
+    \right)
+    +
+    \bm{b}_2
+    \\
+    \bm{a}_2
+    &=
+    \tanh(\bm{z}_2)
+    =
+    \tanh
+    \left[
+        \bm{W}_2 \cdot
+        \tanh
+        \left(
+            \bm{W}_1
+            \cdot
+            \begin{bmatrix}
+                t \\ x
+            \end{bmatrix}
+            + 
+            \bm{b}_1
+        \right)
+        +
+        \bm{b}_2
+    \right]
+\end{align*}
+
+Das Outer-Layer und der Output besitzt erneut folgende Struktur
+%
+\begin{align*}
+    \bm{W}_{N}
+    &=
+    \begin{bmatrix}
+        w_{1}^{(N)} & w_{2}^{(N)} & \ldots & w_{n_2}^{(N)}
+    \end{bmatrix}
+    \in \mathbb{R}^{1 \times n_2},
+    \quad
+    b_{N}
+    \in \mathbb{R}
+    \\
+    V =
+    \bm{z}_N
+    &=
+    \bm{W}_N \cdot \bm{a}_2 + b_N
+    =
+    \sum_{j=1}^{n_2} w_j^{(N)} \bm{a}_{j}^{(2)} + b_N
+\end{align*}
+
+% Neuronales Netz und ihre Ableitung
+\begin{satz}[Neuronal-Networks]
+    Sei $V:\mathbb{R}^{\text{Input}} \to \mathbb{R}^{\text{Output}}$ approximiert durch $V \approx \bm{z}_N$
+    \begin{itemize}
+        \item  Forwardpass:
+        %
+        \begin{align*}
+            \bm{z}^{(n)} &= \bm{W}^{(n)} \cdot \bm{a}^{(n-1)} + \bm{b}^{(n)} \quad n=1,\cdots , L  \\
+            \bm{a}^{(0)}  &= \bm{x}_{\text{Input}} \\
+            \bm{a}^{(n)}  &= \tanh\left( \bm{z}^{(n)} \right) \\
+            \bm{z}^{(N)} &= \bm{W}^{N} \cdot \bm{a}^{(L)} + \bm{b}^{(N)}
+        \end{align*}
+        %
+        \item Backpropagation:
+        %
+        \begin{itemize}
+            \item[1.] Output-Layer
+            \begin{align*}
+                \frac{\partial V}{\partial \bm{W}^{(N)}} = \bm{a}^{(L)} 
+                \quad
+                \frac{\partial V}{\partial \bm{b}^{(N)}} = 1 
+                \quad
+                \frac{\partial V}{\partial \bm{a}^{L}} = \bm{W}^{(N)}
+            \end{align*}
+
+            \item[2.] Für jede Schicht $k= L, L-1 \cdots , 1$
+            %
+            \begin{align*}
+                \frac{\partial V}{\partial \bm{z}^{(k)}}
+                &=
+                \frac{\partial V}{\partial \bm{a}^{(k)}}
+                \cdot 
+                \mathsf{diag}
+                \left[
+                    1 - \left( \bm{a}^{(k)}_i \right)
+                \right]_{i=1, \cdots , n_k}
+                :=
+                \bm{\delta}^{(k)} 
+                \\
+                \frac{\partial V}{\partial \bm{W}^{(k)}} 
+                &=
+                \left(\bm{\delta}^{(k)}\right)^T \cdot \left(\bm{a}^{(k-1)}\right)^T
+                \\
+                \frac{\partial V}{\partial \bm{b}^{(k)}}
+                &=
+                \left(\bm{\delta}^{(k)}\right)^T
+                \\
+                \frac{\partial V}{\partial \bm{a}^{(k-1)}}
+                &=
+                \bm{\delta}^{(k)} \cdot \bm{W}^{(k)}, \quad k > 1
+            \end{align*}
+        \end{itemize}
+    \end{itemize}
+\end{satz}
+
+\proof{
+    Wir skizzieren den Beweis für $L=2$. 
+    \begin{itemize}
+        \item[1.] Ableitung Output-Layer $V = \bm{W}^{(N)} \cdot \bm{a}^{(2)} + b^{(N)}$:
+        %
+        \begin{align*}
+            \frac{\partial V}{\partial w_i^{(N)}} =
+            \bm{a}_i^{(2)}
+            \quad
+            \frac{\partial V}{\partial b_N} = 1
+            \quad
+            \frac{\partial V}{\partial \bm{a}_k^{(2)}} = \bm{W}_k^{(N)} 
+        \end{align*}
+
+        \item[2.] Ableitung durch die Aktivierungsfunktion: Im Vektorfall $\bm{a}_k = \tanh(\bm{z}_k)$ 
+        gilt für jede Komponente $i$
+        %
+        \begin{align*}
+            \frac{\partial \bm{a}_i^{(k)}}{\partial \bm{z}_j^{(k)}} =
+            \frac{\partial \tanh\left( \bm{z}_i^{(k)} \right)}{\partial \bm{z}_j^{(k)}}
+            =
+            \begin{cases}
+                1- \left(\bm{a}_i^{(k)}\right)^2 ,  & i = j \\
+                0           & i \neq j
+            \end{cases}
+        \end{align*}
+
+        Die Jacobi-Matrix ist somit eine Diagonalmatrix
+        %
+        \begin{align*}
+            \frac{\partial \bm{a_k}}{\partial \bm{z_k}} 
+            =
+            \left[
+                \frac{\partial \tanh\left( \bm{z}_i^{(k)} \right)}{\partial \bm{z}_j^{(k)}}
+            \right]_{i, j =1, \cdots , n_k}
+            =
+            \underbrace{
+                \begin{bmatrix}
+                    1- \left(\bm{a}_1^{(k)}\right)^2    & 0 & \cdots & 0 \\
+                    0   & 1- \left(\bm{a}_2^{(k)}\right)^2 & \cdots & 0 \\
+                    \vdots & \vdots & \ddots & \vdots \\
+                    0  & 0 & \cdots & 1- \left(\bm{a}_{n_k}^{(k)}\right)^2 \\
+                \end{bmatrix}
+            }_{
+                \mathsf{diag}\left[1- \left(\bm{a}_i^{(k)}\right)^2 \right]_{i=1,\cdots , n_k}
+            }
+        \end{align*}
+
+        \item[3.] Für die Ableitung der Hidden-Layer Struktur gilt mittels Kettenregel:
+        %
+        \begin{align*}
+            \frac{\partial V}{\partial \bm{z}_k^{(2)}} 
+            &= \frac{\partial V}{\partial \bm{a}_k^{(2)}} 
+            \cdot \frac{\partial \bm{a}_k^{(2)}}{\partial \bm{z}_k^{(2)}}
+            =
+            \bm{W}_k^{(N)} \cdot \left[1 - \left(\bm{a}_k^{(2)} \right)^2 \right]
+            \\
+            \bm{\delta}^{(2)} 
+            :=
+            \frac{\partial V}{\partial \bm{z_2}} 
+            &=
+            \bm{W}_N \cdot 
+            \mathsf{diag}\left[1- \left(\bm{a}_i^{(2)}\right)^2 \right]_{i=1,\cdots , n_2} \in \mathbb{R}^{1 \times n_2}
+        \end{align*}
+
+        \item[4.] Parameter von Hidden-Layer $2$:
+        %
+        \begin{align*}
+            \frac{\partial V}{\partial w_{ki}^{(2)}}
+            &=
+            \frac{\partial V}{\partial \bm{z}_k^{(2)}} 
+            \cdot
+            \frac{\partial \bm{z}_k^{(2)}}{\partial w_{ki}^{(2)}}
+            =
+            \bm{\delta}^{(2)}_k \cdot \bm{a}_i^{(1)}
+            \Rightarrow
+            \frac{\partial V}{\partial \bm{W}^{(2)}}
+            =
+            \left(\bm{\delta}^{(2)} \right)^T \cdot \left(\bm{a}^{(1)}\right)^{T}
+            \\
+            \frac{\partial V}{\partial \bm{b}_k^{(2)}}
+            &=
+            \frac{\partial V}{\partial \bm{z}_k^{(2)}} \cdot
+            \frac{\partial \bm{z}_k^{(2)}}{\partial \bm{b}_k^{(2)}}
+            =
+            \bm{\delta}^{(2)}_k \cdot 1
+            \Rightarrow
+            \frac{\partial V}{\partial \bm{b}^{(2)}}
+            =
+            \bm{\delta}^{(2)}
+        \end{align*}
+
+        \item[5.] Jede Komponente von $\bm{z}^{(2)}$ ist abhängig von $\bm{a}^{(1)}$, denn
+        %
+        \begin{align*}
+            \bm{z}^{(2)} 
+            =
+            \underbrace{
+                \begin{bmatrix}
+                    w_{11}^{(2)} & \cdots   & w_{1 n_1}^{(2)} \\
+                    w_{21}^{(2)} & \cdots   & w_{2 n_1}^{(2)}  \\
+                    \vdots & \ddots &  \vdots\\
+                    w_{n_2 1}^{(2)} & \cdots  & w_{n_2 n_1}^{(2)}
+                \end{bmatrix}
+            }_{\bm{W}_2}
+            \cdot
+            \underbrace{
+                \begin{bmatrix}
+                    \bm{a}_1^{(1)} \\
+                    \bm{a}_2^{(1)} \\
+                    \vdots \\
+                    \bm{a}_{n_1}^{(1)}
+                \end{bmatrix}
+            }_{\bm{a}^{(1)}}
+            +
+            \underbrace{
+                \begin{bmatrix}
+                    \bm{b}_1^{(2)} \\
+                    \bm{b}_2^{(2)} \\
+                    \vdots \\
+                    \bm{b}_{n_2}^{(2)}
+                \end{bmatrix}
+            }_{\bm{b}^{(2)}}
+            =
+            \begin{bmatrix}
+                \sum_{k=1}^{n_1} w_{1k}^{(2)} \cdot \bm{a}_{k}^{(1)} + \bm{b}_1^{(2)} \\
+                \sum_{k=1}^{n_1} w_{2k}^{(2)} \cdot \bm{a}_{k}^{(1)} + \bm{b}_2^{(2)} \\
+                \vdots \\
+                \sum_{k=1}^{n_1} w_{n_{2} k}^{(2)} \cdot \bm{a}_{k}^{(1)} + \bm{b}_{n_2}^{(2)}
+            \end{bmatrix}
+        \end{align*}
+
+        \item[6.] Mittels der Kettenregel folgt somit:
+        %
+        \begin{align*}
+            \frac{\partial V}{\partial \bm{a}_k^{(1)}} 
+            &=
+            \sum_{i=1}^{n_2} \frac{\partial V}{\partial \bm{z}_i^{(2)}}
+            \cdot
+            \frac{\partial \bm{z}_i^{(2)}}{\partial \bm{a}_k^{(1)}}
+            =
+            \sum_{i=1}^{n_2} \bm{\delta}_i^{(2)} \cdot w^{(2)}_{ik}
+            \Rightarrow
+            \frac{\partial V}{\partial \bm{a}^{(1)}}
+            =
+            \bm{\delta}^{(2)} \cdot \bm{W}^{(2)} \in \mathbb{R}^{1 \times n_1}
+            \\
+            \frac{\partial V}{\partial \bm{z}_k^{(1)}} 
+            &=
+            \frac{\partial V}{\partial \bm{a}_k^{(1)}} \cdot 
+            \frac{\partial \bm{a}_k^{(1)}}{\partial \bm{z}_k^{(1)}}
+            =
+            \sum_{i=1}^{n_2} \bm{\delta}_i^{(2)} \cdot w^{(2)}_{ik}
+            \cdot
+            \left[
+                1 - \left(\bm{a}_k^{(1)}\right)^2 
+            \right]
+        \end{align*}
+
+        Wir bezeichnen den Ausdruck als
+        %
+        \begin{align*}
+            \bm{\delta}^{(1)}:=
+            \frac{\partial V}{\partial \bm{z}^{(1)}}
+            =
+            \left(
+                \bm{\delta}^{(2)} \cdot \bm{W}^{(2)}
+            \right) 
+            \cdot 
+            \mathsf{diag}
+            \left[
+                1 - \left( \bm{a}_i^{(1)} \right)^2
+            \right]_{i=1,\cdots, n_1}
+            \in \mathbb{R}^{1 \times n_1}
+        \end{align*}
+
+        \item[7.] Ableitung nach den Parametern in Hidden-Layer Schicht $1$:
+        %
+        \begin{align*}
+            \frac{\partial V}{\partial w^{(1)}_{ij}} =
+            \frac{\partial V}{\partial \bm{z}^{(1)}_{i}} \cdot 
+            \frac{\partial \bm{z}^{(1)}_{i}}{\partial w^{(1)}_{ij}}
+            =
+            \begin{cases}
+                \bm{\delta}_i^{(1)} \cdot t , & j=1 \\
+                \bm{\delta}_i^{(1)} \cdot x , & j=2 \\
+            \end{cases}
+        \end{align*}
+    \end{itemize}
+}
+
+\begin{algorithm}
+    \caption{Backpropagation in Neural Networks $2$ Hidden-Layers}
+    \begin{algorithmic}
+        \State Given $\bm{W}^{(1)},\bm{W}^{(2)}, \bm{W}^{(N)} , \bm{b}^{(1)}, \bm{b}^{(2)}, b^{(N)}, 
+        \begin{bmatrix} t_i & X_{t_i} \end{bmatrix}^T$ 
+
+        \State Computation Outer-Layer
+        %
+        \begin{align*}
+            t
+        \end{align*}
+    \end{algorithmic}
+\end{algorithm}
+
+\newpage
 
 \subsection{Deep Deterministic Policy Gradient}
 

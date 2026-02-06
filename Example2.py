@@ -32,7 +32,7 @@ for episode in range(num_episodes):
         rewards.append(r)
         actions.append(u)
 
-        # Das kennt der Algorithmus nicht
+        # Interaktion mit Environment
         x_next = x + (1/100)*(u)
         t_next = t + (1/100)
         t, x = t_next, x_next
@@ -65,7 +65,7 @@ for episode in range(num_episodes):
 
 # Ausgabe der gelernten Parameter
 # Teste die gelernte Policy OHNE Exploration
-x_test, t_test = 0.0, 0.0
+t_test, x_test = 0.0, 0.0
 trajectory_learned = []
 u_learned = [] 
 
@@ -81,13 +81,13 @@ for step in range(100):
 
 results = np.array(trajectory_learned)
 control = np.array(u_learned)
-plt.plot(results[:, 0], results[:, 1], label="Trajektorie")
-plt.plot(results[:, 0], control, label="u numerisch")
+plt.plot(results[:, 0], results[:, 1], label="State")
+plt.plot(results[:, 0], control, label="Policy")
 
 
 #plt.plot(problem.t, problem.x, label="x numerisch")
-plt.plot(problem.t, problem.x_analytic(), label="x analytisch")
+plt.plot(problem.t, problem.x_analytic(), label="optimal state")
 #plt.plot(problem.t, problem.u, label="u numerisch")
-plt.plot(problem.t, problem.u_analytic(), label="u analytisch")
+plt.plot(problem.t, problem.u_analytic(), label="optimal control")
 plt.legend()
 plt.show()

@@ -1,0 +1,308 @@
+\documentclass[a4paper,12pt, oneside, twocolumn]{scrartcl}
+%\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\setlength{\parindent}{0em}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{polynom}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{tikz}
+\usepackage[a4paper,portrait,left=1.0cm,right=1.0cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{pgf} % Zur Einbindung der PGF Files
+\usepackage{bm}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\newcommand{\e}[1]{\text{e}^{#1}}
+\newcommand{\rot}[2][rot]{\textcolor{#1}{#2}}
+\newcommand{\gruen}[2][gruen]{\textcolor{#1}{#2}}
+\newcommand{\frontcolor}[2][frontcolor]{\textcolor{#1}{#2}}
+\newcommand{\gelb}[2][gelb]{\textcolor{#1}{#2}}
+\newcommand{\orange}[2][orange]{\textcolor{#1}{#2}}
+\newcommand{\blau}[2][blau]{\textcolor{#1}{#2}}
+\newcommand{\hellblau}[2][hellblau]{\textcolor{#1}{#2}}
+\newcommand{\lila}[2][lila]{\textcolor{#1}{#2}}
+\newcommand{\dunkelrot}[2][dunkelrot]{\textcolor{#1}{#2}}
+\newcommand{\dunkelgelb}[2][dunkelgelb]{\textcolor{#1}{#2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\norm}[1]{\left\lVert#1\right\lVert}
+\newcommand{\dv}{\thinspace \mathrm{d}v}
+\newcommand{\dw}{\thinspace \mathrm{d}w}
+\newcommand{\dx}{\thinspace \mathrm{d}x}
+\newcommand{\dy}{\thinspace \mathrm{d}y}
+\newcommand{\dt}{\thinspace \mathrm{d}t}
+\newcommand{\dr}{\thinspace \mathrm{d}r}
+\newcommand{\ds}{\thinspace \mathrm{d}s}
+\newcommand{\du}{\thinspace \mathrm{d}u}
+\newcommand{\dz}{\thinspace \mathrm{d}z}
+\newcommand{\dW}{\thinspace \mathrm{d}W}
+\newcommand{\dX}{\thinspace \mathrm{d}X}
+\newcommand{\dP}{\thinspace \mathrm{d}P}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% Light Mode Customization
+\usepackage{xcolor}
+%\definecolor{backgroundgray}{RGB}{255,255,255}  % Weiß als Seitenhintergrund
+\definecolor{textwhite}{RGB}{0,0,0}            % Schwarz als globale Schriftfarbe
+\definecolor{boxgray}{RGB}{245,245,245}        % Sehr helles Grau für Box-Hintergründe
+\definecolor{boxframe}{RGB}{200,200,200}       % Helles Grau für Box-Rahmen
+\pagecolor{boxgray}  % Hintergrund auf Weiß
+\color{textwhite}           % Text auf Schwarz
+
+% Eigene Farben definiert (nun optimiert für hellen Hintergrund)
+\definecolor{rot}{RGB}{204,0,0}
+\definecolor{blau}{RGB}{0,102,204}
+\definecolor{orange}{RGB}{204,85,0}
+\definecolor{gruen}{RGB}{0,153,0}
+\definecolor{dunkelgruen}{RGB}{0,153,0}
+\definecolor{dunkelblau}{RGB}{0,128,128}
+\definecolor{backcolor}{RGB}{235,245,255}
+\definecolor{frontcolor}{RGB}{0,153,0}
+\definecolor{hellblau}{RGB}{180,210,235}
+\definecolor{lila}{RGB}{153,0,153}
+\definecolor{gelb}{RGB}{204,153,0}
+\definecolor{dunkelrot}{RGB}{153,0,51}
+\definecolor{dunkelgelb}{RGB}{153,153,0}
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{references.bib}
+
+% Ränder und Layout für geteilte Ansicht
+\usepackage{multicol}
+\setlength{\columnsep}{0.5cm}  % Abstand zwischen den Spalten
+
+% Keine Seitenzahl
+\pagestyle{empty}
+
+% Begin des Dokuments
+\begin{document}
+
+\vspace{-1em} % Reduzierter Abstand
+
+\section*{Reinforcement Learning}
+
+Our formulation of the problem based on \cite{sutton_barto_2018} is 
+to find $\pi: \mathcal{S} \to \mathcal{P}(\mathcal{A})$ ($\mathcal{P}$ is a p-measure) such that  
+%
+\begin{align*}
+    \max_{\pi} J(\pi) &= \max_{\pi} \mathsf{E}_{\tau \sim p(\tau|\pi)} 
+    \left[ 
+        \sum_{i=0}^{\infty} \gamma^i \underbrace{R(\bm{s}_i, a_i, \bm{s}_{i+1})}_{r_i}
+    \right]
+    \\
+    p(\tau \mid \pi) &= p(\bm{s}_0) \cdot \prod_{t=0}^{\infty} \pi(a_t|\bm{s}_t) \cdot T_{a_t}(\bm{s}_{t+1}, \bm{s}_t)
+    \\
+    \bm{s}_{t+1} &\sim T_{a_t}(\cdot , \bm{s}_t) 
+    \quad
+    a_t \sim \pi(\cdot | \bm{s}_t)
+\end{align*}
+
+Where $\tau$ is a trajectory of the system, which consists of the states, actions and rewards at each time step.
+%
+\begin{align*}
+    \bm{\tau}_t
+    &=
+    \left\{
+        \vphantom{\int}
+        \bm{s}_{t+i}, a_{t+i}, r_{t+i}, \bm{s}_{t+i+1} 
+    \right\}_{i=0}^{\infty}
+    \Rightarrow
+    J(\rot{\pi}) 
+    =
+    \mathsf{E}
+    \left[
+        \vphantom{\int}
+        R(\bm{\tau}_0)
+    \right]
+\end{align*}
+
+% E_{\tau_0 \sim p(\tau_0| \rot{\pi})}
+Parameterizing the policy $\pi$ with $\theta$ leads to:
+
+% Erklär noch Q Funktion und zeig R ist ein schätzer der Q Funktion
+% Kurze beweisidee: zum policy theorem
+% Die graphik PG Methode für Steuerungsprobleme aber nimm Rauschen noch raus
+% dann Tabelle wo du das OCP als RL/PG problem zeigst und dann die graphiken 
+% wir erwähnen neuronale netze nur und sagen wir haben es benutzt aber erklären die hier nicht
+
+\small{
+    \begin{tabular}{l| l}
+        Infinite dimensional & Finite dimensional \\
+        \hline 
+        $\Pi = \{\pi: \mathcal{\bm{S}} \to \mathcal{P}(\mathcal{A})\}$ 
+        & 
+        $\blau{\theta} \in \mathbb{R}^d$ and $\pi_{\blau{\theta}} \in \Pi$ 
+        \\
+        $J_{\rot{\pi}}:\Pi \to \mathbb{R}$
+        &
+        $J_{\blau{\theta}}:\mathbb{R}^d \to \mathbb{R}$
+        \\
+        $\displaystyle J(\pi) = \mathsf{E}_{\tau \sim p(\tau \mid \rot{\pi})}
+        \left[
+            \vphantom{\int}
+            R(\tau)
+        \right]$
+        & 
+        $\displaystyle J(\blau{\theta}) 
+        = \mathsf{E}_{\tau \sim p(\tau \mid \blau{\theta})}
+        \left[
+            \vphantom{\int}
+            R(\tau)
+        \right]$ 
+        \\ 
+        $\displaystyle \nabla_{\rot{\pi}} J= 
+        \sum_{t=0}^{T-1} p(\bm{s}_t) 
+        \cdot Q^{\rot{\pi}}(\bm{s}, a)$
+        & $\displaystyle 
+            \nabla_{\blau{\theta}}
+            \mathsf{E}_{\tau \sim p(\tau|\blau{\theta})}
+            \left[
+                R(\tau)
+            \right]$ \\
+    \end{tabular}
+}
+
+\section*{Policy Gradient Methods}
+
+\textbf{Policy Gradient Theorem:}
+\begin{align*}
+    \nabla_{\theta} J(\theta)
+    &=
+    \mathsf{E}_{\tau \sim p(\tau|\theta)}
+    \left[
+        \sum_{t=0}^{T-1}
+        Q^{\pi_{\theta}}(\bm{s}_t, a_t) \cdot 
+        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
+    \right]
+\end{align*}
+
+\subsection*{Optimal Control Problems}
+
+\begin{tabular}{ l| l}
+    Control Problem   & RL Problem \\
+    \hline 
+    $\displaystyle \min_u \int_0^1 u^2 \dt + (x(1)-1)^2$                
+    & 
+    $\displaystyle \mathsf{E}_{\pi} \sum_{t=0}^{T-1} u_t^2 + (x_T - 1)^2$
+    \\
+    $\displaystyle \sum_{i=1}^{N} u_i^2 + (x_N - 1)^2$
+    &   
+    $\displaystyle -\sum_{t=0}^{T-1} u_t^2 - (x_T - 1)^2$
+\end{tabular}
+
+% Schemata Policy Gradient Methode
+% \mathcal{U} = \{u:[0,T] \to \mathbb{R} \mid u \text{ measurable} \}
+\usetikzlibrary{positioning}
+\begin{tikzpicture}[>=latex]
+    \node[draw= boxframe,anchor = north ,align=left] (a) at (-2,0) {
+        $\begin{aligned}
+            \min_{u \in \mathcal{U}} & \int_0^T
+            L(X_t,u) \dt 
+            + \Phi(X_T),  
+            \quad
+            \\
+            \dX_t &= f(X_t,u(t)) \dt + \sigma \dW_t, 
+            \quad X_0= x_0
+        \end{aligned}$
+    };
+    \node[draw = rot, anchor = north, align=left] (b) at ([xshift=0cm, yshift=-0.5cm]a.south) {
+        Relaxation of the Problem:  \\
+        %
+        $\begin{aligned}
+            \mathcal{U}_{stoch} = \{ \pi: [0,T] \to \mathcal{P}(\mathbb{R}) 
+            \mid \pi(\cdot | t) \text{ ist W-Maß} \}
+        \end{aligned}$ \\
+
+        $\mathcal{U} \subset \mathcal{U}_{stoch}$
+            %
+        $\begin{aligned}
+            u:[0,T] \to \mathbb{R} \Rightarrow 
+            \pi( \cdot | t) = \delta_{u(t)}
+        \end{aligned}$
+    };
+    \node[draw = rot, below=of b, align=center] (c) {
+        Diskretisierung: $\bm{u} = \left\{ u_i \right\}_{i=0}^{N-1}$ $u_i \sim \pi(u_i\mid t_i)$ \\
+
+        Parametrisierung: $\theta \to \pi_{\theta}(u_i \mid t_i)$ und $\theta \in \mathbb{R}^n$ \\
+        $\begin{aligned}
+            \log\left[\pi_{\theta}(\bm{u})\right] 
+            = 
+            \log\left[ \prod_{i=0}^{N-1} \pi_{\theta}(u_i \mid t_i)\right]
+            =
+            \sum_{i=0}^{N-1} \log\left[\pi_{\theta}(u_i \mid t_i)\right]
+        \end{aligned}$
+        \\
+        $\begin{aligned}
+            \int_0^T L(X_t,u_t) \dt + \Phi(X_T) \approx C(\bm{u}) = C(u_0, \ldots, u_{N-1})
+        \end{aligned}$
+        };
+    \node[draw = rot, below=of c, align=center] (d) {Optimierung: 
+    Wahl spezieller Verteilung $\pi_{\theta} = \mathcal{N}(\mu(\theta,t),b)$ \\
+        $\begin{aligned}
+            &\nabla_{\theta} \mathsf{E}
+            \left[
+                C(\bm{u})
+            \right]
+            = \mathsf{E}
+            \left[
+                \sum_{i=0}^{N-1} \nabla_{\theta} 
+                \log\left(\pi_{\theta}(u_i \mid t_i)\right)
+                \cdot
+                C(u_i, \ldots, u_{N-1})
+            \right]
+            \\
+            &\approx
+            \frac{1}{M} \sum_{m=1}^M
+            \left[
+                \sum_{i=0}^{N-1} 
+                \nabla_{\theta} 
+                \log\left(\pi_{\theta}(u_i^{(m)} \mid t_i)\right)
+                \cdot
+                C(u_i^{(m)}, \ldots, u_{N-1}^{(m)})
+            \right]
+        \end{aligned}$
+        };
+    \node[draw = boxframe, anchor=south, align=left] (e) at ([yshift=-4.55cm, xshift=-0.5cm]d.south) {
+        Gradientenverfahren:  \\
+        $\begin{aligned}
+            \theta_{k+1} = \theta_k - \alpha_k \nabla_{\theta} J(\theta_k)
+        \end{aligned}$
+        \\
+        Simulation des Zustands $X_{t_{i+1}}$ \\
+        $\begin{aligned}
+            X_{t_{i+1}} 
+            &= X_{t_i} + f(X_{t_i},u_i) \Delta t + \sigma Z_i,
+            \\ Z_i &\sim \mathcal{N}(0, \Delta t)
+        \end{aligned}$
+        \\
+        Projektion auf $\mathcal{U}$: \\
+        $\begin{aligned}
+            u^*(t_i) = \mu(\theta^*, t_i) \in \mathcal{U}
+        \end{aligned}$
+        };
+
+    \draw[->, color = boxframe] (a) -- (b);
+    \draw[->, color = boxframe] (b) -- (c);
+    \draw[->, color = boxframe] (c) -- (d);
+    \draw[->, color = boxframe] (d.west) -- ++(-0.9cm,0cm);
+    \draw[->, color = gruen] (a.south) -- ++(0cm, -4.7cm);
+\end{tikzpicture}
+
+
+
+
+
+\section*{Further Directions}
+
+Further improvements based on \cite{lillicrap2015ddpg},
+\cite{haarnoja2018sac} and \cite{haarnoja2018sacapps}.
+
+\small
+\printbibliography
+
+\end{document}
