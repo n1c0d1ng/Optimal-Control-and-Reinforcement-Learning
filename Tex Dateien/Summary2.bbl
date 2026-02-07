@@ -1,5 +1,5 @@
 % $ biblatex auxiliary file $
-% $ biblatex bbl format version 3.3 $
+% $ biblatex bbl format version 3.2 $
 % Do not modify the above lines!
 %
 % This is an auxiliary file used by the 'biblatex' package.
@@ -18,8 +18,8 @@
 
 
 \refsection{0}
-  \datalist[entry]{nty/global//global/global/global}
-    \entry{haarnoja2018sacapps}{article}{}{}
+  \datalist[entry]{nty/global//global/global}
+    \entry{haarnoja2018sacapps}{article}{}
       \name{author}{11}{}{%
         {{hash=45b14f55dd7ae28cb6cb2e23e4a168b9}{%
            family={Haarnoja},
@@ -79,12 +79,10 @@
       }
       \strng{namehash}{b8c131de85c5000ff50df59a4d062227}
       \strng{fullhash}{c6ac1e78375b5b1cb1c472544f2557df}
-      \strng{fullhashraw}{c6ac1e78375b5b1cb1c472544f2557df}
       \strng{bibnamehash}{b8c131de85c5000ff50df59a4d062227}
       \strng{authorbibnamehash}{b8c131de85c5000ff50df59a4d062227}
       \strng{authornamehash}{b8c131de85c5000ff50df59a4d062227}
       \strng{authorfullhash}{c6ac1e78375b5b1cb1c472544f2557df}
-      \strng{authorfullhashraw}{c6ac1e78375b5b1cb1c472544f2557df}
       \field{extraname}{1}
       \field{sortinit}{H}
       \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
@@ -99,7 +97,7 @@
       \verb 1812.05905
       \endverb
     \endentry
-    \entry{haarnoja2018sac}{inproceedings}{}{}
+    \entry{haarnoja2018sac}{inproceedings}{}
       \name{author}{4}{}{%
         {{hash=45b14f55dd7ae28cb6cb2e23e4a168b9}{%
            family={Haarnoja},
@@ -124,12 +122,10 @@
       }
       \strng{namehash}{b8c131de85c5000ff50df59a4d062227}
       \strng{fullhash}{951e86110020d3107317b3e819f3d92d}
-      \strng{fullhashraw}{951e86110020d3107317b3e819f3d92d}
       \strng{bibnamehash}{b8c131de85c5000ff50df59a4d062227}
       \strng{authorbibnamehash}{b8c131de85c5000ff50df59a4d062227}
       \strng{authornamehash}{b8c131de85c5000ff50df59a4d062227}
       \strng{authorfullhash}{951e86110020d3107317b3e819f3d92d}
-      \strng{authorfullhashraw}{951e86110020d3107317b3e819f3d92d}
       \field{extraname}{2}
       \field{sortinit}{H}
       \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
@@ -144,7 +140,7 @@
       \verb 1801.01290
       \endverb
     \endentry
-    \entry{lillicrap2015ddpg}{article}{}{}
+    \entry{lillicrap2015ddpg}{article}{}
       \name{author}{8}{}{%
         {{hash=2a321a868e44d49baf52b5e2d816fb71}{%
            family={Lillicrap},
@@ -189,12 +185,10 @@
       }
       \strng{namehash}{e9929f8db9dd2c08064f17b4d9a7c551}
       \strng{fullhash}{9f2f0357b439f9ae4a3953d81392aaa0}
-      \strng{fullhashraw}{9f2f0357b439f9ae4a3953d81392aaa0}
       \strng{bibnamehash}{e9929f8db9dd2c08064f17b4d9a7c551}
       \strng{authorbibnamehash}{e9929f8db9dd2c08064f17b4d9a7c551}
       \strng{authornamehash}{e9929f8db9dd2c08064f17b4d9a7c551}
       \strng{authorfullhash}{9f2f0357b439f9ae4a3953d81392aaa0}
-      \strng{authorfullhashraw}{9f2f0357b439f9ae4a3953d81392aaa0}
       \field{sortinit}{L}
       \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
       \field{labelnamesource}{author}
@@ -208,7 +202,7 @@
       \verb 1509.02971
       \endverb
     \endentry
-    \entry{sutton_barto_2018}{book}{}{}
+    \entry{sutton_barto_2018}{book}{}
       \name{author}{2}{}{%
         {{hash=eb920e5277d3d5fd0903f3cd41e11871}{%
            family={Sutton},
@@ -226,12 +220,10 @@
       }
       \strng{namehash}{c6212f1a1407d96a3d9f4fefbb07eade}
       \strng{fullhash}{c6212f1a1407d96a3d9f4fefbb07eade}
-      \strng{fullhashraw}{c6212f1a1407d96a3d9f4fefbb07eade}
       \strng{bibnamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
       \strng{authorbibnamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
       \strng{authornamehash}{c6212f1a1407d96a3d9f4fefbb07eade}
       \strng{authorfullhash}{c6212f1a1407d96a3d9f4fefbb07eade}
-      \strng{authorfullhashraw}{c6212f1a1407d96a3d9f4fefbb07eade}
       \field{sortinit}{S}
       \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
       \field{labelnamesource}{author}

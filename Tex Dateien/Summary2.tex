@@ -95,9 +95,9 @@ to find $\pi: \mathcal{S} \to \mathcal{P}(\mathcal{A})$ ($\mathcal{P}$ is a p-me
         \sum_{i=0}^{\infty} \gamma^i \underbrace{R(\bm{s}_i, a_i, \bm{s}_{i+1})}_{r_i}
     \right]
     \\
-    p(\tau \mid \pi) &= p(\bm{s}_0) \cdot \prod_{t=0}^{\infty} \pi(a_t|\bm{s}_t) \cdot T_{a_t}(\bm{s}_{t+1}, \bm{s}_t)
+    p(\tau \mid \pi) &= p(\bm{s}_0) \cdot \prod_{t=0}^{\infty} \pi(a_t|\bm{s}_t) \cdot P_{a_t}(\bm{s}_{t+1}, \bm{s}_t)
     \\
-    \bm{s}_{t+1} &\sim T_{a_t}(\cdot , \bm{s}_t) 
+    \bm{s}_{t+1} &\sim P_{a_t}(\cdot , \bm{s}_t) 
     \quad
     a_t \sim \pi(\cdot | \bm{s}_t)
 \end{align*}
@@ -121,6 +121,194 @@ Where $\tau$ is a trajectory of the system, which consists of the states, action
     \right]
 \end{align*}
 
+\section*{Policy Gradient Methods}
+
+
+Let $\pi_{\theta}$ be a parameterized policy with $\theta \in \mathbb{R}^d$.
+    %
+\begin{align*}
+    \nabla_{\theta} J(\theta)
+    &=
+    \nabla_{\theta} \mathsf{E}_{\tau \sim p(\tau|\theta)}
+    \left[
+        R(\bm{\tau})
+    \right]
+    \\
+    &= 
+    \int_{\mathcal{T}} R(\bm{\tau}) \cdot 
+    \underbrace{
+        \nabla_{\theta} \log(p(\bm{\tau}\mid \theta)) \cdot p(\bm{\tau}\mid \theta)
+    }_{\nabla_{\theta} p(\bm{\tau}|\theta)}
+    \,\mathrm{d}\bm{\tau}
+    \\
+    &=
+    \mathsf{E}_{\tau \sim p(\tau|\theta)}
+    \left[
+        R(\bm{\tau}) \cdot \nabla_{\theta} \log(p(\bm{\tau}\mid \theta))
+    \right]
+\end{align*}
+
+The Logarithm applied to the distribution $p(\bm{\tau} \mid \theta)$:
+%
+\begin{align*}
+    \nabla_{\theta}
+    &
+    \log
+    \left[
+        p(\bm{s}_0) \cdot \prod_{k=0}^{T} \pi_{\theta}(a_k|\bm{s}_k) \cdot P_{a_k}(\bm{s}_{k+1}, \bm{s}_k)
+    \right]
+    \\
+    &=
+    \sum_{k=0}^{T} \nabla_{\theta} 
+    \log\left[
+        \pi_{\theta}(a_k|\bm{s}_k)
+    \right]
+\end{align*}
+
+Let $R(\bm{\tau}) = \sum_{i=0}^{T-1} r_i + r_T$ where $r_i = R(\bm{s}_i, a_i, \bm{s}_{i+1})$
+%
+\begin{align*}
+    &\mathsf{E}_{\tau \sim p(\tau|\theta)}
+    \left[
+        R(\bm{\tau}) \cdot \sum_{k=0}^{T} \nabla_{\theta} 
+        \log\left[
+            \pi_{\theta}(a_k|\bm{s}_k)
+        \right]
+    \right]
+    \\
+    &=
+    \sum_{i=0}^{T}
+    \sum_{k=0}^{T}
+    \mathsf{E}_{\tau}
+    \left[
+        r_i 
+        \cdot 
+        \nabla_{\theta} \log
+        \left[
+            \pi_{\theta}(a_k|\bm{s}_k)
+        \right]
+    \right]
+\end{align*}
+
+For fixed $i<k$ the law of total expectation yields:
+%
+%
+\begin{align*}
+    &\mathsf{E}_{a_k, \bm{s}_k}
+    \left[
+        \mathsf{E}_{\tau}
+        \left[
+            r_i 
+            \cdot 
+            \nabla_{\theta} \log
+            \left[
+                \pi_{\theta}(a_k|\bm{s}_k)
+            \right]
+        \right]
+        \mid a_k, \bm{s}_k
+    \right]
+    \\
+    &=
+    \mathsf{E}_{a_k, \bm{s}_k}
+    \left[
+        \nabla_{\theta} \log
+        \left[
+            \pi_{\theta}(a_k|\bm{s}_k)
+        \right]
+        \cdot
+        \underbrace{
+            \mathsf{E}_{\tau}
+            \left[
+                r_i 
+                \mid a_k, \bm{s}_k
+            \right]
+        }_{
+            \mathsf{E}_{\tau}[r_i \mid \bm{s}_k] = g(\bm{s}_k)
+        }
+    \right]
+    \\
+    &=
+    \mathsf{E}_{\bm{s}_k}
+    \left[
+        \mathsf{E}_{a_k \mid \bm{s}_k}
+        \left[
+            \vphantom{\int}
+            \left[ 
+                g(\bm{s}_k)
+                \cdot 
+                \nabla_{\theta} \log\left( \pi_{\theta}(a_k|\bm{s}_k) \right) 
+            \right]
+            \mid \bm{s}_k
+        \right]
+    \right]
+\end{align*}
+%
+Now using $g(\bm{s}_k)$ is independent of $a_k$ and therefore
+%
+\small{
+    \begin{align*}
+        &
+        \mathsf{E}_{\bm{s}_k}
+        \left[
+            g(\bm{s}_k)
+            \mathsf{E}_{a_k \mid \bm{s}_k}
+            \left[
+                \left[ 
+                    \nabla_{\theta} \log\left( \pi_{\theta}(a_k|\bm{s}_k) \right) 
+                \right]
+                \mid \bm{s}_k
+            \right]
+        \right]
+        \\
+        &=
+        \mathsf{E}_{\bm{s}_k}
+        \left[
+            g(\bm{s}_k)
+            \cdot
+            \int_{\mathcal{A}} 
+            \underbrace{
+                \nabla_{\theta} 
+                \log
+                \left( 
+                    \pi_{\theta}( a |\bm{s}_k) 
+                \right) 
+                \cdot 
+                \pi_{\theta}(a |\bm{s}_k) 
+            }_{
+                \nabla_{\theta} \pi_{\theta}(a|\bm{s}_k)
+            }
+            \mathrm{d}a
+        \right]
+        \\
+        &=
+        \nabla_{\theta} 
+        \underbrace{
+            \int_{\mathcal{A}} \pi_{\theta}(a|\bm{s}_k) \mathrm{d}a
+        }_{
+            =1
+        }
+        = 0
+    \end{align*}
+}
+
+We conclude that for $i<k$ the expectation is zero and 
+we denote $R_t = \sum_{k=t}^{T} r_k = Q(\bm{s}_t, a_t)$ 
+and obtainthe formula:
+%
+\begin{align*}
+    \nabla_{\theta} J(\theta) 
+    &=
+    \mathsf{E}_{\tau \sim p(\tau|\theta)}
+    \left[
+        \sum_{t=0}^{T} \nabla_{\theta} 
+        \log
+        \left( 
+            \pi_{\theta}(a_t|\bm{s}_t) 
+        \right)
+        \cdot
+        Q(\bm{s}_t, a_t)
+    \right]
+\end{align*}
 % E_{\tau_0 \sim p(\tau_0| \rot{\pi})}
 Parameterizing the policy $\pi$ with $\theta$ leads to:
 
@@ -167,19 +355,7 @@ Parameterizing the policy $\pi$ with $\theta$ leads to:
     \end{tabular}
 }
 
-\section*{Policy Gradient Methods}
 
-\textbf{Policy Gradient Theorem:}
-\begin{align*}
-    \nabla_{\theta} J(\theta)
-    &=
-    \mathsf{E}_{\tau \sim p(\tau|\theta)}
-    \left[
-        \sum_{t=0}^{T-1}
-        Q^{\pi_{\theta}}(\bm{s}_t, a_t) \cdot 
-        \nabla_{\theta} \log \pi_{\theta}(a_t|\bm{s}_t)
-    \right]
-\end{align*}
 
 \subsection*{Optimal Control Problems}
 
