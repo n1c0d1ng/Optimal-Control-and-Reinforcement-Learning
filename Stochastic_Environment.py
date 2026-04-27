@@ -7,7 +7,7 @@ class SOCP:
     def __init__(self, N=100):
         self.N = N
         self.T = 1
-        self.sigma = 0.5
+        self.sigma = 0.1
         self.h = self.T / N
         self.t = np.linspace(0, self.T, N + 1)
 
@@ -17,7 +17,7 @@ class SOCP:
         return X + self.h * (X + u + 1) + self.sigma * Z * np.sqrt(self.h)
     
     def compute_running_cost(self, X, u):
-        return self.h *  (np.sum(X) + np.sum(u**2)) 
+        return self.h * (np.sum(X) + np.sum(u**2)) 
     
     def compute_terminal_cost(self, X):
         return X[-1]**2

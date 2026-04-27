@@ -11,6 +11,9 @@ class OCP:
         self.t = np.linspace(0, self.T, N + 1)
         self.u = np.zeros(N + 1)  # Initiale Steuerung
         self.x = np.zeros(N + 1)  # Initialer Zustand
+        self.J_numerical = 0
+        self.J_ANALYTICAL = 0.
+        self.Space_Dimension = 2
 
     # x' = x + u + 1, x(0) = 0
     def forward_integration(self, u):
@@ -23,7 +26,7 @@ class OCP:
     def backward_integration(self):
         p = np.zeros(self.N + 1)
         p[self.N] = 2*self.x[self.N]  # Endwert
-        for i in range(self.N):
+        for i in range(self.N): 
         #for i in range(self.N - 1, -1, -1):
             p[self.N -i -1] = p[self.N - i] + self.h * (1 + p[self.N - i])
             #p[i] = p[i + 1] + self.h * (1 + p[i + 1])
@@ -62,6 +65,12 @@ class OCP:
             # Steuerung aktualisieren
             self.u = self.u + alpha * d
             self.x = self.forward_integration(self.u)
+
+        # Wert J= self.h * sum_{i=0}^{N-1} x_i * (u_i)^2 + (x_N)^2
+        for step in range(self.N):
+            self.J_numerical += (-1)*(self.direct_reward(self.x[step], self.u[step]))
+        self.J_numerical += (-1)*self.terminal_reward(self.x[self.N])
+
 
     # Interaktion mit Environment für den RL Algorithmus
     def direct_reward(self, x, u):

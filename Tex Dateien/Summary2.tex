@@ -1,4 +1,4 @@
-\documentclass[a4paper,12pt, oneside, twocolumn]{scrartcl}
+ \documentclass[a4paper,12pt, oneside, twocolumn]{scrartcl}
 %\usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}
 \setlength{\parindent}{0em}
@@ -104,25 +104,26 @@ to find $\pi: \mathcal{S} \to \mathcal{P}(\mathcal{A})$ ($\mathcal{P}$ is a p-me
 
 Where $\tau$ is a trajectory of the system, which consists of the states, actions and rewards at each time step.
 %
-\begin{align*}
-    \bm{\tau}_t
-    &=
-    \left\{
-        \vphantom{\int}
-        \bm{s}_{t+i}, a_{t+i}, r_{t+i}, \bm{s}_{t+i+1} 
-    \right\}_{i=0}^{\infty}
-    \Rightarrow
-    J(\rot{\pi}) 
-    =
-    \mathsf{E}
-    \left[
-        \vphantom{\int}
-        R(\bm{\tau}_0)
-    \right]
-\end{align*}
+\small{
+    \begin{align*}
+        \bm{\tau}_t
+        &=
+        \left\{
+            \vphantom{\int}
+            \bm{s}_{t+i}, a_{t+i}, r_{t+i}, \bm{s}_{t+i+1} 
+        \right\}_{i=0}^{\infty}
+        \Rightarrow
+        J(\rot{\pi}) 
+        =
+        \mathsf{E}
+        \left[
+            \vphantom{\int}
+            R(\bm{\tau}_0)
+        \right]
+    \end{align*}
+}
 
-\section*{Policy Gradient Methods}
-
+\subsection*{Policy Gradient Methods}
 
 Let $\pi_{\theta}$ be a parameterized policy with $\theta \in \mathbb{R}^d$.
     %
@@ -194,18 +195,15 @@ For fixed $i<k$ the law of total expectation yields:
 %
 %
 \begin{align*}
-    &\mathsf{E}_{a_k, \bm{s}_k}
+    &\mathsf{E}_{\tau \sim p(\tau|\theta)}
     \left[
-        \mathsf{E}_{\tau}
+        r_i 
+        \cdot 
+        \nabla_{\theta} 
+        \log
         \left[
-            r_i 
-            \cdot 
-            \nabla_{\theta} \log
-            \left[
-                \pi_{\theta}(a_k|\bm{s}_k)
-            \right]
+            \pi_{\theta}(a_k|\bm{s}_k)
         \right]
-        \mid a_k, \bm{s}_k
     \right]
     \\
     &=
@@ -292,25 +290,68 @@ Now using $g(\bm{s}_k)$ is independent of $a_k$ and therefore
 }
 
 We conclude that for $i<k$ the expectation is zero and 
-we denote $R_t = \sum_{k=t}^{T} r_k = Q(\bm{s}_t, a_t)$ 
-and obtainthe formula:
+we denote $R_t = \sum_{k=t}^{T} r_k$ 
+and obtain the formula:
 %
 \begin{align*}
     \nabla_{\theta} J(\theta) 
     &=
+    \sum_{t=0}^{T} 
     \mathsf{E}_{\tau \sim p(\tau|\theta)}
     \left[
-        \sum_{t=0}^{T} \nabla_{\theta} 
+        \nabla_{\theta} 
         \log
         \left( 
             \pi_{\theta}(a_t|\bm{s}_t) 
         \right)
         \cdot
-        Q(\bm{s}_t, a_t)
+        R_t
     \right]
 \end{align*}
+
+Conditioned on $(\bm{s}_t,a_t)$ we get for $\nabla_{\theta} J(\theta)$:
+%
+\begin{align*}
+    &\nabla _{\theta} J(\theta)
+    =
+    \mathsf{E}
+    \left[
+        \vphantom{\int}
+        \mathsf{E}
+        \left[
+            \nabla_{\theta} 
+            \log
+            \left( 
+                \pi_{\theta}(a_t|\bm{s}_t) 
+            \right)
+            \cdot
+            R_t
+            \mid a_t, \bm{s}_t
+        \right]
+    \right]
+    \\
+    &=
+    \sum_{t=0}^{T}
+    \mathsf{E}_{a_t, \bm{s}_t}
+    \left[
+        \nabla_{\theta} 
+        \log
+        \left( 
+            \pi_{\theta}(a_t|\bm{s}_t) 
+        \right)
+        \underbrace{
+            \mathsf{E}_{\tau \sim p(\tau|\theta)}
+            \left[
+                R_t \mid a_t, \bm{s}_t
+            \right]
+            }_{
+                Q^{\pi_{\theta}}(\bm{s}_t, a_t)
+            }
+    \right]
+\end{align*}
+
+
 % E_{\tau_0 \sim p(\tau_0| \rot{\pi})}
-Parameterizing the policy $\pi$ with $\theta$ leads to:
 
 % Erklär noch Q Funktion und zeig R ist ein schätzer der Q Funktion
 % Kurze beweisidee: zum policy theorem
@@ -318,65 +359,44 @@ Parameterizing the policy $\pi$ with $\theta$ leads to:
 % dann Tabelle wo du das OCP als RL/PG problem zeigst und dann die graphiken 
 % wir erwähnen neuronale netze nur und sagen wir haben es benutzt aber erklären die hier nicht
 
-\small{
-    \begin{tabular}{l| l}
-        Infinite dimensional & Finite dimensional \\
-        \hline 
-        $\Pi = \{\pi: \mathcal{\bm{S}} \to \mathcal{P}(\mathcal{A})\}$ 
-        & 
-        $\blau{\theta} \in \mathbb{R}^d$ and $\pi_{\blau{\theta}} \in \Pi$ 
-        \\
-        $J_{\rot{\pi}}:\Pi \to \mathbb{R}$
-        &
-        $J_{\blau{\theta}}:\mathbb{R}^d \to \mathbb{R}$
-        \\
-        $\displaystyle J(\pi) = \mathsf{E}_{\tau \sim p(\tau \mid \rot{\pi})}
-        \left[
-            \vphantom{\int}
-            R(\tau)
-        \right]$
-        & 
-        $\displaystyle J(\blau{\theta}) 
-        = \mathsf{E}_{\tau \sim p(\tau \mid \blau{\theta})}
-        \left[
-            \vphantom{\int}
-            R(\tau)
-        \right]$ 
-        \\ 
-        $\displaystyle \nabla_{\rot{\pi}} J= 
-        \sum_{t=0}^{T-1} p(\bm{s}_t) 
-        \cdot Q^{\rot{\pi}}(\bm{s}, a)$
-        & $\displaystyle 
-            \nabla_{\blau{\theta}}
-            \mathsf{E}_{\tau \sim p(\tau|\blau{\theta})}
-            \left[
-                R(\tau)
-            \right]$ \\
-    \end{tabular}
-}
 
+\subsection*{Application on Control Problems}
 
-
-\subsection*{Optimal Control Problems}
+We parametrize the control $u(x,t) = u(t,x \mid \theta)$ and 
+relax the problem by considering 
+$a_t \sim \pi(u(\bm{s}_t, \theta))$. 
 
 \begin{tabular}{ l| l}
     Control Problem   & RL Problem \\
     \hline 
-    $\displaystyle \min_u \int_0^1 u^2 \dt + (x(1)-1)^2$                
+    $x(t)$                
     & 
-    $\displaystyle \mathsf{E}_{\pi} \sum_{t=0}^{T-1} u_t^2 + (x_T - 1)^2$
+    $\bm{s}_t = 
+    \begin{bmatrix}
+        t \\
+        x(t)
+    \end{bmatrix}$
     \\
-    $\displaystyle \sum_{i=1}^{N} u_i^2 + (x_N - 1)^2$
+    $u(t)$                
+    & 
+    $a_t \sim \mathcal{N}(u(\bm{s}_t, \theta), \sigma)$
+    \\
+    $\displaystyle \int_0^T L(x,u) \dt + \Phi(x(T))$                
+    & 
+    $\displaystyle \mathsf{E}_{\tau}\left[ \sum_{i=0}^{N} r_i \right]$
+    \\
+    $\displaystyle x'(t) = f(x,u)$
     &   
-    $\displaystyle -\sum_{t=0}^{T-1} u_t^2 - (x_T - 1)^2$
+    $\displaystyle \bm{s}_{t+1} \sim P_{a_t}(\cdot,\bm{s}_{t})$
 \end{tabular}
 
 % Schemata Policy Gradient Methode
 % \mathcal{U} = \{u:[0,T] \to \mathbb{R} \mid u \text{ measurable} \}
-\usetikzlibrary{positioning}
-\begin{tikzpicture}[>=latex]
-    \node[draw= boxframe,anchor = north ,align=left] (a) at (-2,0) {
-        $\begin{aligned}
+
+\begin{itemize}
+    \item[1.] Let $\mathcal{U} = \{u:[0,T] \to \mathbb{R} \mid u \text{ measurable} \}$
+    %
+    \begin{align*}
             \min_{u \in \mathcal{U}} & \int_0^T
             L(X_t,u) \dt 
             + \Phi(X_T),  
@@ -384,101 +404,204 @@ Parameterizing the policy $\pi$ with $\theta$ leads to:
             \\
             \dX_t &= f(X_t,u(t)) \dt + \sigma \dW_t, 
             \quad X_0= x_0
-        \end{aligned}$
-    };
-    \node[draw = rot, anchor = north, align=left] (b) at ([xshift=0cm, yshift=-0.5cm]a.south) {
-        Relaxation of the Problem:  \\
+    \end{align*}
+    \item[2.] Relaxation of the Problem: $\mathcal{U} \subset \mathcal{U}_{stoch}$
         %
-        $\begin{aligned}
-            \mathcal{U}_{stoch} = \{ \pi: [0,T] \to \mathcal{P}(\mathbb{R}) 
-            \mid \pi(\cdot | t) \text{ ist W-Maß} \}
-        \end{aligned}$ \\
-
-        $\mathcal{U} \subset \mathcal{U}_{stoch}$
-            %
-        $\begin{aligned}
-            u:[0,T] \to \mathbb{R} \Rightarrow 
-            \pi( \cdot | t) = \delta_{u(t)}
-        \end{aligned}$
-    };
-    \node[draw = rot, below=of b, align=center] (c) {
-        Diskretisierung: $\bm{u} = \left\{ u_i \right\}_{i=0}^{N-1}$ $u_i \sim \pi(u_i\mid t_i)$ \\
-
-        Parametrisierung: $\theta \to \pi_{\theta}(u_i \mid t_i)$ und $\theta \in \mathbb{R}^n$ \\
-        $\begin{aligned}
-            \log\left[\pi_{\theta}(\bm{u})\right] 
-            = 
-            \log\left[ \prod_{i=0}^{N-1} \pi_{\theta}(u_i \mid t_i)\right]
-            =
-            \sum_{i=0}^{N-1} \log\left[\pi_{\theta}(u_i \mid t_i)\right]
-        \end{aligned}$
+    \begin{align*}
+        \mathcal{U}_{stoch} &= \{ \pi: \mathcal{S} \to \mathcal{P}(\mathbb{R}) 
+        \mid \pi(\cdot | \bm{s}_t) \text{ is p-measure} \}
         \\
-        $\begin{aligned}
-            \int_0^T L(X_t,u_t) \dt + \Phi(X_T) \approx C(\bm{u}) = C(u_0, \ldots, u_{N-1})
-        \end{aligned}$
-        };
-    \node[draw = rot, below=of c, align=center] (d) {Optimierung: 
-    Wahl spezieller Verteilung $\pi_{\theta} = \mathcal{N}(\mu(\theta,t),b)$ \\
-        $\begin{aligned}
-            &\nabla_{\theta} \mathsf{E}
-            \left[
-                C(\bm{u})
-            \right]
-            = \mathsf{E}
-            \left[
-                \sum_{i=0}^{N-1} \nabla_{\theta} 
-                \log\left(\pi_{\theta}(u_i \mid t_i)\right)
-                \cdot
-                C(u_i, \ldots, u_{N-1})
-            \right]
-            \\
-            &\approx
-            \frac{1}{M} \sum_{m=1}^M
-            \left[
-                \sum_{i=0}^{N-1} 
-                \nabla_{\theta} 
-                \log\left(\pi_{\theta}(u_i^{(m)} \mid t_i)\right)
-                \cdot
-                C(u_i^{(m)}, \ldots, u_{N-1}^{(m)})
-            \right]
-        \end{aligned}$
-        };
-    \node[draw = boxframe, anchor=south, align=left] (e) at ([yshift=-4.55cm, xshift=-0.5cm]d.south) {
-        Gradientenverfahren:  \\
-        $\begin{aligned}
-            \theta_{k+1} = \theta_k - \alpha_k \nabla_{\theta} J(\theta_k)
-        \end{aligned}$
+        u: & \mathbb{R}^{n_x} \times [0,T] \to \mathbb{R} \Rightarrow 
+        \pi( \cdot | \bm{s}_t) = \delta_{u(\bm{s}_t)}
+    \end{align*}
+
+    \item[3.] Discretize: $\bm{a} = \left\{ a_i \right\}_{i=0}^{N-1}$ $a_i \sim \pi(u(\bm{s}_i, \theta))$ 
+    %
+    \small{
+        \begin{align*}
+        \log\left[
+            \underbrace{
+                \prod_{i=0}^{N-1} \pi_{\theta}(a_i | \bm{s}_i) 
+            }_{
+                \pi_{\theta}(\bm{a})
+            }
+        \right] 
+        = 
+        \sum_{i=0}^{N-1} \log\left[\pi_{\theta}(a_i | \bm{s}_i)\right]
+    \end{align*}
+    }
+    \item[4.] Differentiation of the objective function:
+    %
+    \begin{align*}
+        &\nabla_{\theta}
+        \mathsf{E}
+        \left[
+            \int_0^T L(X_t,a_t) \dt + \Phi(X_T)  
+        \right]
         \\
-        Simulation des Zustands $X_{t_{i+1}}$ \\
-        $\begin{aligned}
-            X_{t_{i+1}} 
-            &= X_{t_i} + f(X_{t_i},u_i) \Delta t + \sigma Z_i,
-            \\ Z_i &\sim \mathcal{N}(0, \Delta t)
-        \end{aligned}$
+        &=
+        \int_{\mathcal{A}}
+        \underbrace{
+            \pi_{\theta}(a) \cdot \nabla_{\theta} \log(\pi_{\theta}(a))
+        }_{
+            \nabla_{\theta} \pi_{\theta}(a)
+        }
+        \left[
+           \Delta t \cdot \sum_{i=0}^{N-1} r_i + \Phi(X_T)
+        \right]
+        \mathrm{d}a
         \\
-        Projektion auf $\mathcal{U}$: \\
-        $\begin{aligned}
-            u^*(t_i) = \mu(\theta^*, t_i) \in \mathcal{U}
-        \end{aligned}$
-        };
+        &=
+        \mathsf{E}
+        \left[
+            \sum_{i=0}^{N-1}
+            \nabla_{\theta} 
+            \log(\pi_{\theta}(a_i))
+            \cdot
+            C(a_0 , \ldots, a_{N-1})
+        \right]
+    \end{align*}
+    %
+    \item[5.] Policy Gradient Theorem: $ C(a_i, \ldots, a_{N-1}) := R_i$
+    %
+    \begin{align*}
+        &\nabla_{\theta} \mathsf{E}
+        \left[
+            C(\bm{a})
+        \right]
+        = \mathsf{E}
+        \left[
+            \sum_{i=0}^{N-1} \nabla_{\theta} 
+            \log\left(\pi_{\theta}(a_i)\right)
+            \cdot
+            R_i
+        \right]
+        \\
+        &\approx
+        \frac{1}{M} \sum_{m=1}^M
+        \left[
+            \sum_{i=0}^{N-1} 
+            \nabla_{\theta} 
+            \log\left(\pi_{\theta}(a_i^{(m)})\right)
+            \cdot
+            R_i^{(m)}
+        \right]
+    \end{align*}
+    %
+    \item[5.] Gradient method \cite{Plaat_RL} with $M=1$:
+    %and $\epsilon_i \sim \mathcal{N}(0, \Delta t)$  
+    %
+    \begin{align*}
+        \theta_{k+1} &= \theta_k - \alpha_k \nabla_{\theta} J(\theta_k)
+        \\
+        X_{t_{i+1}} 
+        &= X_{t_i} + f(X_{t_i},u_i) \Delta t + \sigma Z_i
+    \end{align*}
+\end{itemize}
 
-    \draw[->, color = boxframe] (a) -- (b);
-    \draw[->, color = boxframe] (b) -- (c);
-    \draw[->, color = boxframe] (c) -- (d);
-    \draw[->, color = boxframe] (d.west) -- ++(-0.9cm,0cm);
-    \draw[->, color = gruen] (a.south) -- ++(0cm, -4.7cm);
-\end{tikzpicture}
+\section*{Numerical Example}
+
+We consider the following example with $X_0 = 0$:
+%
+\begin{align*}
+    \min_{u} \int_0^1 X_t +u_t^2  \dt + X_1^2  
+    \quad 
+    \dX_t = X_t + u_t + 1, 
+\end{align*}
+
+and use the stochastic Relaxation:
+%
+\begin{align*}
+    \bm{s}_t =
+    \begin{bmatrix}
+        t \\
+        X_t
+    \end{bmatrix}
+    \quad
+    a_t \sim \mathcal{N}\left(u(\bm{s}_t , \theta), b \right)
+\end{align*}
+
+with the parametrization: 
+%
+\begin{align*}
+    u(\bm{s}_t,\theta)
+    =
+    W_N \cdot 
+    \tanh
+    \left(
+        W_1 \cdot \begin{bmatrix} t \\ X_t \end{bmatrix} + b_1
+     \right)
+    +
+    b_N
+\end{align*}
+
+with $W_1 \in \mathbb{R}^{n \times 2}, \bm{b}_1 \in \mathbb{R}^{n}, W_N \in \mathbb{R}^{1 \times n}, b_N \in \mathbb{R}$. 
+Where $\theta \in \mathbb{R}^{4n+1}$ and $n$ is a Hyperparameter.
+% Hier jetzt konkret die Ableitungen zeigen
+
+For the Reward we compute:
+%
+\begin{align*}
+    r_i = \left(X_{t_i} + a_{t_i}^2\right) \Delta t \quad r_N = X_{t_N}^2
+    \Rightarrow
+    R_k :=
+    \sum_{i=k}^{N} r_i
+\end{align*}
+
+For $M=1$ the estimator of our Gradient is given by 
+%
+\begin{align*}
+    \nabla_{\theta} J(\theta)
+    \approx
+    \hat{g}
+    &=
+    \sum_{i=0}^{N-1}
+    \nabla_{\theta} \log(\pi_{\theta}(a_{t_i} \mid \bm{s}_{t_i}))
+    \cdot
+    R_{i}
+    \\
+    &=
+    \sum_{i=0}^{N-1}
+    \frac{a_{t_i} - u(\bm{s}_{t_i}, \theta)}{b} 
+    \cdot R_i
+\end{align*}
+
+Using the dynamic for Simulation:
+%
+\begin{align*}
+    X_{t_{i+1}} = X_{t_i} + \Delta t \left(X_{t_i}+ a_{t_i} +1\right) \quad X_{t_0} = 0
+\end{align*}
 
 
+Application of the standard REINFORCE Algorithm with Monte Carlo Sampling \cite{Plaat_RL} 
+leads to 
+%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\textwidth]{Full_Comparison_PG.png}
+    %\caption{Meine Grafik}
+    %\label{fig:meinbild}
+\end{figure}
+%
+%
+%
+The following results show the high variance in the standard Reinforce-Algorithm 
+as described in \cite{Becht_Tour_of_RL}. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\textwidth]{Comparison_Policy_Simulation.png}
+    %\caption{Meine Grafik}
+    %\label{fig:meinbild}
+\end{figure}
 
 
+%\section*{Further Directions}
 
-\section*{Further Directions}
+% Further improvements based on \cite{lillicrap2015ddpg},
+% \cite{haarnoja2018sac} and \cite{haarnoja2018sacapps}.
 
-Further improvements based on \cite{lillicrap2015ddpg},
-\cite{haarnoja2018sac} and \cite{haarnoja2018sacapps}.
-
-\small
-\printbibliography
-
+\small{
+    \printbibliography
+}
 \end{document}

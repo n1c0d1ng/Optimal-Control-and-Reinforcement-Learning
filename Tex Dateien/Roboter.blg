@@ -1,17 +1,17 @@
-[0] Config.pm:308> INFO - This is Biber 2.20
-[0] Config.pm:311> INFO - Logfile is 'Roboter.blg'
-[111] biber-MSWIN64:340> INFO - === 
-[165] Biber.pm:420> INFO - Reading 'Roboter.bcf'
-[275] Biber.pm:994> INFO - Found 7 citekeys in bib section 0
-[285] Biber.pm:4463> INFO - Processing section 0
-[296] Biber.pm:4654> INFO - Looking for bibtex file 'references.bib' for section 0
-[377] bibtex.pm:1713> INFO - LaTeX decoding ...
-[388] bibtex.pm:1519> INFO - Found BibTeX data source 'references.bib'
-[504] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
-[504] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[504] Biber.pm:4283> INFO - Sorting list 'nty/global//global/global/global' of type 'entry' with template 'nty' and locale 'de-DE'
-[504] Biber.pm:4289> INFO - No sort tailoring available for locale 'de-DE'
-[509] bbl.pm:676> INFO - Writing 'Roboter.bbl' with encoding 'UTF-8'
-[513] bbl.pm:779> INFO - Output to Roboter.bbl
-[513] Biber.pm:131> WARN - ISBN '978-1849964507' in entry 'siciliano2010' is invalid - run biber with '--validate_datamodel' for details.
-[513] Biber.pm:133> INFO - WARNINGS: 1
+[0] Config.pm:307> INFO - This is Biber 2.19
+[0] Config.pm:310> INFO - Logfile is 'Roboter.blg'
+[159] biber-MSWIN64:340> INFO - === 
+[217] Biber.pm:419> INFO - Reading 'Roboter.bcf'
+[293] Biber.pm:979> INFO - Found 7 citekeys in bib section 0
+[304] Biber.pm:4419> INFO - Processing section 0
+[325] Biber.pm:4610> INFO - Looking for bibtex file 'references.bib' for section 0
+[360] bibtex.pm:1713> INFO - LaTeX decoding ...
+[374] bibtex.pm:1519> INFO - Found BibTeX data source 'references.bib'
+[486] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[486] UCollate.pm:68> INFO - Overriding locale 'de-DE' defaults 'variable = shifted' with 'variable = non-ignorable'
+[486] Biber.pm:4239> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'de-DE'
+[486] Biber.pm:4245> INFO - No sort tailoring available for locale 'de-DE'
+[491] bbl.pm:660> INFO - Writing 'Roboter.bbl' with encoding 'UTF-8'
+[494] bbl.pm:763> INFO - Output to Roboter.bbl
+[494] Biber.pm:131> WARN - ISBN '978-1849964507' in entry 'siciliano2010' is invalid - run biber with '--validate_datamodel' for details.
+[494] Biber.pm:133> INFO - WARNINGS: 1

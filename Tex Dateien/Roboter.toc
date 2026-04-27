@@ -23,6 +23,8 @@
 \contentsline {section}{\numberline {6}Reinforcement Learning in Optimal Control}{26}{section.6}%
 \contentsline {subsection}{\numberline {6.1}Policy-Based Algorithms}{26}{subsection.6.1}%
 \contentsline {subsection}{\numberline {6.2}Neuronal Networks}{32}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.3}Deep Deterministic Policy Gradient}{37}{subsection.6.3}%
-\contentsline {subsection}{\numberline {6.4}Two-Link-Revolute Manipulator}{37}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.3}Neuronal ODEs}{36}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Applications on Control Problems}{37}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Deterministic Policy Gradient Methods}{39}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}Two-Link-Revolute Manipulator}{39}{subsection.6.6}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

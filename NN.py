@@ -12,10 +12,100 @@ class Neural_Network_One_Layer:
         self.parameter_dim = n * input_dim + n + output_dim * n + output_dim
         
         # Parameter initialisieren als (n,) statt (n,1) Vektoren
-        self.W1 = np.random.randn(n, input_dim)     # (n, 2)
+        self.W1 = np.random.randn(n, input_dim)     # (n, Input)
         self.b1 = np.random.randn(n)                # (n,)
-        self.WN = np.random.randn(output_dim, n)    # (1, n)
-        self.bN = np.random.randn(output_dim)       # (1,)
+        self.WN = np.random.randn(output_dim, n)    # (Output, n)
+        self.bN = np.random.randn(output_dim)       # (Output,)
+
+    def ForwardPass(self, Input_Vector):
+        input_vec = Input_Vector                    # (Input,)
+        z1 = self.W1 @ input_vec + self.b1          # (n,)
+        a1 = np.tanh(z1)                            # (n,)
+        V = self.WN @ a1 + self.bN                  # (1,)
+        if self.output_dim == 1:
+            return V[0], a1, z1                     # V (1,) V[0] skalar
+        else:
+            return V, a1, z1
+
+    
+    # flatten(): Geht Zeilenweise vor: [[1,2],[3,4]] -> [1,2,3,4]
+    def Backpropagation(self, Input_Vector):
+        V, a1, z1 = self.ForwardPass(Input_Vector)
+        delta_1 = self.WN.flatten() * (1 - a1**2)   # (n,)
+        delta_1 = delta_1.reshape(self.n, 1)        # (n,1)
+        dVdWN = a1                                  # (n,)
+        dVdbN = np.array([[1]])                     # (1,1)
+        input_vec = Input_Vector.reshape(-1,1)      # (Input_Dim,1)
+        dVdW1 = delta_1 @ input_vec.T               # (n,1) @ (1,Input_Dim) = (n,Input_Dim)
+        dVdb1 = delta_1                             # (n,1)
+        grad = np.concatenate([
+            (dVdW1.T).flatten(),                    # (Input_Dim * n,)
+            dVdb1.flatten(),                        # (n,)
+            dVdWN.flatten(),                        # (n,)
+            dVdbN.flatten()                         # (1,)
+            ])                                      # (Input_Dim * n + 2n+1,)
+        return grad
+    
+    def get_parameters(self):
+        # Rückgabe als Vektor der Parameter
+        params = np.concatenate([
+            (self.W1.T).flatten(),
+            self.b1.flatten(),
+            self.WN.flatten(),
+            self.bN.flatten()
+        ])
+        return params
+    
+    def set_parameters(self, params):
+        cols = []
+        index = 0
+
+        for _ in range(self.input_dim):
+            col = params[index:index+self.n]
+            index += self.n
+            cols.append(col)
+        self.W1 = np.column_stack(cols)
+
+        # b1
+        self.b1 = params[index:index+self.n]
+        index += self.n
+
+        # W_N:
+        WN_size = self.output_dim * self.n
+        self.WN = params[index:index+WN_size].reshape(self.output_dim, self.n)
+        index += WN_size
+
+        # b_N:
+        self.bN = params[index:index+self.output_dim]
+
+    # Ableitung nach dem Input: 
+    # V_x = delta^1 * W^1 
+    # delta^1 = W^N * [1 - (a_1)^2] 
+    def sensitivities(self, Input_Vector):
+        a1 = self.ForwardPass(Input_Vector)[1]
+        delta_1 = self.WN.flatten() * (1 - a1**2)   # (n,)
+        grad_x = delta_1 @ self.W1                    # (input_dim,)
+        return grad_x
+
+
+# z_1 = W_1 * [t \\ x] + b_1 
+# a_1 = tanh(z_1)
+# z_2 = W_2 * a_1 + b_2
+# a_2 = tanh(z_2)
+# z_N = W_N a_2 + b_N
+# Under Contruction
+class Neural_Network_Two_Layer:
+    def __init__(self, n=5, input_dim=2, output_dim=1):
+            self.n = n
+            self.input_dim = input_dim
+            self.output_dim = output_dim
+            self.parameter_dim = n * input_dim + n + output_dim * n + output_dim
+            
+            # Parameter initialisieren als (n,) statt (n,1) Vektoren
+            self.W1 = np.random.randn(n, input_dim)     # (n, 2)
+            self.b1 = np.random.randn(n)                # (n,)
+            self.WN = np.random.randn(output_dim, n)    # (1, n)
+            self.bN = np.random.randn(output_dim)       # (1,)
 
     def ForwardPass(self, t, X):
         input_vec = np.array([t, X])                # (2,)
@@ -28,8 +118,7 @@ class Neural_Network_One_Layer:
             return V, a1, z1
 
     
-    # Wichtig flatten(): Geht Zeilenweise vor: 
-    # [[1,2],[3,4]] -> [1,2,3,4]
+    # flatten(): Geht Zeilenweise vor: [[1,2],[3,4]] -> [1,2,3,4]
     def Backpropagation(self, t, X):
         V, a1, z1 = self.ForwardPass(t, X)
         delta_1 = self.WN.flatten() * (1 - a1**2)   # (n,)
@@ -78,19 +167,3 @@ class Neural_Network_One_Layer:
         
         # bN: output_dim Elemente
         self.bN = params[index:index+self.output_dim] # (output_dim,)
-
-# z_1 = W_1 * [t \\ x] + b_1 
-# a_1 = tanh(z_1)
-# z_2 = W_2 * a_1 + b_2
-# a_2 = tanh(z_2)
-# z_N = W_N a_2 + b_N
-class Neural_Network_Two_Layer:
-    def __init__(self, n1=3 , n2 =3):
-        self.n1 = n1
-        self.n2 = n2
-    
-    def ForwardPass(self, t, X):
-        return 0
-    
-    def Backpropagation(self, t, X):
-        return 0

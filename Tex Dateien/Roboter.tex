@@ -29,7 +29,7 @@
 
 \begin{titlepage}
 
-\newcommand{\TitleLineI}{Modellierung eines Roboters} 
+\newcommand{\TitleLineI}{Maximum Principle based Learning for Optimal Control of a Two-Link Revolute Manipulator} 
 \newcommand{\Author}{Nicolas Schäfer}
 \newcommand{\SubmissionDate}{Saarbrücken, \today}
 
@@ -47,7 +47,7 @@
 
 \begin{center}
 	\begin{Large}
-		Modellierung eines Roboters
+		Maximum Principle based Learning for Optimal Control of a Two-Link Revolute Manipulator
 	\end{Large}
 \end{center}
 
@@ -3782,28 +3782,28 @@ Wir verwenden als Aktivierungsfunktion $\tanh: \mathbb{R} \to (-1,1)$:
 Für das Outer-Layer gilt:
 % z_2 = W_2 * a_1 + b_2 
 \begin{align*}
-        \bm{W}_{N}
-        &=
-        \begin{bmatrix}
-            w_{1}^{(N)} & w_{2}^{(N)} & \ldots & w_{n}^{(N)}
-        \end{bmatrix}
-        \in \mathbb{R}^{1 \times n},
-        \quad
-        b_{N}
-        \in \mathbb{R}
-        \\
-        \bm{z}_N
-        &=
-        \bm{W}_N
-        \cdot
-        \bm{a}_1
-        +
-        b_N
-        =
-        \sum_{j=1}^{n}
-        w_{j}^{(N)} a_{j}^{(1)}
-        +
-        b_N
+    \bm{W}_{N}
+    &=
+    \begin{bmatrix}
+        w_{1}^{(N)} & w_{2}^{(N)} & \ldots & w_{n}^{(N)}
+    \end{bmatrix}
+    \in \mathbb{R}^{1 \times n},
+    \quad
+    b_{N}
+    \in \mathbb{R}
+    \\
+    \bm{z}_N
+    &=
+    \bm{W}_N
+    \cdot
+    \bm{a}_1
+    +
+    b_N
+    =
+    \sum_{j=1}^{n}
+    w_{j}^{(N)} a_{j}^{(1)}
+    +
+    b_N
 \end{align*}
 
 Für die Darstellung von $V$ durch $\bm{z}_2$ benötigt man $4n+1$ Parameter:
@@ -3840,155 +3840,6 @@ Für die Darstellung von $V$ durch $\bm{z}_2$ benötigt man $4n+1$ Parameter:
     j = 1, \ldots, n
 \end{align*}
 
-Für den Gradienten $\nabla_{\phi} V_{\phi} \in \mathbb{R}^{4n+1}$ nach den Parametern gilt:
-% nabla_phi V
-\begin{align*}
-    \frac{\partial V}{\partial w_j^{(N)}}
-    &=
-    \tanh
-    \left(
-        w_{j1}^{(1)} \cdot
-        t
-        +
-        w_{j2}^{(1)} \cdot
-        x
-        +
-        b_j^{(1)}
-    \right)
-    = \bm{a}_j^{(1)}
-    \Rightarrow
-    \frac{\partial V}{\partial \bm{W}^{(N)}}
-    =
-    \bm{a}^{(1)}
-    \\
-    \frac{\partial V}{\partial \bm{z}_k^{(1)}}
-    &=
-    \frac{\partial V}{\partial \bm{a}_k^{(1)}}
-    \cdot 
-    \frac{\partial \bm{a}_k^{(1)}}{\partial \bm{z}_k^{(1)}}
-    =
-    w_{k}^{(N)} \cdot
-    \left[
-        1 - \left( \bm{a}^{(1)}_k \right)^2
-    \right]
-    \Rightarrow
-    \frac{\partial V}{\partial \bm{z}^{(1)}}
-    =
-    \bm{W}^{(N)} \circ 
-    \left[
-        1 - \left( \bm{a}^{(1)} \right)^2
-    \right]
-    :=
-    \bm{\delta}^{(1)}
-    \\
-    \frac{\partial V}{\partial w_{ij}^{(1)}}
-    &=
-    \frac{\partial V}{\partial \bm{z}_{i}^{(1)}} \cdot 
-    \frac{\partial \bm{z}_i^{(1)}}{\partial w_{ij}^{(1)}}
-    =
-    \begin{cases}
-        \bm{\delta}_i^{(1)} \cdot t , & j=1 \\
-        \bm{\delta}_i^{(1)} \cdot x , & j=2
-    \end{cases}
-    \Rightarrow
-    \frac{\partial V}{\partial \bm{W}^{(1)}}
-    =
-    \left(\bm{\delta}^{(1)}\right)^T
-    \cdot
-    \begin{bmatrix}
-        t & x
-    \end{bmatrix}
-    \\
-    \frac{\partial V}{\partial \bm{b}_i^{(1)}}
-    &=
-    \frac{\partial V}{\partial \bm{z}_i^{(1)}} \cdot 
-    \frac{\partial \bm{z}_i^{(1)}}{\partial \bm{b}_i^{(1)}}
-    =
-    \bm{\delta}_i^{(1)} \cdot 1 
-    \Rightarrow
-    \frac{\partial V}{\partial \bm{b}^{(1)}} = \bm{\delta}^{(1)}
-\end{align*}
-
-\begin{algorithm}
-    \caption{Backpropagation in Neural Networks $1$ Hidden-Layers}
-    \begin{algorithmic}
-        \State Given $\bm{W}^{(1)}, \bm{W}^{(N)} , \bm{b}^{(1)}, b^{(N)}, 
-        \begin{bmatrix} t_i & X_{t_i} \end{bmatrix}^T$ 
-
-        \State Foward Computation
-        %
-        \begin{align*}
-            \bm{z}^{(1)} &= \bm{W}^{(1)} \cdot 
-            \begin{bmatrix}
-                t_i \\
-                X_{t_i}
-            \end{bmatrix}
-            + 
-            \bm{b}^{(1)}
-            \\
-            \bm{a}^{(1)} &= \tanh\left(\bm{z}^{(1)}\right)
-            \\
-            V 
-            &=
-            \bm{W}^{(N)} \cdot \bm{a}^{(1)} + b^{(N)}
-        \end{align*}
-        %
-        \State Backpropagation
-        %
-        \begin{align*}
-            \bm{\delta}^{(1)} &=
-            \bm{W}^{(N)} \circ 
-            \left[
-                1 - \left( \bm{a}^{(1)} \right)^2
-            \right]
-            \\
-            \frac{\partial V}{\partial \bm{W}^{(N)}}
-            &=
-            \bm{a}^{(1)}
-            \\
-            \frac{\partial V}{\partial b_N} 
-            &= 1
-            \\
-            \frac{\partial V}{\partial \bm{W}^{(1)}}
-            &=
-            \left(\bm{\delta}^{(1)} \right)^T
-            \cdot
-            \begin{bmatrix}
-                t_i & X_{t_i}
-            \end{bmatrix}
-            \\
-            \frac{\partial V}{\partial \bm{b}^{(1)}}
-            &=
-            \left(\bm{\delta}^{(1)} \right)^T
-        \end{align*}
-
-        \Return 
-        %
-        \begin{align*}
-            \nabla_\phi V =
-            \begin{bmatrix}
-                \left(\bm{\delta}^{(1)} \right)^T \cdot t_i \\
-                \left(\bm{\delta}^{(1)} \right)^T \cdot X_{t_i}
-                \\
-                \left(\bm{\delta}^{(1)}\right)^T
-                \\
-                \bm{a}^{(1)}
-                \\
-                1
-            \end{bmatrix}
-            \quad
-            \phi
-            =
-            \begin{bmatrix}
-                \bm{W}^{(1)} \cdot \begin{bmatrix} 1 & 0 \end{bmatrix}^T \\
-                \bm{W}^{(1)}  \cdot \begin{bmatrix} 0 & 1 \end{bmatrix}^T \\
-                \bm{b}^{(1)} \\
-                \left(\bm{W}^{(N)}\right)^T \\
-                b^{(N)}
-            \end{bmatrix}
-        \end{align*}
-    \end{algorithmic}
-\end{algorithm}
 
 Als nächstes Betrachten wir ein Neuronales Netz mit zwei Hidden-Layer $\bm{W}_1, \bm{W}_2$ 
 und den zugehörigen Bias $\bm{b}_1, \bm{b}_2$. 
@@ -4128,269 +3979,791 @@ Das Outer-Layer und der Output besitzt erneut folgende Struktur
     \sum_{j=1}^{n_2} w_j^{(N)} \bm{a}_{j}^{(2)} + b_N
 \end{align*}
 
-% Neuronales Netz und ihre Ableitung
-\begin{satz}[Neuronal-Networks]
-    Sei $V:\mathbb{R}^{\text{Input}} \to \mathbb{R}^{\text{Output}}$ approximiert durch $V \approx \bm{z}_N$
+\begin{definition}[Neuronales Netz]
+    Bezeichne $V :\mathbb{R}^{\text{Input}} \to \mathbb{R}$ mit 
+    %
     \begin{itemize}
-        \item  Forwardpass:
+        \item Eingabe $\bm{x} = \bm{a}^{(0)}$
+        %
+        \item für $k=1, \cdots , L$
         %
         \begin{align*}
-            \bm{z}^{(n)} &= \bm{W}^{(n)} \cdot \bm{a}^{(n-1)} + \bm{b}^{(n)} \quad n=1,\cdots , L  \\
-            \bm{a}^{(0)}  &= \bm{x}_{\text{Input}} \\
-            \bm{a}^{(n)}  &= \tanh\left( \bm{z}^{(n)} \right) \\
-            \bm{z}^{(N)} &= \bm{W}^{N} \cdot \bm{a}^{(L)} + \bm{b}^{(N)}
+            \bm{z}^{(k)} = \bm{W}^{(k)} \cdot \bm{a}^{(k-1)} + \bm{b}^{(k)}
+            \quad
+            \bm{a}^{(k)}  &= \tanh\left( \bm{z}^{(k)} \right)
         \end{align*}
-        %
-        \item Backpropagation:
-        %
-        \begin{itemize}
-            \item[1.] Output-Layer
-            \begin{align*}
-                \frac{\partial V}{\partial \bm{W}^{(N)}} = \bm{a}^{(L)} 
-                \quad
-                \frac{\partial V}{\partial \bm{b}^{(N)}} = 1 
-                \quad
-                \frac{\partial V}{\partial \bm{a}^{L}} = \bm{W}^{(N)}
-            \end{align*}
 
-            \item[2.] Für jede Schicht $k= L, L-1 \cdots , 1$
-            %
-            \begin{align*}
-                \frac{\partial V}{\partial \bm{z}^{(k)}}
-                &=
-                \frac{\partial V}{\partial \bm{a}^{(k)}}
-                \cdot 
-                \mathsf{diag}
-                \left[
-                    1 - \left( \bm{a}^{(k)}_i \right)
-                \right]_{i=1, \cdots , n_k}
-                :=
-                \bm{\delta}^{(k)} 
-                \\
-                \frac{\partial V}{\partial \bm{W}^{(k)}} 
-                &=
-                \left(\bm{\delta}^{(k)}\right)^T \cdot \left(\bm{a}^{(k-1)}\right)^T
-                \\
-                \frac{\partial V}{\partial \bm{b}^{(k)}}
-                &=
-                \left(\bm{\delta}^{(k)}\right)^T
-                \\
-                \frac{\partial V}{\partial \bm{a}^{(k-1)}}
-                &=
-                \bm{\delta}^{(k)} \cdot \bm{W}^{(k)}, \quad k > 1
-            \end{align*}
-        \end{itemize}
+        \item Ausgabe $V =\bm{W}^{N} \cdot \bm{a}^{(L)} + \bm{b}^{(N)}$
     \end{itemize}
+    %
+    als reellwertiges Neuronales Netz mit $L$ Hidden-Layers.
+\end{definition}
+
+% Neuronales Netz und ihre Ableitung
+\begin{satz}[Backpropagation]
+    Sei $V:\mathbb{R}^{\text{Input}} \to \mathbb{R}$ ein Neuronales Netz mit $L$ Hidden-Layers.
+    Für das Output-Layer mit $N = L+1$ gilt:
+    %
+    \begin{align*}
+        \frac{\partial V}{\partial \bm{W}^{(N)}} = \left(\bm{a}^{(L)} \right)^T
+        \quad
+        \frac{\partial V}{\partial \bm{b}^{(N)}} = 1 
+        \quad
+        \frac{\partial V}{\partial \bm{a}^{(L)}} = \bm{W}^{(N)}
+    \end{align*}
+
+    Für die Fehlersignale gilt:
+    %
+    \begin{align*}
+        \bm{\delta}^{(L)} = \bm{W}^{(N)} \circ \left[1 - \left(\bm{a}^{(L)}\right)^2 \right]
+        \quad
+        \bm{\delta}^{(k)} 
+        = 
+        \left(
+            \bm{\delta}^{(k+1)} \cdot \bm{W}^{(k+1)}
+        \right) 
+        \circ  
+        \left[
+            1 - \left(\bm{a}^{(k)}\right)^2 
+        \right],
+        \quad
+        k=L-1, \cdots , 1
+    \end{align*}
+
+    Für $k= L, L-1 \cdots , 1$ erhalten wir die Ableitungen nach den Parametern:
+            %
+    \begin{align*}
+        \frac{\partial V}{\partial \bm{W}^{(k)}} 
+        &= 
+        \bm{\delta}^{(k)} \otimes \bm{a}^{(k-1)} 
+        =
+        \left(\bm{\delta}^{(k)}\right)^T \cdot \left(\bm{a}^{(k-1)}\right)^T
+        \quad 
+        \bm{a}^{(0)} = \bm{x} \\
+        \frac{\partial V}{\partial \bm{b}^{(k)}} &= \bm{\delta}^{(k)} \\
+    \end{align*}
 \end{satz}
 
-\proof{
-    Wir skizzieren den Beweis für $L=2$. 
-    \begin{itemize}
-        \item[1.] Ableitung Output-Layer $V = \bm{W}^{(N)} \cdot \bm{a}^{(2)} + b^{(N)}$:
-        %
-        \begin{align*}
-            \frac{\partial V}{\partial w_i^{(N)}} =
-            \bm{a}_i^{(2)}
-            \quad
-            \frac{\partial V}{\partial b_N} = 1
-            \quad
-            \frac{\partial V}{\partial \bm{a}_k^{(2)}} = \bm{W}_k^{(N)} 
-        \end{align*}
+% hier Herleitung der formeln am Beispiel von 2 Hidden Layers. 
+% das könnte ich nochmal grundlegend überarbeiten und kompakt aufschreiben für den 
+% allgemeinen Fall. 
+% Wichtig ist hierbei auch es reicht der Übergang 
+% dV/dW_k = dV/zk dzk/dW_k
+% delta_k = dV/zk 
+% delta_k = dV/ak daK/dzk
+\begin{beweis}
+    Es gilt mit der Kettenregel:
+    %
+    \begin{align*}
+        \frac{\partial V}{\partial \bm{W}^{(k)}}
+        =
+        \frac{\partial V}{\partial \bm{z}^{(k)}}
+        \cdot 
+        \frac{\partial \bm{z}^{(k)}}{\partial \bm{W}^{(k)}}
+    \end{align*}
 
-        \item[2.] Ableitung durch die Aktivierungsfunktion: Im Vektorfall $\bm{a}_k = \tanh(\bm{z}_k)$ 
-        gilt für jede Komponente $i$
+    Wir bezeichnen $\bm{\delta}^{(k)} := \frac{\partial V}{\partial \bm{z}^{(k)}}$ als das Fehlersignal
+    in Schicht $k$ und erhalten wieder mittels Kettenregel:
+
+    \begin{align*}
+        \bm{\delta}^{(k)}
+        =
+        \frac{\partial V}{\partial \bm{a}^{(k)}}
+        \cdot
+        \frac{\partial \bm{a}^{(k)}}{\partial \bm{z}^{(k)}}
+    \end{align*}
+
+    Für unsere Aktivierungsfunktion $\bm{a}^{(k)} = \tanh(\bm{z}^{(k)})$ gilt komponentenweise
+    %
+    \begin{align*}
+        \frac{\partial \bm{a}_i^{(k)}}{\partial \bm{z}_j^{(k)}} =
+        \frac{\partial \tanh\left( \bm{z}_i^{(k)} \right)}{\partial \bm{z}_j^{(k)}}
+        =
+        \begin{cases}
+            1- \left(\bm{a}_i^{(k)}\right)^2 ,  & i = j     \\
+            0                                   & i \neq j
+        \end{cases}
+    \end{align*}
+
+    Die Jacobi-Matrix ist somit eine Diagonalmatrix
         %
-        \begin{align*}
-            \frac{\partial \bm{a}_i^{(k)}}{\partial \bm{z}_j^{(k)}} =
+    \begin{align*}
+        \frac{\partial \bm{a}^{(k)}}{\partial \bm{z}^{(k)}} 
+        =
+        \left[
             \frac{\partial \tanh\left( \bm{z}_i^{(k)} \right)}{\partial \bm{z}_j^{(k)}}
-            =
-            \begin{cases}
-                1- \left(\bm{a}_i^{(k)}\right)^2 ,  & i = j \\
-                0           & i \neq j
-            \end{cases}
-        \end{align*}
-
-        Die Jacobi-Matrix ist somit eine Diagonalmatrix
-        %
-        \begin{align*}
-            \frac{\partial \bm{a_k}}{\partial \bm{z_k}} 
-            =
-            \left[
-                \frac{\partial \tanh\left( \bm{z}_i^{(k)} \right)}{\partial \bm{z}_j^{(k)}}
-            \right]_{i, j =1, \cdots , n_k}
-            =
-            \underbrace{
-                \begin{bmatrix}
-                    1- \left(\bm{a}_1^{(k)}\right)^2    & 0 & \cdots & 0 \\
-                    0   & 1- \left(\bm{a}_2^{(k)}\right)^2 & \cdots & 0 \\
-                    \vdots & \vdots & \ddots & \vdots \\
-                    0  & 0 & \cdots & 1- \left(\bm{a}_{n_k}^{(k)}\right)^2 \\
-                \end{bmatrix}
-            }_{
-                \mathsf{diag}\left[1- \left(\bm{a}_i^{(k)}\right)^2 \right]_{i=1,\cdots , n_k}
-            }
-        \end{align*}
-
-        \item[3.] Für die Ableitung der Hidden-Layer Struktur gilt mittels Kettenregel:
-        %
-        \begin{align*}
-            \frac{\partial V}{\partial \bm{z}_k^{(2)}} 
-            &= \frac{\partial V}{\partial \bm{a}_k^{(2)}} 
-            \cdot \frac{\partial \bm{a}_k^{(2)}}{\partial \bm{z}_k^{(2)}}
-            =
-            \bm{W}_k^{(N)} \cdot \left[1 - \left(\bm{a}_k^{(2)} \right)^2 \right]
-            \\
-            \bm{\delta}^{(2)} 
-            :=
-            \frac{\partial V}{\partial \bm{z_2}} 
-            &=
-            \bm{W}_N \cdot 
-            \mathsf{diag}\left[1- \left(\bm{a}_i^{(2)}\right)^2 \right]_{i=1,\cdots , n_2} \in \mathbb{R}^{1 \times n_2}
-        \end{align*}
-
-        \item[4.] Parameter von Hidden-Layer $2$:
-        %
-        \begin{align*}
-            \frac{\partial V}{\partial w_{ki}^{(2)}}
-            &=
-            \frac{\partial V}{\partial \bm{z}_k^{(2)}} 
-            \cdot
-            \frac{\partial \bm{z}_k^{(2)}}{\partial w_{ki}^{(2)}}
-            =
-            \bm{\delta}^{(2)}_k \cdot \bm{a}_i^{(1)}
-            \Rightarrow
-            \frac{\partial V}{\partial \bm{W}^{(2)}}
-            =
-            \left(\bm{\delta}^{(2)} \right)^T \cdot \left(\bm{a}^{(1)}\right)^{T}
-            \\
-            \frac{\partial V}{\partial \bm{b}_k^{(2)}}
-            &=
-            \frac{\partial V}{\partial \bm{z}_k^{(2)}} \cdot
-            \frac{\partial \bm{z}_k^{(2)}}{\partial \bm{b}_k^{(2)}}
-            =
-            \bm{\delta}^{(2)}_k \cdot 1
-            \Rightarrow
-            \frac{\partial V}{\partial \bm{b}^{(2)}}
-            =
-            \bm{\delta}^{(2)}
-        \end{align*}
-
-        \item[5.] Jede Komponente von $\bm{z}^{(2)}$ ist abhängig von $\bm{a}^{(1)}$, denn
-        %
-        \begin{align*}
-            \bm{z}^{(2)} 
-            =
-            \underbrace{
-                \begin{bmatrix}
-                    w_{11}^{(2)} & \cdots   & w_{1 n_1}^{(2)} \\
-                    w_{21}^{(2)} & \cdots   & w_{2 n_1}^{(2)}  \\
-                    \vdots & \ddots &  \vdots\\
-                    w_{n_2 1}^{(2)} & \cdots  & w_{n_2 n_1}^{(2)}
-                \end{bmatrix}
-            }_{\bm{W}_2}
-            \cdot
-            \underbrace{
-                \begin{bmatrix}
-                    \bm{a}_1^{(1)} \\
-                    \bm{a}_2^{(1)} \\
-                    \vdots \\
-                    \bm{a}_{n_1}^{(1)}
-                \end{bmatrix}
-            }_{\bm{a}^{(1)}}
-            +
-            \underbrace{
-                \begin{bmatrix}
-                    \bm{b}_1^{(2)} \\
-                    \bm{b}_2^{(2)} \\
-                    \vdots \\
-                    \bm{b}_{n_2}^{(2)}
-                \end{bmatrix}
-            }_{\bm{b}^{(2)}}
-            =
+        \right]_{i, j =1, \cdots , n_k}
+        =
+        \underbrace{
             \begin{bmatrix}
-                \sum_{k=1}^{n_1} w_{1k}^{(2)} \cdot \bm{a}_{k}^{(1)} + \bm{b}_1^{(2)} \\
-                \sum_{k=1}^{n_1} w_{2k}^{(2)} \cdot \bm{a}_{k}^{(1)} + \bm{b}_2^{(2)} \\
-                \vdots \\
-                \sum_{k=1}^{n_1} w_{n_{2} k}^{(2)} \cdot \bm{a}_{k}^{(1)} + \bm{b}_{n_2}^{(2)}
+                1- \left(\bm{a}_1^{(k)}\right)^2    & 0 & \cdots & 0 \\
+                0   & 1- \left(\bm{a}_2^{(k)}\right)^2 & \cdots & 0 \\
+                \vdots & \vdots & \ddots & \vdots \\
+                0  & 0 & \cdots & 1- \left(\bm{a}_{n_k}^{(k)}\right)^2 \\
             \end{bmatrix}
-        \end{align*}
+        }_{
+            \mathsf{diag}\left[1- \left(\bm{a}_i^{(k)}\right)^2 \right]_{i=1,\cdots , n_k}
+        }
+    \end{align*}
 
-        \item[6.] Mittels der Kettenregel folgt somit:
-        %
-        \begin{align*}
-            \frac{\partial V}{\partial \bm{a}_k^{(1)}} 
-            &=
-            \sum_{i=1}^{n_2} \frac{\partial V}{\partial \bm{z}_i^{(2)}}
-            \cdot
-            \frac{\partial \bm{z}_i^{(2)}}{\partial \bm{a}_k^{(1)}}
-            =
-            \sum_{i=1}^{n_2} \bm{\delta}_i^{(2)} \cdot w^{(2)}_{ik}
-            \Rightarrow
-            \frac{\partial V}{\partial \bm{a}^{(1)}}
-            =
-            \bm{\delta}^{(2)} \cdot \bm{W}^{(2)} \in \mathbb{R}^{1 \times n_1}
-            \\
-            \frac{\partial V}{\partial \bm{z}_k^{(1)}} 
-            &=
-            \frac{\partial V}{\partial \bm{a}_k^{(1)}} \cdot 
-            \frac{\partial \bm{a}_k^{(1)}}{\partial \bm{z}_k^{(1)}}
-            =
-            \sum_{i=1}^{n_2} \bm{\delta}_i^{(2)} \cdot w^{(2)}_{ik}
-            \cdot
-            \left[
-                1 - \left(\bm{a}_k^{(1)}\right)^2 
-            \right]
-        \end{align*}
+    Für die Ausgabe $V = \bm{W}^{(N)} \cdot \bm{a}^{(L)} + b_N$ gilt:
+    %
+    \begin{align*}
+        \frac{\partial V}{\partial \bm{W}^{(N)}} =
+        \left(\bm{a}^{(L)}\right)^T
+        \quad
+        \frac{\partial V}{\partial \bm{a}^{(L)}} 
+        = 
+        \bm{W}^{(N)} 
+    \end{align*}
 
-        Wir bezeichnen den Ausdruck als
-        %
-        \begin{align*}
-            \bm{\delta}^{(1)}:=
-            \frac{\partial V}{\partial \bm{z}^{(1)}}
-            =
+    Für Schicht $L$ gilt entsprechend:
+    %
+    \begin{align*}
+        \frac{\partial V}{\partial \bm{W}^{(L)}}
+        &=
+        \bm{\delta}^{(L)}
+        \cdot 
+        \frac{\partial \bm{z}^{(L)}}{\partial \bm{W}^{(L)}}
+        \quad
+        \bm{\delta}^{(L)} 
+        =
+        \underbrace{
+            \frac{\partial V}{\partial \bm{a}^{(L)}}
+        }_{
+            \bm{W}^{(N)} 
+        }
+        \cdot 
+        \underbrace{
+            \frac{\partial \bm{a}^{(L)}}{\partial \bm{z}^{(L)}}
+        }_{
+             \mathsf{diag}\left[1- \left(\bm{a}_i^{(L)}\right)^2 \right]
+        }
+        =:
+        \bm{W}^{(N)}
+        \circ
+        \left[1- \left(\bm{a}^{(L)}\right)^2 \right]
+    \end{align*}
+
+    Um den Tensor zu vermeiden betrachten wir den Ausdruck komponentenweise: 
+    %
+    \begin{align*}
+        \frac{\partial V}{\partial \bm{W}_{ij}^{(k)}}
+        &=
+        \sum_{p=1}^{n}
+        \frac{\partial V}{\partial \bm{z}_p^{(k)}}
+        \cdot 
+        \frac{\partial \bm{z}_p^{(k)}}{\partial \bm{W}_{ij}^{(k)}}
+        \\
+        &=
+        \sum_{p=1}^{n} \bm{\delta}^{(k)}_p \cdot \frac{\partial \bm{z}_p^{(k)}}{\partial \bm{W}_{ij}^{(k)}}
+        \\
+        &=
+        \bm{\delta}^{(k)}_i \cdot \bm{a}_j^{(k-1)}
+        \\
+        \Rightarrow
+        \frac{\partial V}{\partial \bm{W}^{(k)}} 
+        &= 
+        \left(\bm{\delta}^{(k)}\right)^T \cdot \left(\bm{a}^{(k-1)}\right)^T 
+        = \bm{\delta}^{(k)} \otimes \bm{a}^{(k-1)}
+    \end{align*}
+
+    Denn betrachten wir allgemein die Schicht $k$ komponentenweise so gilt:
+    %
+    \begin{align*}
+        \bm{z}^{(k)} 
+        =
+        \underbrace{
+            \begin{bmatrix}
+                \bm{W}_{11}^{(k)} & \cdots   & \bm{W}_{1 m}^{(k)} \\
+                \bm{W}_{21}^{(k)} & \cdots   & \bm{W}_{2 m}^{(k)}  \\
+                \vdots & \ddots &  \vdots\\
+                \bm{W}_{n 1}^{(k)} & \cdots  & \bm{W}_{n m}^{(k)}
+            \end{bmatrix}
+        }_{\bm{W}^{(k)}}
+        \cdot
+        \underbrace{
+            \begin{bmatrix}
+                \bm{a}_1^{(k-1)} \\
+                \bm{a}_2^{(k-1)} \\
+                \vdots \\
+                \bm{a}_{m}^{(k-1)}
+            \end{bmatrix}
+        }_{\bm{a}^{(k-1)}}
+        +
+        \underbrace{
+            \begin{bmatrix}
+                \bm{b}_1^{(k)} \\
+                \bm{b}_2^{(k)} \\
+                \vdots \\
+                \bm{b}_{n}^{(k)}
+            \end{bmatrix}
+        }_{\bm{b}^{(k)}}
+        \Rightarrow
+        \bm{z}_i^{(k)}
+        =
+        \sum_{j=1}^{m} \bm{W}_{i j}^{(k)} \cdot \bm{a}_{j}^{(k-1)} + \bm{b}_{i}^{(k)}
+    \end{align*}
+
+    Für die Ableitung nach den Gewichten $\bm{W}_{ij}^{(k)}$ gilt demnach
+    %
+    \begin{align*}
+        \frac{\partial \bm{z}_p^{(k)}}{\partial \bm{W}_{ij}^{(k)}} 
+        = 
+        \begin{cases}
+            \bm{a}_j^{(k-1)} , & p=i \\
+            0 , & p \neq i
+        \end{cases}
+    \end{align*}
+
+    Für den Zusammenhang zwischen $\bm{z}^{(k+1)}$ und $\bm{z}^{(k)}$ gilt: 
+    %
+    \begin{align*}
+        \bm{z}^{(k+1)} = \bm{W}^{(k+1)} \cdot \bm{a}^{(k)} + \bm{b}^{(k+1)} \quad \bm{a}^{(k)} = \tanh(\bm{z}^{(k)})
+    \end{align*}
+
+    und $\bm{\delta}^{(k+1)}$ ausgedrückt über $\bm{\delta}^{(k)}=\frac{\partial V}{\partial \bm{z}^{(k)}}$ ergibt
+    %
+    \begin{align*}
+        \bm{\delta}^{(k)}
+        &=
+        \frac{\partial V}{\partial \bm{z}^{(k+1)}}
+        \cdot
+        \frac{\partial \bm{z}^{(k+1)}}{\partial \bm{a}^{(k)}}
+        \cdot
+        \frac{\partial \bm{a}^{(k)}}{\partial \bm{z}^{(k)}}
+        \\
+        &=
+        \bm{\delta}^{(k+1)} 
+        \cdot 
+        \bm{W}^{(k+1)} 
+        \cdot
+        \mathsf{diag}\left[1- \left(\bm{a}^{(k)}\right)^2 \right]
+        \\
+        &=
+        \left(
+            \bm{\delta}^{(k+1)}\cdot \bm{W}^{(k+1)} 
+        \right) 
+        \circ
+        \left[1- \left(\bm{a}^{(k)}\right)^2 \right]
+    \end{align*}
+
+    Für den Bias $\bm{b}^{(k)}$ gilt entsprechend: 
+    % V = \bm{W}^{(N)} \cdot \bm{a}^{(L)} + b_N
+    % \bm{a}^{(L)} = tanh(z^L)
+    % z^L = W^L a^(L-1) + b_L
+    \begin{align*}
+        \frac{\partial V}{\partial b^{(N)}}
+        &=
+        1
+        \\
+        \frac{\partial V}{\partial \bm{b}^{(k)}}
+        &=
+        \frac{\partial V}{\partial \bm{a}^{(k)}} 
+        \cdot
+        \frac{\partial \bm{a}^{(k)}}{\partial \bm{z}^{(k)}}
+        \cdot
+        \underbrace{
+            \frac{\partial \bm{z}^{(k)}}{\partial \bm{b}^{(k)}}
+        }_{
+            I_n
+        }
+        =
+        \bm{\delta}^{(k)}
+        \quad
+        k = 1, \cdots , L
+    \end{align*}
+\end{beweis}
+
+%\begin{algorithm}
+%    \caption{Backpropagation in Neural Networks $2$ Hidden-Layers}
+%    \begin{algorithmic}
+%        \State Given $\bm{W}^{(1)},\bm{W}^{(2)}, \bm{W}^{(N)} , \bm{b}^{(1)}, \bm{b}^{(2)}, b^{(N)}, 
+%        \begin{bmatrix} t_i & X_{t_i} \end{bmatrix}^T$ 
+%
+%        \State Computation Outer-Layer
+%        %
+%        \begin{align*}
+%            t
+%        \end{align*}
+%    \end{algorithmic}
+%\end{algorithm}
+
+% Ableitung nach dem Input beim one Hidden-Layer
+\begin{satz}
+    Sei $V:\mathbb{R}^{\text{Input}} \to \mathbb{R}$ ein neuronales Netz mit Input $\bm{x}$. 
+    Dann gilt:
+    %
+    \begin{align*}
+        \frac{\partial V}{\partial \bm{x}} = \bm{\delta}^{(1)} \cdot \bm{W}^{(1)}
+        \quad
+        \nabla_{\bm{x}} V(\bm{x}) 
+        =
+        \left(\bm{\delta}^{(1)} \cdot \bm{W}^{(1)}\right)^T 
+    \end{align*}
+\end{satz}
+
+% Herleitung dazu aus Kettenregel
+\begin{beweis}
+    Es gilt nach der Kettenregel:
+    %
+    \begin{align*}
+        \frac{\partial V}{\partial \bm{x}}
+        &=
+        \frac{\partial V}{\partial \bm{z}^{(1)}}
+        \cdot
+        \frac{\partial \bm{z}^{(1)}}{\partial \bm{x}}
+        = 
+        \bm{\delta}^{(1)} \cdot \bm{W}^{(1)}
+    \end{align*}
+
+    Für $L$ Hidden-Layer erhalten wir mittels Backpropagation
+    %
+    \begin{align*}
+        \bm{\delta}^{(L)} = \bm{W}^{(N)} \circ \left[1 - \left(\bm{a}^{(L)}\right)^2 \right]
+        \quad
+        \bm{\delta}^{(k)} 
+        = 
+        \left(
+            \bm{\delta}^{(k+1)} \cdot \bm{W}^{(k+1)}
+        \right) 
+        \circ  
+        \left[
+            1 - \left(\bm{a}^{(k)}\right)^2 
+        \right],
+        \quad
+        k=L-1, \cdots , 1
+    \end{align*}
+\end{beweis}
+
+\newpage
+
+\subsection{Neuronal ODEs}
+
+Wir betrachten auf $[0,T]$ die Dynamik:
+%
+\begin{align*}
+    \bm{\dot{a}}(t) 
+    = 
+    \tanh
+    \left[
+        \vphantom{\int}
+        \bm{W}(t) \bm{a}(t) + \bm{b}(t)
+    \right]
+    - \bm{a}(t)
+    \quad
+    t \in [0,T]
+\end{align*}
+
+Die Steuerungen sind gegeben durch $\bm{u}(t) = (\bm{W}(t), \bm{b}(t))$ 
+und wir formulieren das Steuerungssystem:
+%
+\begin{align*}
+    \min_{\bm{u}} J(\bm{u}) &= \Phi(\bm{a}(T)) 
+    \\
+    \bm{\dot{a}}(t) &= \bm{f}(\bm{a},\bm{u}) \quad
+    \bm{a}(0) = \bm{x}_0
+\end{align*}
+
+Dann lautet das Maximumprinzip für das Problem: 
+%
+\begin{align*}
+    \bm{H}(\bm{a}, \bm{u}, \bm{p}) 
+    &=
+    \bm{p}(t) \cdot \bm{f}(\bm{a},\bm{u})
+    \\
+    \bm{\dot{p}}(t) 
+    &= - \frac{\partial \bm{H}}{\partial \bm{a}} 
+    =
+    - \bm{p}(t) \cdot \bm{f}_{\bm{a}}(\bm{a}, \bm{u})
+    \quad
+    \bm{p}(T) = 
+    \frac{\partial \Phi}{\partial \bm{a}(T)}
+    \\
+    \bm{\dot{a}} 
+    &=
+    \bm{f}(\bm{a}, \bm{u})
+    \\
+    \frac{\mathrm{d} J}{\mathrm{d} \bm{u}} 
+    &=
+    \frac{\partial \bm{H}}{\partial \bm{u}}
+\end{align*}
+
+Es gilt für die Komponente $i$
+%
+\begin{align*}
+    \bm{f}_{i}(\bm{a}(t), \bm{u}(t))
+    =
+    \tanh
+    \left[
+        \sum_{j=1}^{n} \bm{W}_{ij}(t) \bm{a}_j(t) + \bm{b}_{i}(t)
+    \right]
+    -
+    \bm{a}_i(t)
+\end{align*}
+
+Für die partielle Ableitung nach $\bm{a}_j$ erhalten wir
+%
+\begin{align*}
+    \frac{\partial \bm{f}_i}{\partial \bm{a}_j}
+    =
+    \left[
+        1 - 
+        \tanh
+        \left(
+            \sum_{j=1}^{n} \bm{W}_{ij}(t) \bm{a}_j(t) + \bm{b}_{i}(t)
+        \right)^2
+    \right] 
+    \cdot
+    \bm{W}_{ij}(t) 
+    -  
+    \frac{\partial \bm{a}_i (t)}{\partial \bm{a}_j (t)}
+\end{align*}
+
+Wir erhalten also für die entsprechende Jacobi-Matrix
+%
+\begin{align*}
+    \frac{\partial (\bm{f}_1 , \cdots , \bm{f}_n )}{\partial (\bm{a}_1 , \cdots , \bm{a}_n)}(\bm{a}(t), \bm{u}(t)) 
+    =
+    \textsf{diag}
+    \left[
+        \vphantom{\int}
+        1 - 
+        \tanh
+        \left(
+            \vphantom{\int}
+            \bm{W}(t) \bm{a}(t) + \bm{b}(t)
+        \right)_i^2
+    \right]_{i=1,\cdots , n}
+    \cdot
+    \bm{W}(t)
+    - \bm{I}_n
+\end{align*}
+
+Diskretisierung mittels Schrittweite $h=1$ und $\bm{u}(t) = (\bm{W}(t), \bm{b}(t))$:
+% a' = f(a,u)
+\begin{align*}
+    \bm{a}(t_k) 
+    &= 
+    \bm{a}(t_{k-1}) + \bm{f}(\bm{a}(t_{k-1}), \bm{u}(t_{k-1})) 
+    = 
+    \tanh
+    \left[
+        \vphantom{\int}
+        \bm{W}(t_{k-1}) \cdot \bm{a}(t_{k-1}) + \bm{b}(t_{k-1})
+    \right]  
+    \\
+    \bm{a}(t_k) &:= \bm{a}^{(k)} 
+    \quad
+    \bm{a}^{(0)} = \bm{x}_0
+    \quad
+    \bm{W}(t_{k-1}) := \bm{W}^{k} 
+    \quad
+    \bm{b}(t_{k-1}) := \bm{b}^{(k)}
+    \\
+    \bm{a}^{(k)}
+    &=
+    \tanh
+    \left[
+        \vphantom{\int}
+        \bm{W}^{(k)} \cdot \bm{a}^{(k-1)} + \bm{b}^{(k)}
+    \right]
+    :=
+    \bm{F}_k (\bm{a}^{(k-1)}, \bm{u}^{(k)})
+\end{align*}
+
+Für eine Diskretisierung $\left\{t_0 , \cdots ,t_L =T \right\}$ erhalten wir somit das Neuronale Netz
+% NN 
+\begin{align*}
+    \bm{a}^{(0)} &= \bm{x}_0
+    \\
+    \bm{a}^{(k)} &= 
+    \tanh
+    \left[
+        \bm{W}^{(k)}\bm{a}^{(k-1)} + \bm{b}^{(k)}
+    \right]
+    =: \bm{F}_k(\bm{a}^{(k-1)}, \bm{u}^{(k)})
+    \quad
+    k = 1,\dots, L
+    \\
+    a^{(N)} &= \Phi\left(\bm{a}^{(L)}\right) := \bm{W}^{(N)}\bm{a}^{(L)} + b^{(N)}
+\end{align*}
+
+Für die adjungierte Gleichung erhalten wir:
+% p' = -H_a
+\begin{align*}
+    \bm{p}(t_{k}) &= \bm{p}(t_{k-1}) - \bm{p}(t_{k}) 
+    \cdot \bm{f}_{\bm{a}}(\bm{a}(t_{k-1}),\bm{u}(t_{k-1}))
+    \\
+    \bm{p}^{(k-1)} 
+    &= 
+    \bm{p}^{(k)} 
+    + 
+    \bm{p}^{(k)}
+    \cdot
+    \textsf{diag}
+    \left[
+        \vphantom{\int}
+        1 - 
+        \tanh
+        \left(
+            \vphantom{\int}
+            \bm{W}^{(k)} \cdot \bm{a}^{(k-1)} + \bm{b}^{(k)}
+        \right)_i^2
+    \right]_{i=1,\cdots , n}
+    \cdot
+    \bm{W}^{(k)}
+    - 
+    \bm{p}^{(k)}
+    \cdot 
+    \bm{I}_n
+    \\
+    \bm{p}^{(k-1)} 
+    &=
+    \bm{p}^{(k)}
+    \cdot
+    \frac{\partial \bm{F}_k}{\partial \bm{a}^{(k-1)}}
+    \quad
+    \bm{p}^{(L)} = \frac{\partial \Phi}{\partial \bm{a}^{(L)}} = \bm{W}^{(N)}
+\end{align*}
+
+
+Das Maximumprinzip des Steuerungproblems lautet dann: 
+%
+\begin{align*}
+    H_k \left(\bm{a}^{(k-1)}, \bm{u}^{(k)}, \bm{p}^{(k)}\right) 
+    &= 
+    \bm{p}^{(k)} \cdot \bm{F}_k(\bm{a}^{(k-1)}, \bm{u}^{(k)})
+    \\
+    \frac{\partial J}{\partial \bm{u}^{(k)}} 
+    &= 
+    \frac{\partial H_k}{\partial \bm{u}^{(k)}} 
+    = \bm{p}^{(k)} \cdot \frac{\partial \bm{F}_k}{\partial \bm{u}^{(k)}}, 
+    \quad 
+    k = 1,\dots,L.
+    \\
+    \frac{\partial J}{\partial \bm{W}^{(N)}} 
+    &=
+    (\bm{a}^{(L)})^T
+    \quad
+    \frac{\partial J}{\partial b^{(N)}} = 1
+\end{align*}
+
+
+Mit $\bm{a}^{(k)} = \tanh(\bm{W}^{(k)}\bm{a}^{(k-1)} + \bm{b}^{(k)})$ erhalten wir:
+%
+\begin{align*}
+    \frac{\partial \bm{F}_k}{\partial \bm{a}^{(k-1)}} 
+    &=
+    \operatorname{diag} \left[1- \left( \bm{a}^{(k)} \right)^2 \right] \cdot \bm{W}^{(k)}
+    \\
+    \bm{p}^{(k-1)} 
+    &=
+    \bm{p}^{(k)} 
+    \cdot 
+    \frac{\partial \bm{F}_k}{\partial \bm{a}^{(k-1)}} 
+    \\
+    \bm{p}^{(k-1)} 
+    &= 
+    \underbrace{
+        \bm{p}^{(k)} 
+        \circ 
+        \operatorname{diag} \left[1- \left( \bm{a}^{(k)} \right)^2 \right]
+    }_{
+        := \bm{\delta}^{(k)}
+    } 
+    \cdot \bm{W}^{(k)}
+        \\
+    \underbrace{
+        \bm{p}^{(k-1)} \circ \left[1- \left( \bm{a}^{(k-1)} \right)^2 \right]
+    }_{
+        \bm{\delta}^{(k-1)}
+    }
+    &=
+    \bm{\delta}^{(k)} \cdot \bm{W}^{(k)} \circ \left[1- \left( \bm{a}^{(k-1)} \right)^2 \right]
+\end{align*}
+
+
+Wobei $\left[1- \left( \bm{a}^{(k)} \right)^2 \right]$ der Vektor 
+mit den Elementen $(1-\bm{a}^{(k)}_i)_{i=1,\cdots , n}$ bezeichnet.
+Für die Hidden-Layers gilt entsprechend
+%
+\begin{align*}
+    \frac{\partial J}{\partial \bm{W}_{ij}^{(k)}}
+    &=
+    \sum_{m} \bm{p}_m^{(k)} \cdot 
+    \frac{\partial (\bm{F}_k)_m}{\partial \bm{W}_{ij}^{(k)}}
+    \quad
+    (\bm{F}_k)_m = 
+    \tanh
+    \left(
+        \sum_{j} \bm{W}_{mj}^{(k)} \cdot \bm{a}^{(k-1)}_j + \bm{b}^{(k)}_m
+    \right)
+    \\
+    &=
+    \sum_{m = i} \bm{p}_m^{(k)} \cdot 
+    \left[
+        1 - 
+        \tanh
+        \left(
+            \sum_{j} \bm{W}_{ij}^{(k)} \cdot \bm{a}^{(k-1)}_j + \bm{b}^{(k)}_m
+        \right)^2
+    \right]
+    \cdot 
+    \bm{a}_j^{(k-1)}
+    \\
+    &=
+    \underbrace{
+        \bm{p}_i^{(k)} \cdot 
+        \left[
+            1 - 
             \left(
-                \bm{\delta}^{(2)} \cdot \bm{W}^{(2)}
-            \right) 
-            \cdot 
-            \mathsf{diag}
-            \left[
-                1 - \left( \bm{a}_i^{(1)} \right)^2
-            \right]_{i=1,\cdots, n_1}
-            \in \mathbb{R}^{1 \times n_1}
-        \end{align*}
+                \bm{a}_i^{(k)}
+            \right)^2
+        \right]
+    }_{
+        \bm{\delta}^{(k)}_i
+    }
+    \cdot 
+    \bm{a}_j^{(k-1)}
+\end{align*}
 
-        \item[7.] Ableitung nach den Parametern in Hidden-Layer Schicht $1$:
-        %
-        \begin{align*}
-            \frac{\partial V}{\partial w^{(1)}_{ij}} =
-            \frac{\partial V}{\partial \bm{z}^{(1)}_{i}} \cdot 
-            \frac{\partial \bm{z}^{(1)}_{i}}{\partial w^{(1)}_{ij}}
-            =
-            \begin{cases}
-                \bm{\delta}_i^{(1)} \cdot t , & j=1 \\
-                \bm{\delta}_i^{(1)} \cdot x , & j=2 \\
-            \end{cases}
-        \end{align*}
-    \end{itemize}
-}
+Als Matrix erhalten wir somit erneut 
+%
+\begin{align*}
+     \frac{\partial J}{\partial \bm{W}^{(k)}} 
+     = (\bm{\delta}^{(k)})^T (\bm{a}^{(k-1)})^T 
+     := \bm{\delta}^{(k)} \otimes \bm{a}^{(k-1)}
+\end{align*}
+
+Für den Bias gilt analog 
+%
+\begin{align*}
+    \frac{\partial J}{\partial \bm{b}_{i}^{(k)}}
+    =
+    \sum_{m} \bm{p}_m^{(k)} \cdot 
+    \frac{\partial (\bm{F}_k)_m}{\partial \bm{b}_{i}^{(k)}}
+    =
+    \bm{p}_i^{(k)} \cdot
+    \left[
+        1 - 
+        \left(
+            \bm{a}_i^{(k)}
+        \right)^2
+    \right]
+    \Rightarrow
+    \frac{\partial J}{\partial \bm{b}^{(k)}} = \bm{\delta}^{(k)}
+\end{align*}
 
 \begin{algorithm}
-    \caption{Backpropagation in Neural Networks $2$ Hidden-Layers}
+    \caption{Backpropagation in Neural Networks $1$ Hidden-Layers}
     \begin{algorithmic}
-        \State Given $\bm{W}^{(1)},\bm{W}^{(2)}, \bm{W}^{(N)} , \bm{b}^{(1)}, \bm{b}^{(2)}, b^{(N)}, 
+        \State Given $\bm{W}^{(1)}, \bm{W}^{(N)} , \bm{b}^{(1)}, b^{(N)}, 
         \begin{bmatrix} t_i & X_{t_i} \end{bmatrix}^T$ 
 
-        \State Computation Outer-Layer
+        \State Foward Computation
         %
         \begin{align*}
-            t
+            \bm{z}^{(1)} &= \bm{W}^{(1)} \cdot 
+            \begin{bmatrix}
+                t_i \\
+                X_{t_i}
+            \end{bmatrix}
+            + 
+            \bm{b}^{(1)}
+            \\
+            \bm{a}^{(1)} &= \tanh\left(\bm{z}^{(1)}\right)
+            \\
+            V 
+            &=
+            \bm{W}^{(N)} \cdot \bm{a}^{(1)} + b^{(N)}
         \end{align*}
+        %
+        \State Backpropagation
+        %
+        \begin{align*}
+            \bm{\delta}^{(1)} &=
+            \bm{W}^{(N)} \circ 
+            \left[
+                1 - \left( \bm{a}^{(1)} \right)^2
+            \right]
+            \\
+            \frac{\partial V}{\partial \bm{W}^{(N)}}
+            &=
+            \bm{a}^{(1)}
+            \\
+            \frac{\partial V}{\partial b_N} 
+            &= 1
+            \\
+            \frac{\partial V}{\partial \bm{W}^{(1)}}
+            &=
+            \left(\bm{\delta}^{(1)} \right)^T
+            \cdot
+            \begin{bmatrix}
+                t_i & X_{t_i}
+            \end{bmatrix}
+            \\
+            \frac{\partial V}{\partial \bm{b}^{(1)}}
+            &=
+            \left(\bm{\delta}^{(1)} \right)^T
+        \end{align*}
+
+        \Return 
+        %
+        \begin{align*}
+            \nabla_\phi V =
+            \begin{bmatrix}
+                \left(\bm{\delta}^{(1)} \right)^T \cdot t_i \\
+                \left(\bm{\delta}^{(1)} \right)^T \cdot X_{t_i}
+                \\
+                \left(\bm{\delta}^{(1)}\right)^T
+                \\
+                \bm{a}^{(1)}
+                \\
+                1
+            \end{bmatrix}
+            \quad
+            \phi
+            =
+            \begin{bmatrix}
+                \bm{W}^{(1)} \cdot \begin{bmatrix} 1 & 0 \end{bmatrix}^T \\
+                \bm{W}^{(1)}  \cdot \begin{bmatrix} 0 & 1 \end{bmatrix}^T \\
+                \bm{b}^{(1)} \\
+                \left(\bm{W}^{(N)}\right)^T \\
+                b^{(N)}
+            \end{bmatrix}
+        \end{align*}
+    \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Applications on Control Problems}
+
+\begin{algorithm}
+    \caption{REINFORCE-Monte Carlo \cite{Plaat_RL}}
+    \begin{algorithmic}
+        \State 1
+        \For{Number of episodes}
+            \For{$i \in 0, \cdots , N-1$}
+                \State $a_{t_i} \sim \mathcal{N}(u(\bm{s}_{t_i}, \theta), b)$ 
+                $r_i = \left(X_{t_i} + a_{t_i}^2\right) \Delta t$
+                \State 
+                $X_{t_{i+1}} = X_{t_i} + \Delta t \left(X_{t_i}+ a_{t_i} +1\right)$
+            \EndFor
+            \State Cost $R_{k} = \sum_{i=k}^{N} r_i$ with $r_N = X_{t_N}^2$ 
+            \For{$i \in 0, \cdots , N-1$}
+
+                \begin{align*}
+                    \nabla_{\theta} \log(\pi_{\theta}) = \frac{a_{t_i} - u(\bm{s}_{t_i}, \theta)}{b} \cdot \frac{\partial u(\bm{s}_{t_i},\theta)}{\partial \theta}
+                \end{align*}
+            \EndFor
+        \EndFor
     \end{algorithmic}
 \end{algorithm}
 
 \newpage
 
-\subsection{Deep Deterministic Policy Gradient}
+\subsection{Deterministic Policy Gradient Methods}
 
 \subsection{Two-Link-Revolute Manipulator}
 

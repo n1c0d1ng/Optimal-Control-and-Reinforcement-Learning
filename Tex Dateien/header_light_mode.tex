@@ -21,12 +21,8 @@
 
 % Light Mode Customization
 \usepackage{xcolor}
-%\definecolor{backgroundgray}{RGB}{255,255,255}  % Weiß als Seitenhintergrund
-\definecolor{textwhite}{RGB}{0,0,0}            % Schwarz als globale Schriftfarbe
-\definecolor{boxgray}{RGB}{245,245,245}        % Sehr helles Grau für Box-Hintergründe
-\definecolor{boxframe}{RGB}{200,200,200}       % Helles Grau für Box-Rahmen
-\pagecolor{boxgray}  % Hintergrund auf Weiß
-\color{textwhite}           % Text auf Schwarz
+\pagecolor{white}  % Hintergrund auf Weiß
+\color{black}      % Text auf Schwarz
 
 % Eigene Farben definiert (nun optimiert für hellen Hintergrund)
 \definecolor{rot}{RGB}{204,0,0}
@@ -42,6 +38,8 @@
 \definecolor{gelb}{RGB}{204,153,0}
 \definecolor{dunkelrot}{RGB}{153,0,51}
 \definecolor{dunkelgelb}{RGB}{153,153,0}
+\definecolor{boxgray}{RGB}{245,245,245}        % Sehr helles Grau für Box-Hintergründe
+\definecolor{boxframe}{RGB}{200,200,200}       % Helles Grau für Box-Rahmen
 
 % Section colors (Headings)
 %\usepackage{sectsty}
@@ -53,36 +51,51 @@
 \usepackage{mdframed}
 \mdfdefinestyle{mystyle}{
     leftmargin=0pt,
+    rightline=true,
+    topline=false,
+    bottomline=false,
+    leftline=false,
     linecolor=boxframe,
     linewidth=1pt,
-    backgroundcolor=boxgray,
-    fontcolor=textwhite,
+    backgroundcolor=white,
+    fontcolor=black,
     %frametitlefont={\color{gruen}\bfseries}
 }
 
 % Custom theorem environments
-\newmdtheoremenv[style=mystyle]{satz}{\color{rot}Satz}[section] % linecolor=rot
-\newmdtheoremenv[style=mystyle]{definition}[satz]{\color{gelb}Definition}
-\newmdtheoremenv[style=mystyle,leftmargin=-10pt]{beispiel}[satz]{\color{lila}Beispiel}
-\newmdtheoremenv[style=mystyle,leftmargin=-10pt]{bem}[satz]{Anmerkung}
-\newmdtheoremenv[style=mystyle,leftmargin=-10pt]{ex}{Aufgabe} % \color{gruen}
+\newmdtheoremenv[
+    style=mystyle,
+    leftmargin=-10pt,
+    linecolor=rot
+    ]{satz}{\color{rot}Satz}[section] % linecolor=rot
+\newmdtheoremenv[
+    style=mystyle,
+    leftmargin=-10pt,
+    linecolor=gelb
+    ]{definition}[satz]{\color{gelb}Definition}
+\newmdtheoremenv[
+    style=mystyle,
+    leftmargin=-10pt,
+    linecolor=lila
+    ]{beispiel}[satz]{\color{lila}Beispiel}
+\newenvironment{beweis}{
+    \begin{mdframed}[
+            style=mystyle,
+            leftmargin=-10pt,
+            linecolor=gruen
+        ]
+        \textbf{\color{gruen}Beweis:}
+        }{
+        \hfill $\Box$
+    \end{mdframed}
+}
+
+
 
 % Proof- und Lösungs-Kommandos
 \newcommand{\proof}[1]{
     \begingroup
     \textit{\hfill \\ \gruen{\textbf{Beweis:}} }#1 \hfill $\Box$
-    \endgroup
-}
-\newcommand{\loesung}[1]{
-    \begingroup
-    \renewcommand{\textsc}[1]{{\rmfamily\scshape##1}}
-    \renewcommand{\emph}[1]{{\normalfont##1}}
-    \addtokomafont{subsection}{\color{gruen}}
-    \addtokomafont{subsubsection}{\color{gruen}}
-    \addtokomafont{caption}{\color{gruen}}
-    \addtokomafont{captionlabel}{\color{gruen}}
-    \sffamily\slshape\color{textwhite}
-    \textbf{\hfill \\ Lösung: }#1 
     \endgroup
 }
 
@@ -94,7 +107,7 @@
     keywordstyle=\color{blau},
     language=Python,
     backgroundcolor=\color{boxgray},
-    basicstyle=\ttfamily\color{textwhite},
+    basicstyle=\ttfamily\color{black},
     stringstyle=\color{rot},
     tabsize=2,
     literate={@}{{@}}1,
@@ -117,7 +130,7 @@
 \newcommand{\dunkelrot}[2][dunkelrot]{\textcolor{#1}{#2}}
 \newcommand{\dunkelgelb}[2][dunkelgelb]{\textcolor{#1}{#2}}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \newcommand{\norm}[1]{\left\lVert#1\right\lVert}
 \newcommand{\dv}{\thinspace \mathrm{d}v}
 \newcommand{\dw}{\thinspace \mathrm{d}w}
@@ -128,8 +141,12 @@
 \newcommand{\ds}{\thinspace \mathrm{d}s}
 \newcommand{\du}{\thinspace \mathrm{d}u}
 \newcommand{\dz}{\thinspace \mathrm{d}z}
+\newcommand{\dH}{\thinspace \mathrm{d}H}
+\newcommand{\dS}{\thinspace \mathrm{d}S}
 \newcommand{\dW}{\thinspace \mathrm{d}W}
 \newcommand{\dX}{\thinspace \mathrm{d}X}
+\newcommand{\dY}{\thinspace \mathrm{d}Y}
+\newcommand{\dZ}{\thinspace \mathrm{d}Z}
 \newcommand{\dP}{\thinspace \mathrm{d}P}
 \DeclareMathOperator*{\esssup}{ess\,sup}
 \DeclareMathOperator*{\argmin}{arg\,min}
