@@ -82,6 +82,19 @@ class OCP:
     def get_next_state(self, x, u):
         return x + self.h * (x + u + 1)
     
+    # OU Noise: dY = -alpha Y dt + sigma*dW
+    # Euler-Maruyama: Y_{n+1} = Y_n - alpha Y_n h + sigma sqrt(h) * N(0,1)
+    def noise_generation(self, alpha=0.15, sigma=0.2):
+        Y_old = 0.0 
+        trajectory = np.zeros(self.N)
+        for i in range(self.N):
+            noise = np.random.normal(0,1)
+            Y_new = Y_old - alpha * Y_old + noise * sigma * np.sqrt(self.h)
+            Y_old = Y_new
+            trajectory[i] = Y_new
+        return trajectory
+        
+    
     # p' = -(1+p), p(1) = 2x(1) -> p(t) = -1 + A exp(-t) -> A = 1 + 2x(1) exp(1)
     # p = (6e^2 -4e/ e^2 + 1) exp(-t) -1
     def p_analytic(self):

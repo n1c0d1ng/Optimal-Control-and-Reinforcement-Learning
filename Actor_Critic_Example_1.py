@@ -48,7 +48,8 @@ def Train_Actor_Critic(Environment, num_episodes=10000, learning_rate=0.0001, ex
         grad_Actor = np.zeros(Policy.parameter_dim)
         grad_Critic = np.zeros(Value_Function.parameter_dim)
     
-
+        # Update Actor
+        #------------------------------------------------
         for k in range(Environment.N):
             u = Policy.ForwardPass(np.array([time_grid[k], trajectory[k]]))[0]
             V_val = Value_Function.ForwardPass(np.array([time_grid[k], trajectory[k]]))[0]
@@ -56,6 +57,8 @@ def Train_Actor_Critic(Environment, num_episodes=10000, learning_rate=0.0001, ex
             grad_logp = (actions[k] - u) / sigma**2 * Policy.Backpropagation(np.array([time_grid[k], trajectory[k]]))
             grad_Actor += (R[k] - V_val) * grad_logp
 
+        # Update Critic
+        #------------------------------------------------
         for step in range(Environment.N +1):
             V_val = Value_Function.ForwardPass(np.array([time_grid[k], trajectory[k]]))[0]
             gradV = Value_Function.Backpropagation(np.array([time_grid[k], trajectory[k]]))

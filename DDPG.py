@@ -2,12 +2,12 @@ import numpy as np
 from NN import Neural_Network_One_Layer
 from ControlProblem import OCP
 
-batch_size = 2
+batch_size = 20
 tau = 0.001    # weiche Update-Rate
 learning_rate_actor = 1e-4
 learning_rate_critic = 1e-3
 
-def train_DDPG(Environment = OCP(100),num_episodes = 4, learning_rate = 0.0001, Capacity = 10000):
+def train_DDPG(Environment = OCP(100),num_episodes = 100, learning_rate = 0.0001, Capacity = 10000):
     # Initialisieren der Netzwerke
     u = Neural_Network_One_Layer(n=5, input_dim=2, output_dim=1)          # Actor
     Q = Neural_Network_One_Layer(n=10, input_dim=3, output_dim=1)         # Critic
@@ -28,13 +28,19 @@ def train_DDPG(Environment = OCP(100),num_episodes = 4, learning_rate = 0.0001, 
         t = 0.0
         exploration = max(0.1, 1.0 - episode/num_episodes)  
 
-        # Generiere Trajektorien und speichern im Buffer
+        # Erzeugen einer kompletten OU-Trajektorie
+        noise_trajectory = Environment.noise_generation()
+
+        # Generierung einer kompletten Trajektorie
         for step in range(Environment.N):
 
-            # Frage wie genau wie liest das NN den Input ein ?
-
+            # Agentenrauschen a = u(s) + N(0,exploration)
             action = u.ForwardPass(np.array([t,x]))[0] + np.random.normal(0,exploration)
-            x_next = Environment.get_next_state(x,action)
+            
+            # Systemrauschen: x_next = f(x, a + noise)
+            x_next = Environment.get_next_state(x,action+noise_trajectory[step])
+
+            # R = int_0^1 x + u^2 dt + x(1)^2 
             reward = Environment.direct_reward(x,action)
 
             if step == Environment.N - 1: 
@@ -48,14 +54,18 @@ def train_DDPG(Environment = OCP(100),num_episodes = 4, learning_rate = 0.0001, 
             # (s_t= [t_i X_i] , a_t , r_t , s_t+1 = [t_i+1 , X_i+1] , done)
             Buffer[index_counter] = np.array([t,x,action, reward,t_next, x_next, done])
 
-
             if index_counter == Capacity -1:
                 index_counter = 0
             else: 
                 index_counter += 1
                 numbers_of_samples += 1
 
-            # Ziehen unserer y_i aus dem Buffer:
+            # Update der Simulation
+            t = t_next
+            x = x_next
+
+            # Hier DPG-Algorithmus
+            #------------------------------------------------
             if numbers_of_samples >= batch_size:
 
                 # Zufällige Indizes für den Batch ziehen
@@ -63,71 +73,77 @@ def train_DDPG(Environment = OCP(100),num_episodes = 4, learning_rate = 0.0001, 
                 batch = Buffer[indices]  # (batch_size, 7)
 
                 # Daten extrahieren
+                #----------------------------------------------------
                 s_batch = batch[:, 0:2]         # (t, x)
-                a_batch = batch[:, 2]
-                r_batch = batch[:, 3]
+                a_batch = batch[:, 2]           # (a)
+                r_batch = batch[:, 3]           # (r)
                 s_next_batch = batch[:, 4:6]    # (t_next, x_next)
                 done_batch = batch[:, 6]        # done 
+                #----------------------------------------------------
 
+
+                # Anlegen der Arrays zum Speichern:
                 y = np.zeros(batch_size)
                 Q_current = np.zeros(batch_size)
                 grad_phi = np.zeros(Q.parameter_dim)
 
-                # Berechnung y_i = r_i + Q(s_i+1,u(s_i+1)) unter phi' und theta'
+                # Hier Update Critic: L(phi) = 1/B sum_i (y_i-Q_phi)^2 -> min
                 for i in range(batch_size):
                     s_next = np.array([s_next_batch[i, 0], s_next_batch[i, 1]])
                     a_next = u_target.ForwardPass(s_next)[0]   
                     q_next = Q_target.ForwardPass(np.array([s_next[0], s_next[1], a_next]))[0]
+
+                    # y_i = r_i + Q(s_i+1,u(s_i+1)) unter phi' und theta'
                     y[i] = r_batch[i] + (1 - done_batch[i]) * q_next
 
-                    s = np.array([s_batch[i, 0], s_batch[i, 1]])            # s_i = (t_i,X_i)
-                    q = Q.ForwardPass(np.array([s[0], s[1], a_batch[i]]))[0] # Q_phi(s_i,a_i)
+                    # Q(s_i,a_i = u(s_i)) unter phi
+                    s = np.array([s_batch[i, 0], s_batch[i, 1]])  # s = (t,x)
+                    q = Q.ForwardPass(np.array([s[0], s[1], a_batch[i]]))[0] 
                     Q_current[i] = q
 
-                    # Critic-Update: L(psi) = 1/B sum_i (y_i-Q(s_i,a_i))^2 
-                    # -> L'= 2/B sum_i (y_i-Q(s_i,a_i)) * grad_Q
+                    # L' = 2/B sum_i (y_i-Q_phi) * grad_Q_phi -> min
+                    #------------------------------------------------
                     delta = 2 * (Q_current[i] - y[i]) / batch_size   
                     grad_Q = Q.Backpropagation(np.array([s_batch[i,0], s_batch[i,1], a_batch[i]]))
                     grad_phi += delta * grad_Q
+                    #------------------------------------------------
 
-                # Aktualisierung der Parameter von Q_phi
+                # Gradienentenabstieg für L(phi)
+                # phi_new = phi - learning_rate * grad_phi
                 new_phi = Q.get_parameters() - learning_rate_critic * grad_phi
                 Q.set_parameters(new_phi)
 
                 grad_theta = np.zeros(u.parameter_dim)
+
+                # Hier Update Actor: J(theta) = 1/B sum_i Q(s_i, u(s_i)) -> max
                 for i in range(batch_size):
                     s = np.array([s_batch[i,0], s_batch[i,1]])
                     a_pred = u.ForwardPass(s)[0]   # aktuelle Aktion laut Actor
-                    # Gradient von Q nach a
+
+                    # Gradient von Q nach a: nabla Q = [Q_t , Q_x , Q_a] 
                     grad_input = Q.sensitivities(np.array([s[0], s[1], a_pred]))
                     grad_a = grad_input[2]          # dritte Komponente
+
                     # Gradient von u nach theta
                     grad_u = u.Backpropagation(s)
                     grad_theta += grad_a * grad_u
+
+                # Gradientenabstieg für J(theta)
                 grad_theta /= batch_size
-
                 new_theta = u.get_parameters() + learning_rate_actor * grad_theta
-                u.set_parameters(new_theta)
 
+                # Aktualisieren der Netzwerke
+                #------------------------------------------------
+                u.set_parameters(new_theta)
                 new_phi_target = tau * Q.get_parameters() + (1 - tau) * Q_target.get_parameters()
                 Q_target.set_parameters(new_phi_target)
                 new_theta_target = tau * u.get_parameters() + (1 - tau) * u_target.get_parameters()
                 u_target.set_parameters(new_theta_target)
-
-            # Update der Simulation
-            t = t_next
-            x = x_next
-
-            # # Update Critic: 
-            # Q(s_i,a_i) = r_i + Q(s_i+1,u(s_i+1))
-            # Hier ziehen Batch aus Buffer und dann y = r +  Q(s,u(s')) und Q = Q(s,a) 
-            # Berechne Loss und minimiere L(psi) = sum (y-Q_psi)^2 -> min
-            # also y sind die theoretischen und Q die empirischen
-
-            # Update Actor
+                #------------------------------------------------
 
     print("Succesful")
+    return new_theta, new_phi
 
 # Aufruf des Programms zu testzwecken
 if __name__ == "__main__":
-    train_DDPG(Environment=OCP(100))
+    theta, phi = train_DDPG(Environment=OCP(100), num_episodes=100, learning_rate=0.0001, Capacity=10000)
