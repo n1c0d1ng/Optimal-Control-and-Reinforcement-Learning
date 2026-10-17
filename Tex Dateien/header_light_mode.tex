@@ -1,5 +1,6 @@
 % !TeX root = ./Roboter.tex
-\documentclass[a4paper,12pt, oneside]{scrartcl}
+
+
 \usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}
 \setlength{\parindent}{0em}
@@ -14,6 +15,9 @@
 \usepackage[a4paper,portrait,left=1.0cm,right=1.0cm,top=2cm,bottom=2cm]{geometry}
 \usepackage{pgf} % Zur Einbindung der PGF Files
 \usepackage{bm}
+
+\usepackage{footnote}
+
 
 \usepackage{algorithm}
 \usepackage{algpseudocode}  % pseudocode-Umgebung (\begin{algorithmic}, \State, \For, ...)
@@ -67,37 +71,33 @@
     style=mystyle,
     leftmargin=-10pt,
     linecolor=rot
-    ]{satz}{\color{rot}Satz}[section] % linecolor=rot
+    ]{satz}{Satz}[section] % linecolor=rot \color{rot}Satz
 \newmdtheoremenv[
     style=mystyle,
     leftmargin=-10pt,
     linecolor=gelb
-    ]{definition}[satz]{\color{gelb}Definition}
+    ]{definition}[satz]{Definition} % \color{gelb}Definition
 \newmdtheoremenv[
     style=mystyle,
     leftmargin=-10pt,
     linecolor=lila
-    ]{beispiel}[satz]{\color{lila}Beispiel}
+    ]{beispiel}[satz]{Beispiel} % \color{lila}Beispiel
 \newenvironment{beweis}{
     \begin{mdframed}[
             style=mystyle,
             leftmargin=-10pt,
             linecolor=gruen
         ]
-        \textbf{\color{gruen}Beweis:}
+        \textbf{Beweis:} % \color{gruen}Beweis:
         }{
         \hfill $\Box$
     \end{mdframed}
 }
 
-
-
-% Proof- und Lösungs-Kommandos
-\newcommand{\proof}[1]{
-    \begingroup
-    \textit{\hfill \\ \gruen{\textbf{Beweis:}} }#1 \hfill $\Box$
-    \endgroup
-}
+%\makesavenotesenv{beweis}
+%\makesavenotesenv{beispiel}
+%\makesavenotesenv{definition}
+%\makesavenotesenv{satz}
 
 % Listings für Python
 %\usepackage[german,tworuled]{algorithm2e}

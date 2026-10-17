@@ -1,0 +1,2426 @@
+\documentclass[a4paper, 12pt]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[autostyle=true]{csquotes}
+\setlength{\parindent}{0em}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{polynom}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{tikz}
+\usepackage[a4paper,portrait,left=1.0cm,right=1.0cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{pgf} % Zur Einbindung der PGF Files
+\usepackage{bm}
+
+\usepackage{footnote}
+
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}  % pseudocode-Umgebung (\begin{algorithmic}, \State, \For, ...)
+
+
+% Light Mode Customization
+\usepackage{xcolor}
+\pagecolor{white}  % Hintergrund auf Weiß
+\color{black}      % Text auf Schwarz
+
+% Eigene Farben definiert (nun optimiert für hellen Hintergrund)
+\definecolor{rot}{RGB}{204,0,0}
+\definecolor{blau}{RGB}{0,102,204}
+\definecolor{orange}{RGB}{204,85,0}
+\definecolor{gruen}{RGB}{0,153,0}
+\definecolor{dunkelgruen}{RGB}{0,153,0}
+\definecolor{dunkelblau}{RGB}{0,128,128}
+\definecolor{backcolor}{RGB}{235,245,255}
+\definecolor{frontcolor}{RGB}{0,153,0}
+\definecolor{hellblau}{RGB}{180,210,235}
+\definecolor{lila}{RGB}{153,0,153}
+\definecolor{gelb}{RGB}{204,153,0}
+\definecolor{dunkelrot}{RGB}{153,0,51}
+\definecolor{dunkelgelb}{RGB}{153,153,0}
+\definecolor{boxgray}{RGB}{245,245,245}        % Sehr helles Grau für Box-Hintergründe
+\definecolor{boxframe}{RGB}{200,200,200}       % Helles Grau für Box-Rahmen
+
+% Section colors (Headings)
+%\usepackage{sectsty}
+%\sectionfont{\color{textwhite}}
+%\subsectionfont{\color{textwhite}}
+%\subsubsectionfont{\color{textwhite}}
+
+% Box customization mit mdframed
+\usepackage{mdframed}
+\mdfdefinestyle{mystyle}{
+    leftmargin=0pt,
+    rightline=true,
+    topline=false,
+    bottomline=false,
+    leftline=false,
+    linecolor=boxframe,
+    linewidth=1pt,
+    backgroundcolor=white,
+    fontcolor=black,
+    %frametitlefont={\color{gruen}\bfseries}
+}
+
+% Custom theorem environments
+\newmdtheoremenv[
+    style=mystyle,
+    leftmargin=-10pt,
+    linecolor=rot
+    ]{satz}{Satz}[section] % linecolor=rot \color{rot}Satz
+\newmdtheoremenv[
+    style=mystyle,
+    leftmargin=-10pt,
+    linecolor=gelb
+    ]{definition}[satz]{Definition} % \color{gelb}Definition
+\newmdtheoremenv[
+    style=mystyle,
+    leftmargin=-10pt,
+    linecolor=lila
+    ]{beispiel}[satz]{Beispiel} % \color{lila}Beispiel
+\newenvironment{beweis}{
+    \begin{mdframed}[
+            style=mystyle,
+            leftmargin=-10pt,
+            linecolor=gruen
+        ]
+        \textbf{Beweis:} % \color{gruen}Beweis:
+        }{
+        \hfill $\Box$
+    \end{mdframed}
+}
+
+%\makesavenotesenv{beweis}
+%\makesavenotesenv{beispiel}
+%\makesavenotesenv{definition}
+%\makesavenotesenv{satz}
+
+% Listings für Python
+%\usepackage[german,tworuled]{algorithm2e}
+\usepackage{listings}
+\lstset{
+    commentstyle=\color{gruen},
+    keywordstyle=\color{blau},
+    language=Python,
+    backgroundcolor=\color{boxgray},
+    basicstyle=\ttfamily\color{black},
+    stringstyle=\color{rot},
+    tabsize=2,
+    literate={@}{{@}}1,
+    title=\lstname
+}
+
+% Hyperref Settings
+\usepackage[pdfstartview=Fit,plainpages=false,colorlinks=true,linkcolor=gruen,linktocpage=true,hyperfootnotes=false,bookmarksopen=false]{hyperref}
+
+% Eigene Kommandos
+\newcommand{\e}[1]{\text{e}^{#1}}
+\newcommand{\rot}[2][rot]{\textcolor{#1}{#2}}
+\newcommand{\gruen}[2][gruen]{\textcolor{#1}{#2}}
+\newcommand{\frontcolor}[2][frontcolor]{\textcolor{#1}{#2}}
+\newcommand{\gelb}[2][gelb]{\textcolor{#1}{#2}}
+\newcommand{\orange}[2][orange]{\textcolor{#1}{#2}}
+\newcommand{\blau}[2][blau]{\textcolor{#1}{#2}}
+\newcommand{\hellblau}[2][hellblau]{\textcolor{#1}{#2}}
+\newcommand{\lila}[2][lila]{\textcolor{#1}{#2}}
+\newcommand{\dunkelrot}[2][dunkelrot]{\textcolor{#1}{#2}}
+\newcommand{\dunkelgelb}[2][dunkelgelb]{\textcolor{#1}{#2}}
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\lVert}
+\newcommand{\dv}{\thinspace \mathrm{d}v}
+\newcommand{\dw}{\thinspace \mathrm{d}w}
+\newcommand{\dx}{\thinspace \mathrm{d}x}
+\newcommand{\dy}{\thinspace \mathrm{d}y}
+\newcommand{\dt}{\thinspace \mathrm{d}t}
+\newcommand{\dr}{\thinspace \mathrm{d}r}
+\newcommand{\ds}{\thinspace \mathrm{d}s}
+\newcommand{\du}{\thinspace \mathrm{d}u}
+\newcommand{\dz}{\thinspace \mathrm{d}z}
+\newcommand{\dH}{\thinspace \mathrm{d}H}
+\newcommand{\dS}{\thinspace \mathrm{d}S}
+\newcommand{\dW}{\thinspace \mathrm{d}W}
+\newcommand{\dX}{\thinspace \mathrm{d}X}
+\newcommand{\dY}{\thinspace \mathrm{d}Y}
+\newcommand{\dZ}{\thinspace \mathrm{d}Z}
+\newcommand{\dP}{\thinspace \mathrm{d}P}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{references.bib}
+\definecolor{codebg}{rgb}{0.92,0.92,0.92}
+\definecolor{keywordcolor}{rgb}{0.2,0.2,0.7}
+\definecolor{stringcolor}{rgb}{0.8,0.1,0.1}
+\definecolor{commentcolor}{rgb}{0.4,0.4,0.4}
+
+
+\lstset{
+  backgroundcolor=\color{codebg},
+  %frame=single,
+  %numbers=left,
+  %numberstyle=\tiny\color{gray},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{keywordcolor}\bfseries,
+  stringstyle=\color{stringcolor},
+  commentstyle=\color{gruen}\itshape,
+  language=Python,
+  tabsize=2,
+  showstringspaces=false
+}
+
+\begin{document}
+
+\section{Modellierung eines Roboters}
+
+Wir halten uns an \cite{spong2004} und \cite{siciliano2010}
+% Herleitung der ELE aus Newton
+\begin{align*}
+    \underbrace{f - mg}_{\textsf{Kräftebilanz}} 
+    = \underbrace{m \ddot{x}}_{\textsf{Newtons 2nd Law}} 
+    &= \frac{\mathrm{d}}{\dt} \left[m \rot{\dot{x}} \right] \\
+    f - \frac{\mathrm{\partial}}{\partial x} 
+    \underbrace{
+        \left[ mg x(t) \right]
+        }_{\textsf{Potenzielle Energie }V} 
+    &= \frac{\mathrm{d}}{\dt} \rot{\frac{\partial}{\partial \dot{x}}} 
+    \underbrace{
+        \left[m \rot{ \frac{1}{2} \dot{x}(t)^2} \right]
+        }_{\textsf{kinetische Energie } T} \\
+    f \dunkelgelb{- \frac{\partial V}{\partial x}} 
+    = \frac{\mathrm{d}}{\dt} \rot{\frac{\partial T}{\partial \dot{x}}}
+    &\Rightarrow
+    f = \frac{\mathrm{d}}{\dt} \rot{\frac{\partial L}{\partial \dot{x}}} 
+    - \dunkelgelb{\frac{\partial L}{\partial x}} 
+\end{align*}
+
+Wobei $L = T - V = \frac{1}{2}m \dot{x}(t)^2 -mg x(t)$ gilt.
+Für generalisierte Koordinaten $\textbf{q} = \theta \in \mathbb{R}^n$
+%
+\begin{align*}
+\frac{d}{dt} \left( \frac{\partial T}{\partial \dot{\textbf{q}}_{i}}  \right) 
+- \frac{\partial T}{\partial \textbf{q}_i}  
++ \frac{\partial V}{\partial \textbf{q}_i} 
+= \tau_i \quad i=1, \cdots , n
+\end{align*}
+
+% Herleitung kinetische Energie und Massenmatrix
+Für die kinetische Energie eines starren Körpers gilt:
+%
+\begin{align*}
+    T 
+    &= \frac{1}{2} m \textbf{v}^T \textbf{v} 
+    + \frac{1}{2} \boldsymbol{\omega}^T I \boldsymbol{\omega}
+\end{align*}
+%
+Wobei $\textbf{v}$ die Geschwindigkeit des Schwerpunkts, 
+$\boldsymbol{\omega}$ die Winkelgeschwindigkeit 
+und $I$ der Trägheitstensor bezüglich des Schwerpunkts ist.
+Für den Trägheitstensor gilt:
+% Trägheitstensor Definition
+\begin{align}
+    I = \int_V \rho(\textbf{r}) 
+    [(\textbf{r} \cdot \textbf{r}) \textbf{1} 
+    - \textbf{r} \otimes \textbf{r}] \mathrm{d}V \label{eq:traegheitstensor}
+\end{align}
+
+Für ein Mehrkörpersystem mit generalisierten 
+Koordinaten $\textbf{q}$ lässt sich die Gesamtenergie in 
+kompakter Form schreiben als:
+%
+\begin{align*}
+T &= \frac{1}{2} \dot{\textbf{q}}^T M(\textbf{q}) \dot{\textbf{q}}
+\end{align*}
+%
+wobei $M(\textbf{q})$ die konfigurationsabhängige Massenmatrix ist, 
+die alle Massen und Trägheiten der einzelnen Glieder erfasst.
+Für die Geschwindigkeiten gilt mittels der Kettenregel:
+% Definition Jacobi J_v, J_omega
+\begin{align*}
+    \textbf{v} = J_v(\textbf{q}) \dot{\textbf{q}} \quad \text{und} \quad
+    \boldsymbol{\omega} = J_\omega(\textbf{q}) \dot{\textbf{q}}
+    \quad
+    J_v = \frac{\partial \textbf{r}}{\partial \textbf{q}} 
+    \quad \text{und} \quad  
+    J_\omega = \frac{\partial \boldsymbol{\omega}}{\partial \dot{\textbf{q}}}
+\end{align*}
+
+Einsetzen in die kinetische Energie liefert:
+% Herleitung T = 1/2 q'M(q)q
+\begin{align*}
+    T 
+    &= \frac{1}{2} m (J_v \dot{\textbf{q}})^T (J_v \dot{\textbf{q}}) 
+    + \frac{1}{2} (J_\omega \dot{\textbf{q}})^T I (J_\omega \dot{\textbf{q}}) \\
+    &= \frac{1}{2} \dot{\textbf{q}}^T (m J_v^T J_v) \dot{\textbf{q}} 
+    + \frac{1}{2} \dot{\textbf{q}}^T (J_\omega^T I J_\omega) \dot{\textbf{q}} \\
+    &= \frac{1}{2} \dot{\textbf{q}}^T 
+    \underbrace{\left( m J_v^T J_v + J_\omega^T I J_\omega \right)}_{M(\textbf{q})} 
+    \dot{\textbf{q}}
+\end{align*}
+
+Die Gesamtenergie setzt sich zusammen 
+aus der Summe der Energien aller $n$ Glieder:
+% Formulierung M(q)
+\begin{align*}
+    M(\textbf{q}) 
+    &=
+    \sum_{i=1}^n m_i J_{v_i}^T J_{v_i} + J_{\omega_i}^T I_i J_{\omega_i} 
+\end{align*}
+
+\subsection{Two Link Revolute Manipulator}
+
+Wir bezeichnen $\textbf{q} = 
+\begin{bmatrix} \gruen{\theta_1} \\ \dunkelrot{\theta_2} \end{bmatrix}$ 
+als die generalisierten Koordinaten des Systems. Die Schwerpunkte der beiden Links
+bezeichnen wir mit $(x_1, y_1)$ und $(x_2, y_2)$. Die Abstände der Schwerpunkte
+von den Gelenken werden mit $a_1$ und $a_2$ bezeichnet.
+
+% Graphik des Roboterarms
+%--------------------------------------------------------------------------------------------------------
+\begin{center}
+\begin{tikzpicture}[scale = 1.75, every node/.style={transform shape}]
+    % Koordinatensystem
+    %\draw[very thin, gray] (-5,-5) grid (5,5); % Raster
+    %\draw[->] (-5,0) -- (5,0); % x-Achse
+    %\draw[->] (0,-5) -- (0,5); % y-Achse
+    
+    % Achsen und Hilfslinien
+    \draw[white, dashed, ->] (0.0,-1.0) -- (3.5,-1.0);
+    \draw[white, dashed, ->] (0.0,-1.0) -- (0.0,3.0);
+    
+    % Schwerpunkte
+    \draw[dashed] (1.0,-0.5) -- (1.0,-1.0);
+    \draw[dashed] (1.0,-0.5) -- (0,-0.5);
+    \node at (-0.2, -0.5) {\tiny $y_1$};  % Punktbeschriftung
+    \node at (1, -1.2) {\tiny $x_1$}; 
+    \draw[dashed] (2.5,1) -- (0.0,1);
+    \draw[dashed] (2.5,1) -- (2.5,-1);
+    \node at (-0.2, 1.0) {\tiny $y_2$};  % Punktbeschriftung
+    \node at (2.5, -1.2) {\tiny $x_2$}; 
+
+    % Erste Zeichnung (Original)
+    \fill[hellblau] (-4,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+    \draw[white, line width = 0.2mm] (-4,-1) circle (0.25);  % Weißer Rand um das Objekt
+    
+    \draw[white, line width = 0.2mm] (-4.25,-1.4) rectangle (-3.75,-1);  % Weißer Rand um das Rechteck
+    \fill[hellblau] (-4.25,-1.4) rectangle (-3.75,-1);  % Füllt das Rechteck mit hellblau
+    \draw[thick, white] (-4.5,-1.4) -- (-3.5,-1.4);
+    
+    % Grüne Linie angepasst (Endpunkt auf (-2.0, 0.0))
+    \draw[thick, gruen] (-4,-1) -- (-2.0,0.0);
+    
+    % Rote Linie angepasst (von (-2.0, 0.0) nach (-1.0, 2.0))
+    \draw[thick, dunkelrot] (-2.0,0.0) -- (-1.0,2.0);
+    
+    % Glieder
+    \fill[blau] (-2.0,0.0) circle (0.1);
+    \draw[white, thin] (-2.0,0.0) circle (0.1);  % Weißer Rand um das Objekt
+    \fill[blau] (-4.0,-1.0) circle (0.1);
+    \draw[white, thin] (-4.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+    
+	% Beschriftungen
+	\node at (-3, -0.75) {\tiny $\gruen{l_1}$};  % 
+	\node at (-1.5, 1.5) {\tiny $\dunkelrot{l_2}$};  % 
+	
+	% Schwerpunkte 
+	\fill[white] (-3.0,-0.5) circle (0.05);
+	\fill[white] (-1.5,1) circle (0.05);
+	
+	\draw[white, <->] (-1.85,0.15) -- (-1.5,0.85);
+	\draw[white, <->] (-3.85,-0.85) -- (-3.1,-0.45);
+	
+	% Beschriftungen
+	\node at (-3.5, -0.4) {\tiny $a_1$};  % 
+	\node at (-1.5, 0.5) {\tiny $a_2$};  % 
+    
+    % Zweite Zeichnung (verschoben um 4 Einheiten entlang der x-Achse)
+    \fill[hellblau] (0,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+    \draw[white, line width = 0.2mm] (0,-1) circle (0.25);  % Weißer Rand um das Objekt
+    
+    \draw[white, line width = 0.2mm] (-0.25,-1.4) rectangle (0.25,-1);  % Weißer Rand um das Rechteck
+    \fill[hellblau] (-0.25,-1.4) rectangle (0.25,-1);  % Füllt das Rechteck mit hellblau
+    \draw[thick, white] (-0.5,-1.4) -- (0.5,-1.4);
+    
+    % Grüne Linie (verschoben)
+    \draw[thick, gruen] (0,-1) -- (2.0,0.0);
+    \draw[thick, gruen, dotted] (0,-1) -- (3.5,0.75);
+    
+    % Rote Linie (verschoben)
+    \draw[thick, dunkelrot] (2.0,0.0) -- (3.0,2.0);
+    
+    % Glieder
+    \fill[blau] (2.0,0.0) circle (0.1);
+    \draw[white, thin] (2.0,0.0) circle (0.1);  % Weißer Rand um das Objekt
+    \fill[blau] (0.0,-1.0) circle (0.1);
+    \draw[white, thin] (0.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+    \fill[blau] (3.0,2.0) circle (0.1);
+    \draw[white, thin] (3.0,2.0) circle (0.1);  % Weißer Rand um das Objekt
+    
+    % Winkel
+    \draw [gruen, thick] (1,-1)  arc[start angle=0,end angle=45,radius=0.5cm];
+	\node at (0.75, -0.85) {\tiny $\gruen{\theta_1}$};  % Winkelbeschriftung
+	
+	\draw [dunkelrot, thick] (3,0.5)  arc[start angle=0,end angle=80,radius=0.5cm];
+	\node at (2.7, 0.6) {\tiny $\dunkelrot{\theta_2}$};  % Winkelbeschriftung
+\end{tikzpicture}
+\end{center}
+%--------------------------------------------------------------------------------------------------------
+
+Für die Koordinaten der Schwerpunkte gilt:
+% Koordinaten der Schwerpunkte
+\begin{align*}
+    \begin{pmatrix}
+        x_1 \\
+        y_1 \\
+        z_1
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        a_1 \cdot \cos(\gruen{\theta_1}) \\
+        a_1 \cdot \sin(\gruen{\theta_1}) \\
+        0
+    \end{pmatrix}
+    \quad
+    \begin{pmatrix}
+        x_2 \\
+        y_2 \\  
+        z_2
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        l_1 \cdot \cos(\gruen{\theta_1}) 
+        + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        l_1 \cdot \sin(\gruen{\theta_1}) 
+        + a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        0
+    \end{pmatrix}
+\end{align*}
+
+\subsubsection{Formulierung der Massenmatrix}
+
+Für die Massenmatrix gilt hier:
+% M(q)
+\begin{align*}
+    M(\textbf{q}) 
+    = m_1 J_{v_{\gruen{1}}}^T J_{v_{\gruen{1}}} 
+    + J_{\omega_{\gruen{1}}}^T I_1 J_{\omega_{\gruen{1}}}  
+    + m_2 J_{v_{\dunkelrot{2}}}^T J_{v_{\dunkelrot{2}}} 
+    + J_{\omega_{\dunkelrot{2}}}^T I_2 J_{\omega_{\dunkelrot{2}}} 
+\end{align*}
+
+Hierbei bezeichnet $J$ die Jacobi-Matrix, $I_i$ das Trägheitstensor 
+und $m_i$ die Masse des $i$-ten Links.
+% Berechnung der Jacobi-Matrizen J_v
+\begin{align*}
+    J_{v_1} &=
+    \frac{\partial \textbf{r}_1}{\partial \textbf{q}}
+    =
+    \frac{\partial (x_1,y_1,z_1)}{\partial (\gruen{\theta_1}, \dunkelrot{\theta_2})}
+    =
+    \begin{pmatrix}
+        \frac{\partial x_1}{\partial \gruen{\theta_1}} 
+        & \frac{\partial x_1}{\partial \dunkelrot{\theta_2}} \\
+        \frac{\partial y_1}{\partial \gruen{\theta_1}} 
+        & \frac{\partial y_1}{\partial \dunkelrot{\theta_2}} \\
+        \frac{\partial z_1}{\partial \gruen{\theta_1}} 
+        & \frac{\partial z_1}{\partial \dunkelrot{\theta_2}} 
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        -a_1 \sin(\gruen{\theta_1}) & 0 \\
+        a_1 \cos(\gruen{\theta_1}) & 0 \\
+        0 & 0
+    \end{pmatrix}
+    \\
+    J_{v_2} &=
+    \frac{\partial \textbf{r}_2}{\partial \textbf{q}}
+    =
+    \frac{\partial (x_2,y_2,z_2)}{\partial (\gruen{\theta_1}, \dunkelrot{\theta_2})}
+    =
+    \begin{pmatrix}
+        \frac{\partial x_2}{\partial \gruen{\theta_1}} 
+        & \frac{\partial x_2}{\partial \dunkelrot{\theta_2}} \\
+        \frac{\partial y_2}{\partial \gruen{\theta_1}} 
+        & \frac{\partial y_2}{\partial \dunkelrot{\theta_2}} \\
+        \frac{\partial z_2}{\partial \gruen{\theta_1}}
+        & \frac{\partial z_2}{\partial \dunkelrot{\theta_2}}
+    \end{pmatrix} 
+    =
+    \begin{pmatrix}
+        -l_1 \sin(\gruen{\theta_1}) - a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & -a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        0 & 0
+    \end{pmatrix}
+\end{align*}
+
+Für das Matrizenprodukt $J_{v_1}^T J_{v_1}$ gilt:
+% Berechnung der Matrizenprodukte J_v1^T * J_v1
+\begin{align*}
+    J_{v_1}^T J_{v_1} 
+    &=
+    \begin{pmatrix}
+        -a_1 \sin(\gruen{\theta_1}) & a_1 \cos(\gruen{\theta_1}) & 0 \\
+        0 & 0 & 0
+    \end{pmatrix}
+    \cdot
+    \begin{pmatrix}
+        -a_1 \sin(\gruen{\theta_1}) & 0 \\
+        a_1 \cos(\gruen{\theta_1}) & 0 \\
+        0 & 0
+    \end{pmatrix}
+    \\
+    &=
+    \begin{pmatrix}
+        a_1^2 \sin^2(\gruen{\theta_1}) + a_1^2 \cos^2(\gruen{\theta_1}) & 0 \\
+        0 & 0
+    \end{pmatrix}
+    \\
+    &=
+    \begin{pmatrix}
+        a_1^2 & 0 \\
+        0 & 0
+    \end{pmatrix}
+\end{align*}
+
+Für das Matrizenprodukt $J_{v_2}^T J_{v_2}$ gilt:
+% Berechnung der Matrizenprodukte J_v2^T * J_v2
+\begin{align*}
+    J_{v_2}^T J_{v_2} 
+    &=
+    \begin{pmatrix}
+        -l_1 \sin(\gruen{\theta_1}) - a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & 0 \\
+        -a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2})
+        & 0
+    \end{pmatrix}
+    \\
+    &\quad \cdot
+    \begin{pmatrix}
+        -l_1 \sin(\gruen{\theta_1}) - a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & -a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        0 & 0
+    \end{pmatrix}
+    \\
+    &=
+    \begin{pmatrix}
+        (l_1^2 + a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}})) 
+        & (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) \\
+        (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) 
+        & a_2^2
+    \end{pmatrix}
+\end{align*}
+
+Für die Winkelgeschwindigkeiten setzen wir   
+$\bm{\omega}_1 = \begin{pmatrix}0 & 0 & \gruen{\theta_1'}\end{pmatrix}^T$ und 
+$\bm{\omega}_2 = \begin{pmatrix} 0 & 0 &\gruen{\theta_1'} + \dunkelrot{\theta_2'}\end{pmatrix}^T$.
+% Berechnung der Jacobi-Matrizen J_\omega
+\begin{align*}
+    J_{\omega_1} &=
+    \frac{\partial \bm{\omega}_1}{\partial \dot{\textbf{q}}}
+    =
+    \frac{\partial (\omega_1)}{\partial (\gruen{\theta_1}', \dunkelrot{\theta_2}')}
+    =
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \frac{\partial \omega_1}{\partial \gruen{\theta_1}'} 
+        & \frac{\partial \omega_1}{\partial \dunkelrot{\theta_2}'} 
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \gruen{1} & \dunkelrot{0}
+    \end{pmatrix}
+    \\
+    J_{\omega_2} &=
+    \frac{\partial \bm{\omega}_2}{\partial \dot{\textbf{q}}}
+    =
+    \frac{\partial (\omega_2)}{\partial (\gruen{\theta_1}', \dunkelrot{\theta_2}')}
+    =
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \frac{\partial \omega_2}{\partial \gruen{\theta_1}'} 
+        & \frac{\partial \omega_2}{\partial \dunkelrot{\theta_2}'} 
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \gruen{1} & \dunkelrot{1}
+    \end{pmatrix}
+\end{align*}
+
+Für den Trägheitstensor $I_i$ gilt:
+% Allgemeiner Trägheitstensor
+\begin{align*}
+    I = 
+    \begin{pmatrix}
+        I_{xx} & I_{xy} & I_{xz} \\
+        I_{yx} & I_{yy} & I_{yz} \\
+        I_{zx} & I_{zy} & I_{zz}
+    \end{pmatrix}   
+    =
+    \begin{pmatrix}
+        \int (y^2 + z^2) \mathrm{d}m & -\int xy \mathrm{d}m & -\int xz \mathrm{d}m \\
+        -\int yx \mathrm{d}m & \int (x^2 + z^2) \mathrm{d}m & -\int yz \mathrm{d}m \\
+        -\int zx \mathrm{d}m & -\int zy \mathrm{d}m & \int (x^2 + y^2) \mathrm{d}m
+    \end{pmatrix}
+\end{align*}
+
+Für symmetrische Körper (z.B. Zylinder, Kugel, Quader) 
+gilt: $I_{xy} = I_{xz} = I_{yz} = 0$ also erhalten wir eine Diagonalmatrix. 
+% Symmetrischer Trägheitstensor
+\begin{align*}
+    I_i 
+    =
+    \begin{pmatrix}
+        \int_ y^2 \mathrm{d}m & 0 & 0 \\
+        0 & \int x^2 \mathrm{d}m & 0 \\
+        0 & 0 & \int (x^2 + y^2) \mathrm{d}m
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        \int_V \rho y^2 \mathrm{d}V & 0 & 0 \\
+        0 & \int_V \rho x^2 \mathrm{d}V & 0 \\
+        0 & 0 & \int_V \rho (x^2 + y^2) \mathrm{d}V
+    \end{pmatrix}
+\end{align*}
+
+
+Für die Massenmatrix $M(\textbf{q})$ gilt somit:
+% Berechnung der Massenmatrix M(q)
+\begin{align*}
+    M(\textbf{q}) 
+    &= m_1 J_{v_{\gruen{1}}}^T J_{v_{\gruen{1}}} 
+    + J_{\omega_{\gruen{1}}}^T I_1 J_{\omega_{\gruen{1}}}  
+    + m_2 J_{v_{\dunkelrot{2}}}^T J_{v_{\dunkelrot{2}}} 
+    + J_{\omega_{\dunkelrot{2}}}^T I_2 J_{\omega_{\dunkelrot{2}}}    
+    \\
+    &=
+    m_1 
+    \begin{pmatrix}
+        a_1^2 & 0 \\
+        0 & 0
+    \end{pmatrix}
+    +
+    \underbrace{
+        \begin{pmatrix}
+            0 & 0 & \gruen{1} \\
+            0 & 0 & \dunkelrot{0}
+        \end{pmatrix}
+        \cdot
+        \begin{pmatrix}
+            I_{1,xx} & 0 & 0 \\
+            0 & I_{1,yy} & 0 \\
+            0 & 0 & I_{1,zz}
+        \end{pmatrix}}_{
+        = 
+        \begin{pmatrix}
+            0 & 0 & I_{1,zz} \\
+            0 & 0 & 0
+        \end{pmatrix}
+    }
+    \cdot   
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \gruen{1} & \dunkelrot{0}
+    \end{pmatrix}
+    \\
+    &\quad +
+    m_2
+    \begin{pmatrix}
+        (l_1^2 + a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}})) 
+        & (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) \\
+        (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) 
+        & a_2^2
+    \end{pmatrix}
+    \\
+    &\quad +
+    \underbrace{
+        \begin{pmatrix}
+            0 & 0 & \gruen{1} \\
+            0 & 0 & \dunkelrot{1}
+        \end{pmatrix}
+        \cdot
+        \begin{pmatrix}
+            I_{2,xx} & 0 & 0 \\
+            0 & I_{2,yy} & 0 \\
+            0 & 0 & I_{2,zz}
+        \end{pmatrix}}_{
+        = 
+        \begin{pmatrix}
+            0 & 0 & I_{2,zz} \\
+            0 & 0 & I_{2,zz}
+        \end{pmatrix}
+    }   
+    \cdot
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \gruen{1} & \dunkelrot{1}
+    \end{pmatrix}
+    \\
+    &=
+    \begin{pmatrix}
+        m_1 a_1^2 + I_{1,zz} + m_2 \cdot (l_1^2 + a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}})) + I_{2,zz}
+        & m_2 (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) +I_{2,zz}  \\
+        m_2 (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) + I_{2,zz}
+        & m_2 a_2^2 +I_{2,zz} 
+    \end{pmatrix}
+\end{align*}
+
+Die Trägheitselemente $I_{i,xx}$ und $I_{i,yy}$ sind nicht relevant.
+Für unser Model verwenden wir den Standardansatz eines 
+dünnen Stabes der Länge $l_i$ und Masse $m_i$. 
+Somit gilt $z= y \approx 0$ und wir erhalten: $I_{i,xx} = I_{i,yy} =0$
+% Tensor langer dünner Stab
+\begin{align*}
+    I_{i,zz} \approx \int_{-\frac{l_{i}}{2}}^{\frac{l_{i}}{2}} 
+    \underbrace{\rho}_{\frac{m_{i}}{l_{i}}} x^2 \mathrm{d}x
+    = \frac{1}{3} \cdot \frac{m_{i}}{l_{i}} 
+    \cdot 
+    \left[ 
+        \left( \frac{l_{i}}{2} \right)^3 -  \left( -\frac{l_{i}}{2} \right)^3 
+    \right]
+    = \frac{1}{12} m_{i} l_{i}^{2}
+    \Rightarrow
+    I_i     
+    = 
+    \begin{pmatrix}
+        0 & 0 & 0 \\
+        0 & 0 & 0 \\
+        0 & 0 & \frac{1}{12} m_{i} l_{i}^{2}
+    \end{pmatrix}
+\end{align*}
+
+
+\subsubsection{Aufstellen der Coriolis-Matrix}
+
+Für die partiellen Ableitungen der kinetischen Energie 
+$T(\textbf{q}, \dot{\textbf{q}}) = \frac{1}{2} \dot{\textbf{q}}^T M(\textbf{q}) \dot{\textbf{q}}$ gilt:
+% Ableitung dT/d theta
+\begin{align*}
+    \frac{\partial T}{\partial \gruen{\theta_{1}}}
+    &= 
+    \frac{1}{2}  \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} 
+    \gruen{\theta_{1}'}^2 
+    + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} 
+    \dunkelrot{\theta_{2}'} 
+    + \frac{1}{2} \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}} 
+    \dunkelrot{\theta_{2}'}(t)^2
+    \\
+    \frac{\partial T}{\partial \dunkelrot{\theta_{2}}}
+    &= 
+    \frac{1}{2} \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'}^2
+    + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+    + \frac{1}{2} \frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}(t)^2
+    \\
+    \frac{\partial T}{\partial \gruen{\theta_{1}'}} 
+    &= M_{\gruen{1 1}} \gruen{\theta_{1}'} + M_{\gruen{1}\dunkelrot{2}}  \dunkelrot{\theta_{2}'}
+    \\
+    \frac{\partial T}{\partial \dunkelrot{\theta_{2}'}} 
+    &=
+    M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}'} + M_{\dunkelrot{22}} \dunkelrot{\theta_{2}'}
+\end{align*}
+
+Für die zeitlichen Ableitungen der Größen gilt 
+% Ableitung d/dt dT/d theta_1'
+\begin{align*}
+    \frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \gruen{\theta_{1}'}} 
+    &=
+    \underbrace{
+        \frac{\mathrm{d}}{\dt} M_{\gruen{1 1}}
+    }_{
+        \frac{\partial M_{11}}{\partial \theta_{1}} \theta_{1}' 
+        + \frac{\partial M_{11}}{\partial \theta_{2}} \theta_{2}'
+        } 
+    \cdot \gruen{\theta_{1}'} + M_{\gruen{1 1}} \gruen{\theta_{1}''} + 
+    \underbrace{
+        \frac{\mathrm{d}}{\dt} M_{\gruen{1}\dunkelrot{2}}
+        }_{
+            \frac{\partial M_{12}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial M_{12}}{\partial \theta_{2}} \theta_{2}'
+            } 
+        \cdot \dunkelrot{\theta_{2}'} + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} 
+    \\
+    &= \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
+    + \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
+    +  M_{\gruen{1 1}} \gruen{\theta_{1}''} 
+    + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+    + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
+    + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} \\
+    &=
+    \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
+    + \left[ 
+        \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} 
+        \right] 
+    \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
+    + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
+    + M_{\gruen{1 1}} \gruen{\theta_{1}''} + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+% Ableitung d/dt dT/d theta_2'
+\begin{align*}
+\frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \dunkelrot{\theta_{2}'}} 
+&=
+\underbrace{\frac{\mathrm{d}}{\dt} M_{\gruen{1}\dunkelrot{2}}}_{\frac{\partial M_{12}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial M_{12}}{\partial \theta_{2}} \theta_{2}'} \cdot \gruen{\theta_{1}'} + M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''} + \underbrace{\frac{\mathrm{d}}{\dt} M_{\dunkelrot{22}}}_{\frac{\partial M_{22}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial M_{22}}{\partial \theta_{2}} \theta_{2}'} \cdot \dunkelrot{\theta_{2}'} + M_{\dunkelrot{22}} \dunkelrot{\theta_{2}''} \\
+&= 
+\frac{\partial M_{12}}{\partial \theta_{1}}  \gruen{\theta_{1}'}^2 
+ + \frac{\partial M_{12}}{\partial \theta_{2}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+ + M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''}
+ + \frac{\partial M_{22}}{\partial \theta_{1}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+ + \frac{\partial M_{22}}{\partial \theta_{2}}  \dunkelrot{\theta_{2}'}^2 
+ + M_{\dunkelrot{22}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+Es gilt 
+% Ableitung d/dt dT/d theta_1' - dT/d theta_1
+\begin{align*}
+    \frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \gruen{\theta_{1}'}}  - \frac{\partial T}{\partial \gruen{\theta_{1}}}
+    &=
+    \left[ \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} - \frac{1}{2}  \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \right] \gruen{\theta_{1}'}^2
+    + \left[ \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} -  \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \right] \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
+    + \left[\frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} - \frac{1}{2} \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}} \right] \dunkelrot{\theta_{2}'}^2 \\
+    & \quad
+    +  M_{\gruen{1 1}} \gruen{\theta_{1}''} 
+    + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+% Ableitung d/dt dT/d theta_2' - dT/d theta_2
+\begin{align*}
+\frac{\mathrm{d}}{\dt} \frac{\partial T}{\partial \dunkelrot{\theta_{2}'}} - \frac{\partial T}{\partial \dunkelrot{\theta_{2}}}
+&= 
+\left[ \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} - \frac{1}{2} \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \right] \gruen{\theta_{1}'}^2 
++ \left[ \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}} - \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \right] \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
++ \left[ \frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}} - \frac{1}{2} \frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}} \right]  \dunkelrot{\theta_{2}'}^2 \\
+& \quad + M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''} + D_{\dunkelrot{22}} \dunkelrot{\theta_{2}''} \\
+&=
+\underbrace{\left[ \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} - \frac{1}{2} \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \right]}_{C_{\dunkelrot{2}\gruen{1}}} \gruen{\theta_{1}'}
++ \underbrace{\left[ \frac{1}{2} \frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}}  \dunkelrot{\theta_{2}'} + \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} \right]}_{C_{\dunkelrot{22}}}  \dunkelrot{\theta_{2}'}
++ M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''} + M_{\dunkelrot{22}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+Für die Einträge der Matrix $C$ gilt
+% Berechnung der Einträge der Coriolis-Matrix C
+\begin{align*}
+C_{11} 
+&=
+\frac{1}{2}  \underbrace{\frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} }_{= 0} \gruen{\theta_{1}'} + \underbrace{\frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}}}_{ =  -2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})} \dunkelrot{ \theta_{2}'}
+=
+-2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{ \theta_{2}'} 
+\\
+C_{12}
+&=
+\underbrace{\frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}}}_{= - m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})} \dunkelrot{\theta_{2}'} - \frac{1}{2} \underbrace{\frac{\partial M_{22}}{\partial \gruen{\theta_{1}}}}_{ = 0} \dunkelrot{\theta_{2}'}
+=
+- m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{\theta_{2}'}
+\\
+C_{21} 
+&= \underbrace{\frac{\partial M_{12}}{\partial \gruen{\theta_{1}}}}_{= 0} \gruen{\theta_{1}'} - \frac{1}{2} \underbrace{\frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}}}_{= -2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) } \gruen{\theta_{1}'}
+=
+m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})\gruen{\theta_{1}'}
+\\
+C_{22} 
+&=
+\frac{1}{2} \underbrace{\frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}}}_{ = 0} \dunkelrot{\theta_{2}'} + \underbrace{ \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}}}_{ = 0} \gruen{\theta_{1}'}
+= 0
+\end{align*}
+
+Es gilt somit 
+% Resultat Coriolis-Matrix C(q, qdot) * qdot
+\begin{align*}
+C(\textbf{q}, \dot{\textbf{q}}) \cdot \dot{\textbf{q}}
+=
+\begin{pmatrix}
+    -2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{ \theta_{2}'} 
+    &
+    - m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{\theta_{2}'} 
+    \\
+    m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})\gruen{\theta_{1}'}
+    &
+    0
+\end{pmatrix}
+\begin{pmatrix}
+    \gruen{\theta_{1}'} \\
+    \dunkelrot{\theta_{2}'} 
+\end{pmatrix}
+\end{align*}
+
+\subsubsection{Gravitationsterme}
+
+Für die potenzielle Energie $V$ gilt:
+% V = m*g*h als Potenzielle Energie
+\begin{align*}
+    V 
+    &= m_1 \cdot g \cdot y_1 + m_2 \cdot g \cdot y_2 
+    = m_1  g  a_1 \sin(\gruen{\theta_1}) 
+    + m_2  g \left( l_1 \sin(\gruen{\theta_1}) 
+    + a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \right)
+\end{align*}
+
+Für die partiellen Ableitungen erhalten wir
+% Berechnung der Gravitationsterme G(q) = dV/dq
+\begin{align*}
+    G(\textbf{q})
+    =
+    \frac{\partial V}{\partial \textbf{q}}
+    =
+    \begin{pmatrix}
+        \frac{\partial V}{\partial \gruen{\theta_1}} \\
+        \frac{\partial V}{\partial \dunkelrot{\theta_2}}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        m_1  g  a_1 \cos(\gruen{\theta_1}) + m_2  g \left( l_1 \cos(\gruen{\theta_1}) 
+        + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \right) \\
+        m_2  g \left( l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} 
+        + \dunkelrot{\theta_2}) \right)
+    \end{pmatrix}
+\end{align*}
+
+% Hier Berechnung für zusätzliches Gewicht an link2
+\newpage
+\subsection{Einfaches Greifobjekt}
+Wir modellieren ein Variables Greifobjekt, welches am Ende von Link 2 gehalten wird. 
+Wir betrachten nachfolgend das Greifobjekt als Punktmasse mit Masse $m_G$. 
+
+% Greifobjekt
+%--------------------------------------------------------------------------------------------------------
+\begin{center}
+    \begin{tikzpicture}[scale = 1.75, every node/.style={transform shape}]
+        % Koordinatensystem
+        %\draw[very thin, gray] (-5,-5) grid (5,5); % Raster
+        %\draw[->] (-5,0) -- (5,0); % x-Achse
+        %\draw[->] (0,-5) -- (0,5); % y-Achse
+        
+        % Erste Zeichnung (Original)
+        \fill[hellblau] (-4,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+        %\draw[white, line width = 0.2mm] (-4,-1) circle (0.25);  % Weißer Rand um das Objekt
+        
+        %\draw[white, line width = 0.2mm] (-4.25,-1.4) rectangle (-3.75,-1);  % Weißer Rand um das Rechteck
+        \fill[hellblau] (-4.25,-1.4) rectangle (-3.75,-1);  % Füllt das Rechteck mit hellblau
+        %\draw[thick, white] (-4.5,-1.4) -- (-3.5,-1.4);
+        
+        % Grüne Linie angepasst (Endpunkt auf (-2.0, 0.0))
+        \draw[thick, gruen] (-4,-1) -- (-3.0,1.0);
+        
+        % Rote Linie angepasst (von (-2.0, 0.0) nach (-1.0, 2.0))
+        \draw[thick, dunkelrot] (-3.0,1.0) -- (-1.0,1.0);
+        
+        % Glieder
+        \fill[blau] (-3.0,1.0) circle (0.1);
+        \draw[white, thin] (-3.0,1.0) circle (0.1);  % Weißer Rand um das Objekt
+        \fill[blau] (-4.0,-1.0) circle (0.1);
+        \draw[white, thin] (-4.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+        
+        % Beschriftungen
+        \node at (-3, -0.75) {\tiny $\gruen{l_1}$};  % 
+        \node at (-1.5, 1.5) {\tiny $\dunkelrot{l_2}$};  % 
+        
+        % Schwerpunkte 
+        %\fill[white] (-3.0,-0.5) circle (0.05);
+        %\fill[white] (-1.5,1) circle (0.05);
+        
+        %\draw[white, <->] (-1.85,0.15) -- (-1.5,0.85);
+        %\draw[white, <->] (-3.85,-0.85) -- (-3.1,-0.45);
+        
+        % Beschriftungen
+        \node at (-3.5, -0.4) {\tiny $a_1$};  % 
+        \node at (-1.5, 0.5) {\tiny $a_2$};  % 
+
+        \draw[dunkelrot, thick] (-1.0,0.9) -- (-1.0, 1.1);
+        \draw[dunkelrot, thick] (-1.0,0.9) -- ++(0.1,0.0);
+        \draw[dunkelrot, thick] (-1.0,1.1) -- ++(0.1,0.0);
+        \node at (-0.6,0.7) {\tiny $m_G$}; % Beschriftung
+
+        % Erste Zeichnung (Original) verschoben um +4 in x
+        \fill[hellblau] (0,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+        \draw[white, line width = 0.2mm] (0,-1) circle (0.25);  % Weißer Rand um das Objekt
+        
+        \draw[white, line width = 0.2mm] (-0.25,-1.4) rectangle (0.25,-1);  % Weißer Rand um das Rechteck
+        \fill[hellblau] (-0.25,-1.4) rectangle (0.25,-1);  % Füllt das Rechteck mit hellblau
+        \draw[thick, white] (-0.5,-1.4) -- (0.5,-1.4);
+        
+        % Grüne Linie angepasst (Endpunkt auf (1.0, 1.0))
+        \draw[thick, gruen] (0,-1) -- (1.0,1.0);
+        
+        % Rote Linie angepasst (von (1.0, 1.0) nach (3.0, 1.0))
+        \draw[thick, dunkelrot] (1.0,1.0) -- (3.0,1.0);
+
+        % Orange Linie zum Greifobjekt
+        \draw[thick, orange] (3.0,1.0) -- (3.3,1.4);
+        \draw[thick, orange] (3.364,1.352) -- (3.236,1.448);
+        \draw[thick, orange] (3.364,1.352) -- ++(0.072,0.096);
+        \draw[thick, orange] (3.236,1.448) -- ++(0.072,0.096);
+
+        % Winkel
+        \draw [orange, thick] (3.35,1.0)  arc[start angle=0,end angle=45,radius=0.35cm];
+	    \node at (3.25, 0.9) {\tiny $\orange{\theta_3}$};  % Winkelbeschriftung
+        \draw[thick, dunkelrot, dotted] (3,1) -- (4.0,1.0);
+        \node at (3.0, 1.3) {\tiny $\orange{l_3}$};
+
+        \fill[blau] (3.0,1.0) circle (0.1);
+        \draw[white, thin] (3.0,1.0) circle (0.1);  % Weißer Rand um das Objekt
+
+        % Glieder
+        \fill[blau] (1.0,1.0) circle (0.1);
+        \draw[white, thin] (1.0,1.0) circle (0.1);  % Weißer Rand um das Objekt
+        \fill[blau] (0.0,-1.0) circle (0.1);
+        \draw[white, thin] (0.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+    \end{tikzpicture}
+\end{center}
+%--------------------------------------------------------------------------------------------------------
+
+Für die Masse von Link 2 inklusive Greifobjekt gilt:
+% m_i' = m_i + m_G
+\begin{align*}
+    m_{i}' = m_{i} + m_{G}
+\end{align*}
+
+Für den Schwerpunkt von Link 2 inklusive Greifobjekt gilt:
+% a_i' = (m_i * a_i + m_G * d) / (m_i + m_G)
+\begin{align*}
+    \textbf{a}_{2}'
+    &= \frac{m_{i} \cdot \textbf{a}_{2} + m_{G} \cdot \textbf{d}}{m_{i} + m_{G}}
+    \quad
+    \textbf{d}(\orange{\theta_3}) =
+    \begin{pmatrix}
+        l_2 + r \cdot \cos(\orange{\theta_3}) \\
+        r \cdot \sin(\orange{\theta_3}) \\
+        0
+    \end{pmatrix}
+\end{align*}
+
+Für den Trägheitstensor von Link 2 inklusive Greifobjekt gilt:
+% I_i' = I_i + m_i * S(a_i - a_i') + m_G * S(d - a_i')
+\begin{align*}
+    I_{i}' 
+    &= 
+    I_{i} + m_{i} \cdot S(\textbf{a}_{i} - \textbf{a}_{i}') 
+    + m_{G} \cdot S(\textbf{d} - \textbf{a}_{i}')
+    \quad
+    S(\textbf{v}) =
+    \begin{pmatrix}
+        v_{y}^2 + v_{z}^2 & -v_{x} v_{y} & -v_{x} v_{z} \\
+        -v_{x} v_{y} & v_{x}^2 + v_{z}^2 & -v_{y} v_{z} \\
+        -v_{x} v_{z} & -v_{y} v_{z} & v_{x}^2 + v_{y}^2
+    \end{pmatrix}
+\end{align*}
+
+Wobei $S(\textbf{v})$ die Steiner-Matrix ist. 
+Wir erhalten die Matrix direkt aus der Definition des Trägheitstensors (\ref{eq:traegheitstensor}) einer Punktmasse
+mit $\rho(\textbf{r}) = m \cdot \delta(\text{r}-\textbf{d})$.
+Für die Verschiebungsvektoren gilt:
+% Berechnung a_2'
+\begin{align*}
+    \textbf{d}
+    =
+    \begin{pmatrix}
+        l_2 \\
+        0 \\
+        0 
+    \end{pmatrix}
+    \textbf{a}_{2} =
+    \begin{pmatrix}
+        \frac{l_2}{2} \\
+        0 \\
+        0 
+    \end{pmatrix}
+    \Rightarrow
+    \textbf{a}_{2}'
+    =
+    \frac{l_2}{m_{2} + m_{G}}
+    \begin{pmatrix}
+        \frac{m_{2}}{2} + m_{G} \\
+        0 \\
+        0
+    \end{pmatrix}
+\end{align*}
+
+Für die Steiner-Matrizen gilt entsprechend
+% Berechnung der Steiner-Matrizen
+\begin{align*}
+    S(\textbf{a}_{2} - \textbf{a}_{2}')
+    =
+    \begin{pmatrix}
+        0 & 0 & 0 \\
+        0 & \left[\frac{l_2}{2} - a_{2}'\right]^2 & 0 \\
+        0 & 0 & \left[\frac{l_2}{2} - a_{2}'\right]^2
+    \end{pmatrix}
+    \quad
+    S(\textbf{d} - \textbf{a}_{2}')
+    =
+    \begin{pmatrix}
+        0 & 0 & 0 \\
+        0 & \left[l_2^2 - a_{2}'\right]^2 & 0 \\
+        0 & 0 & \left[l_2^2 - a_{2}'\right]^2
+    \end{pmatrix}
+\end{align*}
+
+Somit erhalten wir für den Trägheitstensor von Link 2 inklusive Greifobjekt:
+% Berechnung I_2'
+\begin{align*}
+    I_{2}'
+    &=
+    \begin{pmatrix}
+        I_{2,xx} & 0 & 0 \\
+        0 & I_{2,yy} 
+        + m_2 \cdot \left[\frac{l_2^2}{2} - a_{2}'\right]^2 
+        + m_G \cdot \left[\frac{l_2^2}{2} - a_{2}'\right]^2 
+        & 0 \\
+        0 & 0 & I_{2,zz} 
+        + m_2 \cdot \left[\frac{l_2^2}{2} - a_{2}'\right]^2 
+        + m_G \cdot \left[\frac{l_2^2}{2} - a_{2}'\right]^2
+    \end{pmatrix}
+\end{align*}
+
+Für die Koordinaten des Schwerpunktes von Link 3 gilt:
+% Berechnung der Koordinaten des Schwerpunktes von Link 3
+\begin{align*}
+    \textbf{r}_3
+    &=
+    \begin{pmatrix}
+        l_1 \cos(\gruen{\theta_1}) 
+        + l_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        + l_3 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2} + \orange{\theta_3}) \\
+        l_1 \sin(\gruen{\theta_1}) 
+        + l_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        + l_3 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2} + \orange{\theta_3}) \\
+        0
+    \end{pmatrix}
+\end{align*}
+Berechnung der Jacobi-Matrizen für Link 3 bezüglich der Geschwindigkeiten:
+% Jacobi-Matrizen für Link 3
+\begin{align*}
+    J_{v_3} &=
+    \frac{\partial \textbf{r}_3}{\partial \textbf{q}}
+\end{align*}
+
+Für die Winkelgeschwindigkeit des Links 3 setzen wir 
+$\bm{\omega_3}= 
+\begin{pmatrix} 
+    0 & 0 & \gruen{\theta_1'} + \dunkelrot{\theta_2'} + \orange{\theta_3'} 
+\end{pmatrix}$
+
+und erhalten für die Jacobi-Matrix bezüglich der Winkelgeschwindigkeit:
+% Jacobi-Matrizen für Link 3
+\begin{align*}
+    J_{\omega_3} &=
+    \frac{\partial \bm{\omega_3}}{\partial \dot{\textbf{q}}} 
+    =
+    \begin{pmatrix}
+        0 & 0 & 0 \\
+        0 & 0 & 0 \\
+        1 & 1 & 1
+    \end{pmatrix}
+\end{align*}
+
+
+\newpage
+
+
+
+\section{Theorie optimaler Steuerungungsprobleme}
+
+Wir halten uns an die Definitionen in \cite{gerdts2012}
+
+\begin{definition}[Optimales Steuerungsproblem]
+    Seien $t_0<t_f$ feste Zeiten und 
+    %
+    \begin{align*}
+        \Phi &: \mathbb{R}^{n_{\bm{x}}} \to \mathbb{R}, \\
+        L &: [t_0,t_f] \times \mathbb{R}^{n_{\bm{x}}}  \to \mathbb{R},  \\
+        f &: [t_0,t_f] \times \mathbb{R}^{n_{\bm{x}}} \times \mathbb{R}^{n_{\bm{u}}} 
+        \to \mathbb{R}^{n_{\bm{x}}}
+    \end{align*}
+    %
+    hinreichend glatte Funktionen und $\mathcal{U} \subset \mathbb{R}^{n_{\bm{u}}}$ 
+    eine abgeschlossene konvexe nichtleere Menge. 
+    %
+    \begin{align*}
+        \min_{\bm{u}} \int_{t_0}^{t_f} L(t,\bm{x}(t),\bm{u}(t)) \dt + \Phi(\bm{x}(t_f))
+    \end{align*}
+    %
+    mit $\bm{x} \in W_{1,\infty}^{n_{\bm{x}}}([t_0,t_f]), 
+    \bm{u} \in L_{\infty}^{n_{\bm{u}}}([t_0,t_f])$ und 
+    %
+    \begin{align*}
+        \dot{\bm{x}}(t) = f(t,\bm{x}(t),\bm{u}(t)), \quad \bm{x}(t_0) = \bm{x}_0, \quad \bm{u}(t) \in \mathcal{U} \text{ f.ü. } t \in [t_0,t_f]
+    \end{align*}
+\end{definition}
+
+Wir betrachten ein Steuerungsproblem und definieren die Value-Function $V$ mittels
+%
+\begin{align*}
+    V(x(t),\dunkelgelb{t}) := \min_{\dunkelrot{u}} \left\{ \int_{\dunkelgelb{t}}^{t_f} L(s,x(s),\dunkelrot{u}(s)) \ds + \Phi(x(t_f)) \right\}
+\end{align*}
+
+\begin{satz}[Hamilton-Jacobi-Bellman Gleichung]
+    Die Value-Function erfüllt
+    %
+    \begin{align*}
+        0 = \frac{\partial V(x, t)}{\partial t} 
+        + \min_{u} \left[ L(t,x, u) + \frac{\partial V(x,t)}{\partial x} \cdot f(t,x,u) \right], 
+        \quad x \in \mathbb{R}^n, \, t_0 \leq t \leq t_f
+    \end{align*}
+    %
+    mit den Randbedingungen
+    %
+    \begin{align*}
+        V(x, \lila{t_f}) = \Phi(x(\lila{t_f})) 
+        \quad 
+        V(x, \dunkelgelb{t_0} ) = \min_u \int_{\dunkelgelb{t_0}}^{t_f} L(t,x(t),u(t)) \dt + \Phi(x(t_f)) 
+    \end{align*}
+\end{satz}
+
+
+\begin{beweis}
+    Die Value-Function $V(x,t)$ beschreibt die minimalen Kosten von Zustand $x$ zum Endzeitpunkt $t_f$.  Für $s \in [t,t_f]$ gilt
+    %
+    \begin{itemize}
+        \item Systemdynamik
+        %
+        \begin{align*}
+            x'(s) = f(x(s), u(s)), \quad x(t) = x
+        \end{align*}
+
+        \item Kostenfunktional
+        %
+        \begin{align*}
+            J(u) = \int_t^{t_f} L(s,x(s),u(s)) \ds + \Phi(x(t_f))
+        \end{align*}
+    \end{itemize}
+
+    Angenommen, wir wechseln zum Zeitpunkt $t+h$ zu einer optimalen Steuerung, dann gilt für unser Zielfunktional 
+    %
+    \begin{align*}
+        J(u) 
+        &= \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{\int_{t+h}^{t_f} L(s,x(s),u(s)) \ds + \Phi(x(t_f)) } \\
+        &= \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} 
+    \end{align*}
+
+    Da $V(x(t), t)$ die minimalen Kosten vom Zustand $x$ zur Zeit $t$ angibt, gilt:
+    %
+    \begin{align*}
+        V(x(t),t) 
+        &\leq \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} \\
+        \Rightarrow 0 &\leq \int_{t}^{t+h} L(s,x(s),u(s)) \ds + \dunkelrot{V(x(t+h),t+h)} - V(x(t),t) 
+    \end{align*}
+
+    Im Grenzübergang $h \to 0$ erhalten wir
+    %
+    \begin{align*}
+        0 &\leq \gruen{\lim_{h \to 0}  \frac{1}{h}  \int_{t}^{t+h} L(s,x(s),u(s)) \ds} + \dunkelrot{\lim_{h \to 0} \frac{ V(x(t+h),t+h) - V(x,t) }{h}} \\
+        &= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\mathrm{d}}{\dt} V(x(t),t)} \\
+        &= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\partial V}{\partial t}  + \frac{\partial V}{\partial x} \cdot x'(t)} \\
+        &= \gruen{ L(t,x(t),u(t))} + \dunkelrot{\frac{\partial V}{\partial t}  + \frac{\partial V}{\partial x} \cdot f(t,x(t), u(t))}
+    \end{align*}
+
+    Durch Minimierung bezüglich $u$ erhalten wir die Gleichheit und somit
+    %
+    \begin{align*}
+        0 &= \frac{\partial V}{\partial t} + \orange{\min_{u} \left[L(t,x(t),u(t)) +  \frac{\partial V}{\partial x} \cdot f(t,x(t), u(t))   \right]} \\
+        &= \frac{\partial V}{\partial t} + \orange{\textsf{H}\left(t,x(t) , \frac{\partial V}{\partial x}(t,x(t)) \right)}
+    \end{align*}
+\end{beweis}
+
+\subsection{Herleitung des Minimumprinzips}
+
+Berechnung der totalen Ableitung der Value-Function $V$ entlang der Charakteristik $x(t)$:
+%
+\begin{align*}
+\frac{dV}{dt} &= \blau{\frac{\partial V}{\partial x}} \frac{dx}{dt} + \lila{\frac{\partial V}{\partial t}} = \blau{p(x,t)} \cdot x'(t) \lila{- H\left( t,x , \frac{\partial V}{\partial x} \right)} \\
+\end{align*}
+
+Berechnung der totalen Ableitung von $p = \frac{\partial V}{\partial x}$:
+%
+\begin{align*}
+\frac{dp}{dt} &= \frac{\mathrm{d}}{\dt} \left( \frac{\partial V}{\partial x} \right) =  \frac{\partial^2 V}{\partial x^2} \cdot x'(t) + \rot{\frac{\partial V}{\partial x \partial t}}
+\end{align*}
+
+Differenzieren der HJB bezüglich $x$ liefert
+%
+\begin{align*}
+0 = \frac{\mathrm{d}}{\dx} \left[ \frac{\partial V}{\partial t} + H\left(t,x, \orange{ \frac{\partial V}{\partial x}} \right) \right] = \rot{\frac{\partial V}{\partial t \partial x}} + \frac{\partial H}{\partial x} + \frac{\partial H}{\partial \orange{p}} \cdot \frac{\partial^2 V}{\partial x^2}
+\end{align*}
+
+Einsetzen der Gleichung liefert:
+%
+\begin{align*}
+\frac{dp}{dt} =  \frac{\partial^2 V}{\partial x^2} \cdot x'(t) + \rot{\left(- \frac{\partial H}{\partial x} - \frac{\partial H}{\partial p} \cdot \frac{\partial^2 V}{\partial x^2} \right)}
+= \frac{\partial^2 V}{\partial x^2} \cdot \gruen{\left(x'(t) - \frac{\partial H}{\partial p} \right)} - \frac{\partial H}{\partial x}
+\end{align*}
+
+Wir erhalten somit die bekannten, notwendigen Optimalitätsbedingungen:
+%
+\begin{align*}
+p'(t) = -H_x , \quad \gruen{x'(t) = f(t,x,u^*)}, \quad u^* = \textsf{argmin} \left[ L(t,x,u)+ p(t,x)f(t,x,u) \right]
+\end{align*}
+
+%-----------------------------------------------------------------------------------------------------------
+\subsection{Anwendung auf Linear-Quadratische Probleme}
+
+\subsubsection{Finite time problem}
+
+Gegeben sei das Steuerungsproblem 
+%
+\begin{align*}
+\min_u &  \int_{\dunkelgelb{t_0}}^{t_f} x^T Q x + u^T R u \dt + \underbrace{(x(t_f)- x_f)^T S (x(t_f)- x_f)}_{x(t_f)^T S x(t_f) -2x_{f}^T S x(t_f) +x_{f}^{T} S x_f} 
+= V(\dunkelgelb{t_0},x(\dunkelgelb{t_0})) + x_{f}^{T} S x_f
+\end{align*}
+
+unter der Nebenbedingung $x'(t) = Ax+Bu$ und $x(t_0) = x_0$. Der Term $x_{f}^{T} S x_f$ ist unabhängig von $u$ und kann bei der Minimierung weggelassen werden.
+
+% Aufbau der Value Funktion und HJB
+%----------------------------------------------------------------------------------------------
+%\begin{itemize}
+%\item Als Ansatz für die Value-Funktion wählen wir 
+%
+\begin{align*}
+V(x,t) 	&= x^T K(t) x + 2 s(t)^T x +r(t) \quad V(x,t_f) = x(t_f)^T K(t_f) x(t_f) + 2 s(t_f)^T x(t_f) + r(t_f)
+\end{align*}
+
+Wir erhalten für die Endwerte
+%
+\begin{align*}
+K(t_f) = S, \quad s(t_f) = - S x_f \quad r(t_f) = 0
+\end{align*}
+
+%\item Für die partiellen Ableitungen gilt:
+%
+\begin{align*}
+V_t = x^T K'(t) x + 2 s'(t)^T x +r'(t) \quad \rot{V_x = 2K(t)x +2s(t)} 
+\end{align*}
+
+
+%\item Minimierung bezüglich $u$ liefert 
+%
+\begin{align*}
+\frac{\partial}{\partial u} \left[ x^T Q x + u^T R u + V_x^T \cdot (Ax+Bu) \right] &= 2Ru + B^T \cdot V_x \Rightarrow u^{*}(t) = - \frac{1}{2} R^{-1} B^T \rot{V_x}
+\end{align*}
+
+%\item Da $R^T = R$ gilt, folgt $(R^{-1})^T = R^{-1}$ und $K^T = K$, da Hesse-Matrix von $V$. %   weiter mit $u^{*}$
+%
+
+% Hier weitermachen und ausmultiplizieren
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{align*}
+(u^{*})^T R u^{*} 
+&=  \left(- \frac{1}{2} R^{-1} B^T V_x \right)^T R \left(- \frac{1}{2} R^{-1} B^T V_x \right) \\
+&= \frac{1}{4} \cdot \left( R^{-1} B^T \rot{V_x} \right)^T R \left( R^{-1} B^T \rot{V_x} \right) \\
+&= \frac{1}{4} \cdot \left(\rot{2} R^{-1} B^T \rot{(K(t)x + s(t))} \right)^T R \left( \rot{2} R^{-1} B^T \rot{(K(t)x + s(t))} \right) \\
+&=  (K(t)x + s(t))^T \orange{B R^{-1}} \gruen{ R R^{-1}} \orange{B^T} (K(t)x + s(t)) \\
+&=    < K(t)x + s(t) , \orange{P} (2K(t)x + s(t)) >  \\
+&=  < K(t)x, P K(t)x > +  \underbrace{< K(t)x, Ps(t) >}_{< s(t),  \orange{P^{T}} K(t)x  >} + < s(t), P K(t)x  > + <s(t), P s(t) >  \\
+&= x^T K(t)^T P K(t)x + 2 \cdot s(t)^T P K(t) x +  s(t)^T P s(t)
+\end{align*}
+
+mit $P = B R^{-1} B^T$ und $P^T = P$.  
+%
+
+\begin{align*}
+V_x^{T}  \left( - \frac{1}{2} B R^{-1} B^T V_x \right)
+&= (2K(t)x +2s(t))^T \left( - \frac{1}{2} B R^{-1} B^T (2K(t)x +2s(t)) \right) \\
+&= -2 \cdot (K(t)x + s(t))^T P (K(t)x + s(t)) \\
+&= -2 \cdot x^T K(t)^T P K(t)x -4 \cdot s(t)^T P K(t)x -2 \cdot s(t)^T P s(t) 
+\end{align*}
+
+\begin{align*}
+V_x^T Ax &= 2 (K(t)x + s(t))^T A x = 2 x^T K(t)^T A x + 2 s(t)^T Ax = x^T (K(t)^T A + A^T K(t) ) x + 2 s(t)^T Ax
+\end{align*}
+
+
+\begin{align*}
+- V_t 	&= \min_u \left[ x^T Q x + u^T R u + V_x^T \cdot (Ax+Bu) \right] 
+\end{align*}
+
+
+
+\begin{align*}
+- V_t 								&=  x^T Q x + (u^{*})^T R u^{*}  + V_x^T \cdot \left( Ax- \frac{1}{2} B R^{-1} B^T V_x \right) 
+\\
+\dunkelrot{-} x^T \dunkelrot{K'(t)} x - 2 \blau{s'(t)}^T x  -\orange{r'(t)} 	&= x^T (\dunkelrot{Q-KPK+ KA + A^T K}) x - 2 \cdot (\blau{(P K -A)^T s(t)})^T x - \orange{ s(t)^T P s(t)}
+\end{align*}
+
+\begin{align*}
+K'(t) &= -Q+K(t) B R^{-1} B^T K(t) - K(t) A - A^T K(t) \quad K(t_f) = S \\
+s'(t) &= (K(t) B R^{-1} B^T  - A^T) s(t) \quad s(t_f) = -S x_f  \\
+r'(t) &= s(t)^T B R^{-1} B^T s(t) \quad r(t_f) = 0
+\end{align*}
+
+\subsubsection{infinite time problem}
+
+Im Grenzfall $t \to \infty$ betrachten wir das Steuerungsproblem
+%
+\begin{align*}
+\min_u &  \int_{\dunkelgelb{t_0}}^{\infty} (x-x_f)^T Q (x-x_f)  + u^T R u \dt 
+= V(x(\dunkelgelb{t_0}))
+\end{align*}
+
+unter der Nebenbedingung $x'(t) = Ax+Bu$ und $x(t_0) = x_0$. Als Ansatz für die Value Funktion wählen wir erneut 
+%
+\begin{align*}
+V(x) = x^T K x + 2s^T x + r \Rightarrow V_x = 2Kx + 2s
+\end{align*}
+
+Es gilt erneut 
+%
+\begin{align*}
+\frac{\partial}{\partial u} \left((x-x_f)^T Q (x-x_f)  + u^T R u  + V_x^T (Ax+Bu) \right) = 2Ru + B^T V_x  = 0 \Rightarrow u^{*} = -\frac{1}{2} R^{-1} B^T V_x 
+\end{align*}
+
+
+\begin{align*}
+(x-x_f)^T Q (x-x_f) 
+&= x^T Q x - 2 x_f^T Q x + x_f^T Q x_f
+\end{align*}
+
+\begin{align*}
+0 &= x^T ( Q - KPK + KA + A^T K ) x -2 ((PK-A)^T s + Qx_f)^T x - s^T (P) s + x_f^T Q x_f
+\end{align*}
+
+\subsection{Optimality Condition}
+
+Steuerung $\bm{u}\in C^1(\mathbb{R};\mathbb{R}^{n_u})$: Wir betrachten die Störung 
+    %
+\begin{align*}
+    \bm{u}_\epsilon(t) := \bm{u}(t) + \epsilon \cdot \bm{h}(t) 
+    \quad
+    \bm{x}_\epsilon(t) := \bm{x}(t) + \epsilon \cdot \bm{\eta}(t) 
+\end{align*}
+
+Einsetzen in die Systemdynamik $\bm{\dot{x}}=\bm{f}(\bm{x},\bm{u})$ liefert:
+%
+\begin{align*}
+    \left. \frac{\mathrm{d}}{\mathrm{d}\epsilon}
+    \bm{\dot{x}}(t) + \epsilon \cdot \bm{\dot{\eta}}(t) \right|_{\epsilon=0}
+    &=
+    \left.
+    \frac{\mathrm{d}}{\mathrm{d}\epsilon}
+    \bm{f}
+    \left(
+        \bm{x}(t) + \epsilon \cdot \bm{\eta}(t),\bm{u}(t) + \epsilon \cdot \bm{h}(t)
+    \right)
+    \right|_{\epsilon=0}
+    \\
+    \bm{\dot{\eta}}(t) 
+    &=
+    \frac{\partial \bm{f}}{\partial \bm{x}} \cdot \bm{\eta}(t) 
+    +
+    \frac{\partial \bm{f}}{\partial \bm{u}} \cdot \bm{h}(t) 
+\end{align*}
+
+Aus $\bm{x}_\epsilon(t_0) = \bm{x}_0$ für alle $\epsilon$ folgt $\bm{\eta}(t_0) = 0$. 
+%
+\begin{align*}
+    \left. 
+        \frac{\mathrm{d}}{\mathrm{d}\epsilon} 
+        J(\bm{u} + \epsilon \bm{h}) 
+    \right|_{\epsilon=0} 
+    &= 
+    \left.
+        \frac{\mathrm{d}}{\mathrm{d}\epsilon} 
+        \int_{t_0}^{t_f} L(\bm{x}_\epsilon, \bm{u}_\epsilon) \dt + \Phi(\bm{x}_\epsilon(t_f))
+    \right|_{\epsilon=0}
+    \\
+    &=
+    \int_{t_0}^{t_f} L_{\bm{x}}(\bm{x}, \bm{u}) \cdot \bm{\eta}(t)   
+    + L_{\bm{u}}(\bm{x}, \bm{u}) \cdot \bm{h}(t) \dt 
+    + \Phi(\bm{x}(t_f)) \cdot \bm{\eta}(t_f)
+\end{align*}
+
+Multiplikation des adjungierten Zustandes $\bm{p}$
+\footnote{
+    The adjoint state $\bm{p}:\mathbb{R} \to \mathbb{R}^{n_x}$ satisfies 
+    %
+    \begin{align*}
+        \bm{\dot{p}}(t) 
+        = 
+        - \left(\frac{\partial H}{\partial \bm{x}}\right)^T 
+        = 
+        - \left(\frac{\partial L}{\partial \bm{x}}\right)^T 
+        - \left(\frac{\partial \bm{f}}{\partial \bm{x}}\right)^T \cdot \bm{p}(t)
+        \quad
+        \bm{p}(t_f) = \left(\frac{\partial \Phi(\bm{x}(t_f))}{\partial \bm{x}}\right)^T
+    \end{align*}
+} 
+mit der Sensitivitätsgleichung für $\bm{\eta}$ liefert:
+%
+\begin{align*}
+    \bm{p}(t)^T
+    \left(
+        \bm{\dot{\eta}}(t) 
+        -
+        \frac{\partial \bm{f}}{\partial \bm{x}} \cdot \bm{\eta}(t) 
+        -
+        \frac{\partial \bm{f}}{\partial \bm{u}} \cdot \bm{h}(t)
+    \right)
+    &=
+    0
+\end{align*}
+
+Einsetzen in die Ableitung des Zielfunktionals liefert:\footnote{
+    Integration by parts leads to
+    %
+    \begin{align*}
+        - \int_{t_0}^{t_f} \bm{p}(t)^T \bm{\dot{\eta}}(t) \dt
+        &=
+        \int_{t_0}^{t_f} \bm{\dot{p}}(t)^T \bm{\eta}(t) \dt 
+        -
+        \left[
+            \vphantom{\int}
+            \bm{p}(t)^T \bm{\eta}(t)
+        \right]_{t_0}^{t_f}
+        =
+        \int_{t_0}^{t_f} 
+        \left(
+            - \frac{\partial L}{\partial \bm{x}} 
+            - 
+            \bm{p}(t)^T \frac{\partial \bm{f}}{\partial \bm{x}}
+        \right)  
+        \bm{\eta}(t) \dt 
+        -
+        \frac{\partial \Phi(\bm{x}(t_f))}{\partial \bm{x}} \cdot \bm{\eta}(t_f)
+    \end{align*}
+}
+%
+\begin{align*}
+    D(\bm{u},\bm{h})
+    &:=
+    \left. 
+        \frac{\mathrm{d}}{\mathrm{d}\epsilon} 
+        J(\bm{u} + \epsilon \bm{h}) 
+    \right|_{\epsilon=0} 
+    \\
+    &= 
+    \left.
+        \frac{\mathrm{d}}{\mathrm{d}\epsilon} 
+        \int_{t_0}^{t_f} L(\bm{x}_\epsilon, \bm{u}_\epsilon) \dt + \Phi(\bm{x}_\epsilon(t_f))
+    \right|_{\epsilon=0}
+    \\
+    &=
+    \int_{t_0}^{t_f} 
+    L_{\bm{x}} \cdot \bm{\eta}
+    + 
+    L_{\bm{u}} \cdot \bm{h}
+    - 
+    \bm{p}^T
+    \left[
+        \bm{\dot{\eta}} 
+        -
+        \frac{\partial \bm{f}}{\partial \bm{x}} \cdot \bm{\eta}
+        -
+        \frac{\partial \bm{f}}{\partial \bm{u}} \cdot \bm{h}
+    \right]
+    \dt 
+    + \frac{\partial \Phi(\bm{x}(t_f))}{\partial \bm{x}} \cdot \bm{\eta}(t_f)
+    \\
+    &=
+    \int_{t_0}^{t_f} 
+    \left(
+        L_{\bm{u}} + \bm{p}^T \bm{f}_{\bm{u}} 
+    \right)
+    \cdot \bm{h}(t)
+    \dt 
+\end{align*}
+
+für jede beliebige Testfunktion $\bm{\eta}$. Somit gilt 
+$\nabla_{\bm{u}} J(\bm{u}) = L_{\bm{u}}^T + \bm{f}_{\bm{u}}^T \bm{p}(t)$. 
+Sei $\bm{u}\in \mathbb{R}^N$ ein endlichdimensionaler Vektor, dann gilt für die Variation von $\bm{u}$:
+%
+\begin{align*}
+    \bm{u}_\epsilon = \bm{u} + \epsilon \bm{h} 
+\end{align*}
+
+da $\bm{h}$ nicht zeitabhängig ist, gilt 
+%
+\begin{align*}
+    D(\bm{u},\bm{h})
+    =
+    \bm{h} \cdot
+    \int_{t_0}^{t_f} 
+    \left(
+        L_{\bm{u}} + \bm{p}^T \bm{f}_{\bm{u}} 
+    \right)
+    \dt 
+    \Rightarrow
+    \nabla_{\bm{u}} J(\bm{u}) =
+    \int_{t_0}^{t_f} 
+    \left(
+        L_{\bm{u}}^T
+        +
+        \bm{f}_{\bm{u}}^T \cdot \bm{p}
+    \right)
+    \dt
+\end{align*}
+%
+Wobei $L_{\bm{u}}^T \in \mathbb{R}^{N \times 1}, \bm{f}_{\bm{u}}^T \in \mathbb{R}^{N \times n_x}$ gilt.
+
+
+\newpage
+
+
+\section{Linearisierung der Dynamik}
+
+Wir gehen analog zu \cite{ICIIECS2017} vor.
+% Arbeitsbereich
+Wir definieren den Zustand 
+$\textbf{x} = 
+\begin{bmatrix}
+    \textbf{q} \\ \dot{\textbf{q}}
+\end{bmatrix}$
+und schreiben unsere Dynamikgleichung wir folgt um 
+% Linearisierung der allgemeinen Dynamik x = [q; q']
+\begin{align*}
+    M(\textbf{q}) \ddot{\textbf{q}} 
+    + C(\textbf{q}, \dot{\textbf{q}}) \dot{\textbf{q}} 
+    + G(\textbf{q}) = \bm{u} 
+    \Rightarrow
+    \underbrace{
+            \begin{bmatrix}
+                \dot{\textbf{q}} \\ \ddot{\textbf{q}}
+            \end{bmatrix}
+    }_{
+        \dot{\textbf{x}}
+    }
+    =
+    \underbrace{
+        \begin{bmatrix}
+            \dot{\textbf{q}} \\
+            M^{-1}(\textbf{q}) 
+            \left[ 
+                \bm{u} - C(\textbf{q}, \dot{\textbf{q}}) \dot{\textbf{q}} - G(\textbf{q}) 
+                \right]
+        \end{bmatrix}
+    }_{
+        f(\textbf{x}, \bm{u})
+    }
+\end{align*}
+
+Wir linearisieren um den Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$
+% Linearisierung x' = f(x,u) approx f(x*,u*) + df/dx (x-x*) + df/du (u-u*)
+\begin{align*}
+    \dot{\bm{x}} 
+    &= f(\bm{x},\bm{u}) \\
+    &\approx \underbrace{f(\bm{x}^*,\bm{u}^*)}_{= 0} + 
+    \underbrace{\frac{\partial f}{\partial x}(\bm{x}^*,\bm{u}^*)}_{A(\bm{x}^*,\bm{u}^*)}(\bm{x}-\bm{x}^*) 
+    + \underbrace{\frac{\partial f}{\partial u}(\bm{x}^*,\bm{u}^*)}_{B(\bm{x}^*,\bm{u}^*)}(\bm{u}-\bm{u}^*) 
+    \\
+    &= A(\bm{x}^*,\bm{u}^*) \bar{\bm{x}} + B(\bm{x}^*,\bm{u}^*) \bar{\bm{u}}
+\end{align*}
+
+Wobei $\bar{\bm{x}}(t) = \bm{x}(t) -\bm{x}^*$ und $\bar{\bm{u}}(t) = \bm{u}(t)-\bm{u}^*$ gilt. 
+Für die Ableitung der Größen gilt
+% Ableitung der Abweichung
+\begin{align*}
+    \frac{\mathrm{d} \bar{\bm{x}}}{\dt}
+    = \dot{\bm{x}} - \underbrace{\frac{\mathrm{d} \bm{x}^*}{\dt}}_{= 0} 
+    = \dot{\bm{x}}(t) 
+    \Rightarrow 
+    \bar{\bm{x}}(t) = A \bar{\bm{x}}(t) + B \bar{\bm{u}}(t)
+\end{align*}
+
+Somit ist die Rückführung von $\bar{\bm{x}}$ auf $\bm{0}$ 
+äquivalten zu der Rückführung von $\bm{x}$ auf den Arbeitspunkt $\bm{x}^*$.
+Wir definieren 
+$h(\bm{q} , \dot{\bm{q}}, \bm{u}):= \bm{u} - C(\bm{q},\dot{\bm{q}}) \dot{\bm{q}} - G(\bm{q})$.
+und wenden die Produktregel auf den Term $M(\bm{q}) \ddot{\bm{q}}$ an, um die Ableitung von $f$ nach $\bm{x}$ zu bestimmen.
+% D(M q'') = DM q'' + M D(q'') = Dh
+\begin{align*}
+    \frac{\partial}{\partial \bm{x}} 
+    \left[ 
+        \vphantom{\int}
+        M(\bm{q}) \ddot{\bm{q}}
+    \right] 
+    &= 
+    \frac{\partial}{\partial \bm{x}} 
+    \left[
+        \vphantom{\int}
+        h(\bm{q}, \dot{\bm{q}}, \bm{u})
+    \right]
+    \Rightarrow
+    \frac{\partial M}{\partial \bm{x}} \ddot{\bm{q}} 
+    + M(\bm{q}) \frac{\partial \ddot{\bm{q}}}{\partial \bm{x}} 
+    = 
+    \frac{\partial h}{\partial \bm{x}}
+\end{align*}
+
+Werten wir $h$ im Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$ aus, 
+so gilt $\ddot{\bm{q}} = \dot{\bm{q}} = \bm{0}$, 
+somit fällt der erste Term weg und wir erhalten
+% Am Gleichgewichtspunkt q'' = 0
+\begin{align*}
+    \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
+    &=
+    \underbrace{
+        \frac{\partial M}{\partial \bm{x}} \ddot{\bm{q}} 
+        }_{=0}
+    + M(\bm{x}^*) \frac{\partial \ddot{\bm{q}}}{\partial \bm{x}}  
+    \Rightarrow
+    \frac{\partial \ddot{\bm{q}}}{\partial \bm{x}} 
+    = 
+    M^{-1}(\bm{q}^*) \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
+\end{align*}
+
+Für die Ableitung der Funktion $h = \bm{u} - C(\bm{q}, \dot{\bm{q}}) \dot{\bm{q}} - G(\bm{q})$ in ($\bm{x}^*, \bm{u}^*$) gilt
+% Ableitung von h nach x    
+\begin{align*}
+    \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
+    =
+    \begin{bmatrix}
+        \frac{\partial h}{\partial \bm{q}} & \frac{\partial h}{\partial \dot{\bm{q}}}
+    \end{bmatrix}
+    &=
+    \begin{bmatrix}
+        -\frac{\partial C}{\partial \bm{q}} \dot{\bm{q}} - \frac{\partial G}{\partial \bm{q}} & -C(\bm{q}, \dot{\bm{q}}) - \frac{\partial C}{\partial \dot{\bm{q}}} \dot{\bm{q}} \\
+    \end{bmatrix}
+    (\bm{q}^*, \dot{\bm{q}}^* = \bm{0}) \\
+    &=
+    \begin{bmatrix}
+        -\frac{\partial G}{\partial \bm{q}} & -C(\bm{q}^*, \bm{0})
+    \end{bmatrix}
+\end{align*}
+
+Fassen wir die Ergebnisse zusammen, so gilt für die Ableitung von $f$ nach $\bm{x}$ im Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$
+% Ableitung von f nach x    
+\begin{align*}
+    A(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        \frac{\partial \dot{\bm{q}}}{\partial \bm{q}} 
+        & \frac{\partial \dot{\bm{q}}}{\partial \dot{\bm{q}}} \\[6pt]
+        \frac{\partial \ddot{\bm{q}}}{\partial \bm{q}} 
+        & \frac{\partial \ddot{\bm{q}}}{\partial \dot{\bm{q}}}
+    \end{bmatrix}
+    (\bm{x}^*, \bm{u}^*) 
+    =
+    \begin{bmatrix}
+        0 & I \\
+        M^{-1}(\bm{q}^*) 
+        \left[
+            -\frac{\partial G}{\partial \bm{q}}(\bm{q}^*) 
+        \right]
+        & 
+        M^{-1}(\bm{q}^*) 
+        \left[
+            -C(\bm{q}^*,\bm{0})
+        \right]
+    \end{bmatrix}   
+\end{align*}
+
+Für die Ableitung von $f$ nach $\bm{u}$ gilt
+% Ableitung von f nach u
+\begin{align*}
+    B(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        \frac{\partial \dot{\bm{q}}}{\partial \bm{u}} \\[6pt]
+        \frac{\partial \ddot{\bm{q}}}{\partial \bm{u}}
+    \end{bmatrix}
+    (\bm{x}^*, \bm{u}^*) 
+    =
+    \begin{bmatrix}
+        0 \\[6pt]
+        M^{-1}(\bm{q}^*)
+    \end{bmatrix}
+\end{align*}
+
+% Satz mit den Blockmatrizen
+%----------------------------------------------------------------------------------------------
+\begin{satz}
+    Gegeben sei die Dynamikgleichung
+    %
+    \begin{align*}
+        M(\bm{q}) \ddot{\bm{q}} 
+        + C(\bm{q}, \dot{\bm{q}}) \dot{\bm{q}} 
+        + G(\bm{q}) = \bm{u}
+        \Rightarrow
+        \dot{\bm{x}} = f(\bm{x}, \bm{u})
+    \end{align*}
+    und ein Arbeitspunkt $(\bm{x}^*, \bm{u}^*)$ mit $f(\bm{x}^*, \bm{u}^*) = \bm{0}$. 
+    Dann gilt für die Linearisierung:
+    %
+    \begin{align*}
+        \dot{\bm{x}}
+        &=
+        A(\bm{x}^*, \bm{u}^*) \bm{x} + B(\bm{x}^*, \bm{u}^*) \bm{u} \\
+        &=
+        \begin{bmatrix}
+            0 & I \\
+            M^{-1}(\bm{q}^*) 
+            \left[
+                -\frac{\partial G}{\partial \bm{q}}(\bm{q}^*) 
+            \right]
+            & 
+            M^{-1}(\bm{q}^*) 
+            \left[
+                -C(\bm{q}^*,\bm{0})
+            \right]
+        \end{bmatrix} 
+        \bm{x} +
+        \begin{bmatrix}
+            0 \\[6pt]
+            M^{-1}(\bm{q}^*)
+        \end{bmatrix}
+        \bm{u}
+    \end{align*}
+\end{satz}
+% (M^-1 h)_1 = (M^-1)_{11} h_1 + (M^{-1})_{12} h_2
+% (M^-1 h)_2 = (M^{-1})_{21} h_1 + (M^{-1})_{22} h_2
+
+\subsection{Linearisierung des two link revolute manipulators}
+
+Wir definieren  $x_1 = q_1$, $x_2 = q_2$, $x_3 = \dot{q_1}$, $x_4 = \dot{q_2}$  
+und erhalten $\dot{\bm{x}} = f(\bm{x},\bm{u})$ mit
+% Hier f genau definieren
+\begin{align*}
+    \begin{bmatrix}
+        f_1(\bm{x},\bm{u})  \\
+        f_2(\bm{x},\bm{u}) 
+    \end{bmatrix} 
+    =
+    \begin{bmatrix}
+        \dot{q}_1 \\
+        \dot{q}_2
+    \end{bmatrix}
+    \quad
+    \begin{bmatrix}
+        f_3(\bm{x},\bm{u}) \\
+        f_4(\bm{x},\bm{u}) 
+    \end{bmatrix}
+    =
+    M(\bm{q})^{-1}
+    \left[ 
+        \bm{u} - C(\bm{x}) 
+        \dot{\bm{q}}
+        - G(\bm{q}) 
+    \right]
+\end{align*}
+
+Für die Corioliskraft im Punkt $(\bm{x}^*,\bm{u}^*)$, 
+bzw. für die Matrix $C(\bm{q}, \dot{\bm{q}}= \bm{0})$ gilt:
+%
+\begin{align*}
+    C(\bm{q}^*, \bm{0}) 
+    =
+    \begin{bmatrix}
+        0 & -m_2 l_1 a_2 \sin(q_2^*) \cdot 0 \\
+        m_2 l_1 a_2 \sin(q_2^*) \cdot 0 & 0
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        0 & 0 \\
+        0 & 0
+    \end{bmatrix}
+\end{align*}
+
+Wir berechnen zunächst die Ableitung von $h$ bzgl. $\bm{x}$ im Punkt $(\bm{x}^*, \bm{u}^*)$ 
+und erhalten
+% Ableitung von h nach x
+% h_x = [h_q \\ h_q']
+\begin{align*}
+    \frac{\partial h}{\partial \bm{x}}(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        - \frac{\partial G}{\partial \bm{q}} & - \underbrace{C(\bm{q}^*, \bm{0})}_{= \bm{0}}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        - \frac{\partial G_1}{\partial q_1}(\bm{q}^*) 
+        & - \frac{\partial G_1}{\partial q_2}(\bm{q}^*) 
+        & 0 & 0 \\
+        - \frac{\partial G_2}{\partial q_1}(\bm{q}^*) 
+        & - \frac{\partial G_2}{\partial q_2}(\bm{q}^*) 
+        & 0 & 0
+    \end{bmatrix}
+\end{align*}
+
+Für die konkrete Matrix $A = f_{\bm{x}}(\bm{x}^*, \bm{u}^*)$ gilt
+% Matrix A
+\begin{align*}
+    A(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        \frac{\partial f_1}{\partial x_1}  
+        & \frac{\partial f_1}{\partial x_2}  
+        & \frac{\partial f_1}{\partial x_3}  
+        & \frac{\partial f_1}{\partial x_4} 
+        \\ \frac{\partial f_2}{\partial x_1} 
+        & \frac{\partial f_2}{\partial x_2} 
+        & \frac{\partial f_2}{\partial x_3} 
+        & \frac{\partial f_2}{\partial x_4} 
+        \\ \frac{\partial f_3}{\partial x_1} 
+        & \frac{\partial f_3}{\partial x_2} 
+        & \frac{\partial f_3}{\partial x_3} 
+        & \frac{\partial f_3}{\partial x_4} 
+        \\ \frac{\partial f_4}{\partial x_1} 
+        & \frac{\partial f_4}{\partial x_2} 
+        & \frac{\partial f_4}{\partial x_3} 
+        & \frac{\partial f_4}{\partial x_4}
+    \end{bmatrix}(\bm{x}^*, \bm{u}^*) 
+    =  
+    \begin{bmatrix}
+        \begin{matrix}
+            0 & 0 \\
+            0 & 0
+        \end{matrix}
+        &
+        \begin{matrix}
+            1 & 0 \\
+            0 & 1
+        \end{matrix}
+        \\[12pt]
+        - M^{-1}(\bm{q}^*) \frac{\partial G}{\partial \bm{q}}(\bm{q}^*)
+        &
+        \begin{matrix}
+            0 & 0 \\
+            0 & 0
+        \end{matrix}
+    \end{bmatrix}
+\end{align*}
+
+Für die konkrete Matrix $B = f_{\bm{u}}(\bm{x}^*, \bm{u}^*)$ gilt
+% Matrix B
+\begin{align*}
+    B(\bm{x}^*, \bm{u}^*)
+    &=
+    \begin{bmatrix}
+        \frac{\partial f_1}{\partial u_1}  
+        & \frac{\partial f_1}{\partial u_2}  
+        \\ \frac{\partial f_2}{\partial u_1} 
+        & \frac{\partial f_2}{\partial u_2} 
+        \\ \frac{\partial f_3}{\partial u_1} 
+        & \frac{\partial f_3}{\partial u_2} 
+        \\ \frac{\partial f_4}{\partial u_1} 
+        & \frac{\partial f_4}{\partial u_2} 
+    \end{bmatrix}(\bm{x}^*, \bm{u}^*) 
+    =  
+    \begin{bmatrix}
+        \begin{matrix}
+            0 & 0 \\
+            0 & 0
+        \end{matrix}
+        \\[12pt]
+        M^{-1}(\bm{q}^*)
+    \end{bmatrix}   
+\end{align*}
+
+Für die konkret Berechnung der partiellen Ableitungen der Gravitationskraft gilt
+% Ableitung der Gravitationskraft
+\begin{align*}
+    G(\bm{q}) &=
+    \begin{bmatrix}
+        m_1  g  a_1 \cos(\gruen{q_1}) + m_2  g \left( l_1 \cos(\gruen{q_1}) 
+        + a_2 \cos(\gruen{q_1} + \dunkelrot{q_2}) \right) \\
+        m_2  g \left( l_1 \cos(\gruen{q_1}) + a_2 \cos(\gruen{q_1} + \dunkelrot{q_2}) \right)
+    \end{bmatrix}
+    \\
+    \frac{\partial G}{\partial \bm{q}}
+    &=
+    \begin{bmatrix}
+        \frac{\partial G_1}{\partial q_1}
+        & \frac{\partial G_1}{\partial q_2} \\
+        \frac{\partial G_2}{\partial q_1}
+        & \frac{\partial G_2}{\partial q_2}
+    \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+        - m_1 g a_1 \sin(\gruen{q_1}) 
+        - m_2 g \left( l_1 \sin(\gruen{q_1}) + a_2 \sin(\gruen{q_1} + \dunkelrot{q_2}) \right)
+        & - m_2 g a_2 \sin(\gruen{q_1} + \dunkelrot{q_2}) \\
+        - m_2 g \left( l_1 \sin(\gruen{q_1}) + a_2 \sin(\gruen{q_1} + \dunkelrot{q_2}) \right)
+        & - m_2 g a_2 \sin(\gruen{q_1} + \dunkelrot{q_2})
+    \end{bmatrix}
+\end{align*}
+
+Die Massenmatrix $M(\bm{q})$ ist gegeben durch den Ausdruck:
+% Massenmatrix M^-1
+\begin{align*}
+    M(\bm{q})
+    =
+    \begin{bmatrix}
+        m_1 a_1^2 + I_{1,zz} + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{q_{2}}) ) + I_{2,zz}
+        &  m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{q_{2}})) + I_{2,zz} \\
+        m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{q_{2}})) + I_{2,zz}
+        & m_2 a_2^2 + I_{2,zz}
+    \end{bmatrix}
+\end{align*}
+
+
+Für die Inverse der Massenmatrix $M^{-1}$ gilt analytisch 
+mittels $F_{\dunkelrot{q_2}} := m_2 l_1 a_2 \cos(\dunkelrot{q_{2}})$
+
+\begin{align*}
+    \det(M) &= M_{11} M_{22} - M_{12}^2 \\
+            &= \left[ m_1 a_1^2 + I_{1,zz} + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  
+            \cos(\dunkelrot{q_{2}}) ) + I_{2,zz} \right]
+             \cdot (m_2 a_2^2 + I_{2,zz}) \\
+            &\quad - (m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{q_{2}})) + I_{2,zz})^2 \\
+            &= 
+            \left[
+            m_1 a_1^2 + I_{1,zz} + I_{2,zz} + m_2 l_1^2 +m_2 a_2^2 + 
+            2 \underbrace{m_2 l_1 a_2  
+            \cos(\dunkelrot{q_{2}})}_{F_{\dunkelrot{q_{2}}}} 
+            \right] 
+            (m_2 a_2^2 + I_{2,zz}) \\ 
+            &\quad
+            - (m_2 a_2^2 + I_{2,zz})^2
+            - 2 \underbrace{m_2 l_1 a_2 \cos(\dunkelrot{q_{2}})}_{F_{\dunkelrot{q_{2}}}}
+            \cdot (m_2 a_2^2 + I_{2,zz})
+            - F_{\dunkelrot{q_{2}}}^2 \\
+            &= 
+            (m_2 a_2^2 + I_{2,zz}) \cdot 
+            \left[
+                m_1 a_1^2 + I_{1,zz} + m_2 l_1^2 +
+                \underbrace{I_{2,zz}  + m_2 a_2^2 - m_2 a_2^2 - I_{2,zz}}_{= 0}
+            \right]
+            - \underbrace{
+                (m_2 l_1 a_2 )^2 (1- \sin(\dunkelrot{q_{2}})^2)
+                }_{F_{\dunkelrot{q_{2}}}^2}
+            \\
+            &= 
+            (m_2 a_2^2 + I_{2,zz}) \cdot (m_1 a_1^2 + I_1 + m_2 l_1^2)
+            - (m_2 l_1 a_2 )^2 + (m_2 l_1 a_2 )^2 \sin(\dunkelrot{q_{2}})^2
+            \\
+            &= (m_2 a_2^2 + I_{2,zz}) \cdot (m_1 a_1^2 + I_1) 
+            + \underbrace{
+                (m_2 a_2^2 + I_{2,zz}) \cdot m_2 l_1^2
+            }_{m_2^2 l_1^2 a_2^2+ m_2 l_1^2 I_{2,zz}}
+            - (m_2 l_1 a_2 )^2 + (m_2 l_1 a_2 )^2 \sin(\dunkelrot{q_{2}})^2
+            \\
+            &= (m_1 a_1^2 + I_1 + m_2 l_1^2)
+            \cdot (m_2 a_2^2 + I_2) 
+            + m_2 l_1^2 I_{2,zz}
+            + m_2^2 l_1^2 a_2^2  \sin(\dunkelrot{q_{2}})^2
+\end{align*}
+
+Für die Inverse der Massenmatrix gilt somit
+\begin{align*}
+    M^{-1} &= \frac{1}{\det(M)} 
+    \begin{pmatrix}
+        M_{22} & -M_{12} \\
+        -M_{21} & M_{11}
+    \end{pmatrix} \\
+    &= \frac{1}{\det(M)} 
+    \begin{pmatrix}
+        m_2 a_2^2 + I_2 & - (m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{x_{2}})) + I_2) \\
+        - (m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{x_{2}})) + I_2) & m_1 a_1^2 + I_1 + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{x_{2}}) ) + I_2 
+    \end{pmatrix}
+\end{align*}
+
+\begin{align*}
+    M_{11} &= m_1 a_1^2 + I_1 + m_2 \cdot (l_1^2 +a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{x_{2}}) ) + I_2 \\
+    M_{12} &= m_2 \cdot (a_2^2 +  l_1 a_2  \cos(\dunkelrot{x_{2}})) + I_2 \\
+    M_{21} &= M_{12} \\
+    M_{22} &= m_2 a_2^2 + I_2
+\end{align*}
+%----------------------------------------------------------------------------------------------
+
+
+
+\usetikzlibrary{positioning}
+\begin{tikzpicture}[>=latex]
+    \node[draw= boxframe,anchor = north west ,align=left] (a) at (-2,0) {
+        Ursprungsproblem:\\
+        $\begin{aligned}
+            \min_u & \int_0^\infty 
+            (\bm{q} - \bm{q}_f)^T Q (\bm{q} - \bm{q}_f) 
+            + (\bm{u} - \bm{u}_f)^T R (\bm{u} - \bm{u}_f) \dt \\
+            	\textsf{s.t. } & M(\bm{q}) \ddot{\bm{q}} 
+                + C(\bm{q},\dot{\bm{q}}) \dot{\bm{q}} 
+                + G(\bm{q}) = \bm{u};
+                \quad
+                \bm{u}_f - G(\bm{q}_f) = \bm{0} 
+        \end{aligned}$
+    };
+    \node[draw = rot, anchor = north west, align=left] (b) at ([xshift=1cm]a.north east) {
+        Berechnung von $M^{-1}(\bm{q}_f)$ und $\frac{\partial G}{\partial \bm{q}}(\bm{q}_f)$: \\
+        %
+        $\begin{aligned}
+            A &= 
+            \begin{bmatrix}
+                \bm{0}_2 & I_2 \\
+                M^{-1} \frac{\partial G}{\partial \bm{q}}
+                & 
+                \bm{0}_2
+            \end{bmatrix}, \quad
+            B &=
+            \begin{bmatrix}
+                \bm{0} \\
+                M^{-1}
+            \end{bmatrix}
+        \end{aligned}$
+    };
+    \node[draw = rot, below=of b, align=center] (c) {
+        LQR mit $\bar{\bm{x}} = \bm{x} - \bm{x}_f, \bar{\bm{u}} = \bm{u} - \bm{u}_f$ \\
+
+        $\begin{aligned}
+            \min_{\bar{\bm{u}}} & \int_0^\infty 
+            \bar{\bm{x}}^T Q \bar{\bm{x}} + \bar{\bm{u}}^T R \bar{\bm{u}} \dt 
+            \quad\dot{\bar{\bm{x}}} = A \bar{\bm{x}} + B \bar{\bm{u}};
+        \end{aligned}$ \\
+        Lösung der Riccati-Gleichung für $K \in \mathbb{R}^{2 \times 2}$ \\
+        $\begin{aligned}
+            Q - K B R^{-1} B^T K + KA + A^T K &= 0 
+        \end{aligned}$
+        };
+    \node[draw = rot, below=of c, align=center] (d) {Closed-Loop Regelung:\\
+        $\begin{aligned}
+            \bm{u} 
+            = \bm{u}_f + \bar{\bm{u}} 
+            = G(\bm{q}_f) -R^{-1} B^T K (\bm{x} - \bm{x}_f)
+        \end{aligned}$
+        };
+    \node[draw = boxframe, anchor=south, align=left] (e) at ([yshift=-6cm]a.south) {
+        Lösung Originalsystem \\
+        $\begin{aligned}
+            \bm{x}_0 &= \bm{x}(0) \\
+            \bm{u}_i &= G(\bm{q}_f) - R^{-1} B^T K (\bm{x}_i - \bm{x}_f) \\
+            \bm{x}_{i+1} &= \bm{x}_i + h \cdot f(\bm{x}_i, \bm{u}_i)  
+        \end{aligned}$
+        };
+
+    \draw[->, color = boxframe] (a) -- (b);
+    \draw[->, color = boxframe] (b) -- (c);
+    \draw[->, color = boxframe] (c) -- (d);
+    \draw[->, color = boxframe] (d.west) -- ++(-2.45cm,0cm);
+    \draw[->, color = gruen] (a) -- (e);
+\end{tikzpicture}
+
+\subsection{Riccati Regler}
+
+Es gilt 
+%
+\begin{align*}
+    F(K) := Q - KPK + KA + A^T K \Rightarrow F(K) = 0
+\end{align*}
+
+% Wichtige Grundbegriffe aus LA
+%----------------------------------------------------------------------------
+\begin{definition}
+    Sei $X \in \mathbb{R}^{n \times n}$ dann definieren wir 
+    %
+    \begin{align*}
+    \textsf{vec}(X) = 
+    \begin{pmatrix}
+    X_{11} & X_{21} & \cdots & X_{n1} & X_{12} & X_{22} & \cdots X_{nn}  
+    \end{pmatrix}^T 
+    \in 
+    \mathbb{R}^{n^2}
+    \end{align*}
+    %
+    Seien $A \in \mathbb{R}^{n \times m}, B \in \mathbb{R}^{p \times r}$, dann definieren wir 
+    %
+    \begin{align*}
+    A \otimes B =
+    \begin{pmatrix}
+    A_{11} B 	& \cdots 	& A_{1m} B 	\\
+    A_{12} B 	& \hdots 	& A_{2m} B	\\
+    \vdots		& \ddots	& \vdots	\\
+    A_{n1} B	& \cdots	& A_{nm} B
+    \end{pmatrix}
+    \in 
+    \mathbb{R}^{mp \times nr}
+    \end{align*}
+\end{definition}
+%----------------------------------------------------------------------------
+
+Es gilt die Formel
+%
+\begin{align*}
+    \textsf{vec}(MXN) = (N^T \otimes M) \textsf{vec}(X)  
+\end{align*}
+
+Betrachten wir den Fall $M= 1$ und $N=A$ bzw. $N = 1$ und $M=A^T$ erhalten wir mit $X=K$ 
+%
+\begin{align*}
+    \textsf{vec}(KA)= (A^T \otimes 1) \textsf{vec}(K) \quad \textsf{vec}(A^T K) = (1 \otimes A^T) \textsf{vec}(K)
+\end{align*}
+
+Anwendung auf unser Problem liefert
+%
+\begin{align*}
+    \underbrace{
+        \textsf{vec}(F(K))
+    }_{
+        f(x = \textsf{vec}(K))
+    } 
+    = 
+    \underbrace{
+        \textsf{vec}(Q)
+    }_{q} 
+    - 
+    \underbrace{
+        \textsf{vec}(KPK)
+    }_{
+        g(x = \textsf{vec}(K))
+    } 
+    + 
+    \underbrace{
+        \textsf{vec}(KA)
+    }_{
+        (A^T \otimes 1) \textsf{vec}(K)
+    } 
+    + 
+    \underbrace{
+        \textsf{vec}(A^T K)
+    }_{
+        (1 \otimes A^T) \textsf{vec}(K)
+    }
+\end{align*}
+
+Durch Einführung von $x = \textsf{vec}(K) \in \mathbb{R}^{n^2}$ erhalten wir 
+%
+\begin{align*}
+    f(x) = q - g(x)+ (A^T \otimes 1)x + (1 \otimes A^T)x
+\end{align*}
+
+Da $(KP)^T = KP$ gilt 
+% 
+\begin{align*}
+    g(\textsf{vec}(K)) = \textsf{vec}(KPK) = (1 \otimes KP) \textsf{vec}(K) 
+\end{align*}
+
+
+
+Wir betrachten die Variation $K(\epsilon) = K + \epsilon \cdot \bar{K}$ und die Funktion $h:\mathbb{R} \to \mathbb{R}^{n^2}$ mit
+%
+\begin{align*}
+    h(\epsilon) 
+    := g(\textsf{vec}(K(\epsilon))) 
+    &= \textsf{vec}(K(\epsilon) P K(\epsilon)) \\
+    &= \textsf{vec}((K + \epsilon \cdot \bar{K}) P (K + \epsilon \cdot \bar{K})) \\
+    &= \textsf{vec}(KPK + \epsilon KP \bar{K} + \epsilon \bar{K} PK + \epsilon^2 \bar{K} P \bar{K})
+\end{align*}
+
+Ableitung nach $\epsilon$ und Auswertung in $\epsilon = 0$ ergibt
+%
+\begin{align*}
+    h'(0) 
+    = \frac{d}{d\epsilon} g(\textsf{vec}(K + \epsilon \bar{K})) \bigg|_{\epsilon = 0} 
+    = \textsf{vec}(KP\bar{K} + \bar{K}PK)
+    = \textsf{vec}(KP\bar{K}) + \textsf{vec}(\bar{K}PK)
+\end{align*}
+
+Umschreiben als Matrix-Vektor-Produkt
+%
+\begin{align*}
+    \textsf{vec}(KP \cdot \bar{K} \cdot 1) = (1 \otimes KP) \textsf{vec}(\bar{K}) \quad \textsf{vec}(1 \cdot \bar{K} \cdot PK) = ((PK)^T \otimes 1) \textsf{vec}(\bar{K})
+\end{align*}
+
+Wir erhalten als Ableitung 
+%
+\begin{align*}
+    g'(x) = (1 \otimes KP) + ((PK)^T \otimes 1) \Rightarrow f'(x) = - (1 \otimes KP) - ((PK)^T \otimes 1) + (A^T \otimes 1) + (1 \otimes A^T)
+\end{align*}
+
+\newpage
+
+% Hier mal allgemein Ulbrich Brüder Gradientenverfahren zitieren, dann Gerdts für optimale Steuerung 
+% und dann direkter Bezug zum RL und ML 
+
+
+\section{Gradientenverfahren}
+
+
+\subsection{Gradientenverfahren für den two link revolute Manipulator}
+
+Wir betrachten das Steuerungsproblem 
+%
+\begin{align*}
+    \min_{\bm{u}} &\int_{t_0}^{t_f} L(\bm{x},\bm{u}) \dt + \Phi(\bm{x}(t_f)) \\
+    L(\bm{x},\bm{u}) 
+    &= 
+    (\bm{u} - \bm{u}_f)^T \cdot R \cdot (\bm{u} - \bm{u}_f) \\ 
+    \Phi(\bm{x}(t_f)) &= (\bm{q}(t_f) - \bm{q}_f)^T \cdot Q \cdot (\bm{q}(t_f) - \bm{q}_f) \\
+    \dot{\bm{x}} &= f(\bm{x},\bm{u}) =  
+    \begin{bmatrix}
+        \dot{\bm{q}} \\
+        M^{-1}(\bm{q}) \cdot ( - C(\bm{q},\dot{\bm{q}}) \cdot \dot{\bm{q}} - G(\bm{q}) + \bm{u} )
+    \end{bmatrix}
+    \\
+    \bm{x} 
+    &=
+    \begin{bmatrix}
+        \bm{q} \\
+        \dot{\bm{q}}
+    \end{bmatrix}
+    \quad
+    \bm{x}(t_0) =
+    \begin{bmatrix}
+        \bm{q}(t_0) \\
+        \dot{\bm{q}}(t_0)
+    \end{bmatrix}
+\end{align*}
+
+Für die adjungierte Gleichung gilt
+%
+\begin{align*}
+    \dot{\bm{p}} = - H_{\bm{x}} 
+    =
+    -
+    \begin{bmatrix}
+        \frac{\partial H}{\partial \bm{q}} \\[6pt]
+        \frac{\partial H}{\partial \dot{\bm{q}}}
+    \end{bmatrix},
+    \quad
+    \bm{p}(t_f) = \Phi_{\bm{x}}(\bm{x}(t_f))
+    = \begin{bmatrix}
+        2 Q (\bm{q}(t_f) - \bm{q}_f) \\
+        \bm{0}
+    \end{bmatrix}
+    \quad
+    H[t] = L(\bm{u}) + \bm{p}^T \cdot f(\bm{x},\bm{u})
+\end{align*}
+
+Für den Gradienten gilt
+%
+\begin{align*}
+    \nabla J(\bm{u}) 
+    &= 
+    \frac{\partial H}{\partial \bm{u}}
+    =
+    2 R \cdot (\bm{u} - \bm{u}_f) +
+    \frac{\partial f}{\partial \bm{u}}^T \cdot \bm{p} 
+\end{align*} 
+
+Wir nutzen die spezielle Struktur unseres Problems
+%
+\begin{align*}
+    \frac{\partial f}{\partial \bm{u}}
+    =
+    \begin{bmatrix}
+        \bm{0}_2 \\
+        M^{-1}(\bm{q})
+    \end{bmatrix}
+    \Rightarrow
+    \frac{\partial f}{\partial \bm{u}}^T \cdot
+    \begin{bmatrix}
+        \bm{p}_{\bm{q}} \\
+        \bm{p}_{\dot{\bm{q}}}
+    \end{bmatrix}
+    =
+    M^{-1}(\bm{q}) \cdot \bm{p}_{\dot{\bm{q}}}
+    \Rightarrow
+    \nabla J(\bm{u})
+    =
+    2 R \cdot (\bm{u} - \bm{u}_f) + M^{-1}(\bm{q}) \cdot \bm{p}_{\dot{\bm{q}}}
+\end{align*}
+ 
+% Hier konkrerte Schritte des Algorithmus
+\begin{itemize}
+    \item[1)] Foward Integration der State Equation: $\dot{\bm{x}}=f(\bm{x},\bm{u})$
+    %
+    \begin{align*}
+        \bm{x}_0 &= \bm{x}(t_0) \\
+        \bm{x}_{i+1} 
+        &=
+        \bm{x}_i + h \cdot
+        \begin{bmatrix}
+            \dot{\bm{q}}_i \\
+            M^{-1}(\bm{q}_i) \cdot ( - C(\bm{q}_i,\dot{\bm{q}}_i) \cdot \dot{\bm{q}}_i - G(\bm{q}_i) + \bm{u}_i )
+        \end{bmatrix}
+        \quad i = 0, \ldots, N-1
+    \end{align*}
+    %
+    Abspeichern Array $\bm{X} = [\bm{x}_0, \bm{x}_1, \ldots, \bm{x}_N]$
+    \item[2)] Backward Integration der Adjungierten Gleichung: 
+    $\dot{\bm{p}} = - H_{\bm{x}} = - \frac{\partial f}{\partial \bm{x}}$
+    %
+    \begin{align*}
+        \bm{p}_N 
+        &= \bm{p}(t_f) 
+        = 
+        \begin{bmatrix}
+            2 Q (\bm{q}(t_f) - \bm{q}_f) \\
+            \bm{0}
+        \end{bmatrix} \\
+        \bm{p}_{i-1} 
+        &= \bm{p}_{i} + h  \cdot
+        \begin{bmatrix}
+           \bm{0}_2 & I_2 \\
+            \frac{\partial \ddot{\bm{q}}}{\partial \bm{q}}
+           &
+           \frac{\partial \ddot{\bm{q}}}{\partial \dot{\bm{q}}}
+        \end{bmatrix}
+        \cdot \bm{p}_{i} \\
+        \frac{\partial \ddot{\bm{q}}}{\partial \bm{q}} 
+        &=
+        \frac{\partial}{\partial \bm{q}} 
+        \left( 
+            M^{-1}(\bm{q}_i) \cdot ( - C(\bm{q}_i,\dot{\bm{q}}_i) \cdot \dot{\bm{q}}_i 
+            - G(\bm{q}_i) + \bm{u}_i ) 
+            \right) 
+            \\
+        \frac{\partial \ddot{\bm{q}}}{\partial \bm{q}} &= 
+        \frac{\partial}{\partial \dot{\bm{q}}} \left( 
+            M^{-1}(\bm{q}_i) \cdot ( - C(\bm{q}_i,\dot{\bm{q}}_i) 
+            \cdot \dot{\bm{q}}_i - G(\bm{q}_i) + \bm{u}_i ) 
+            \right)
+    \end{align*}
+    %
+    \begin{itemize}
+        \item[2.1)] Finite Differenzen für $\frac{\partial \ddot{\bm{q}}}{\partial x_j}$ $j=1,2,3,4$
+        %
+        \begin{align*}
+            \bm{x}_{plus}  &= \bm{x} + \epsilon \cdot \bm{e}_j
+            \quad
+            \bm{x}_{minus}  = \bm{x} - \epsilon \cdot \bm{e}_j
+            \\
+            \ddot{\bm{q}}(\bm{x}) 
+            &= M^{-1}(\bm{q}) 
+            \cdot ( - C(\bm{q},\dot{\bm{q}}) \cdot \dot{\bm{q}} - G(\bm{q}) + \bm{u} ) \\
+            \frac{\partial \ddot{\bm{q}}}{\partial x_j}
+            &\approx
+            \frac{\ddot{\bm{q}}(\bm{x}_{plus}) - \ddot{\bm{q}}(\bm{x}_{minus})}{2 \epsilon}
+        \end{align*}
+    \end{itemize}
+    Abspeichern Array $\bm{P} = [\bm{p}_0, \bm{p}_1, \ldots, \bm{p}_N]$
+    \item[3)] Gradientenverfahren 
+    $\bm{u}_{i+1} = \bm{u}_i - \alpha_j \cdot \nabla J(\bm{u}_i)$
+    %   %
+    \begin{align*}
+        \bm{u}_{i+1} &= \bm{u}_i - \alpha_j \cdot 
+        \left[
+            2 R \cdot (\bm{u}_i - \bm{u}_f) + M^{-1}(\bm{q}_i) \cdot \bm{P}_{\dot{\bm{q}},i}
+        \right]
+        \quad i = 0, \ldots, N-1    
+    \end{align*}
+        \begin{itemize}
+            \item[3.1)] Berechnung der Schrittweite $\alpha_j$ über Linesearch
+            %
+            \begin{align*}
+                \alpha_{test} &= \beta^m \cdot \alpha_0 \\
+                \bm{u}_{test} &= \bm{u}_k - \alpha_{test} \cdot \nabla J(\bm{u}_k) \\
+                J_{test} &= J(\bm{u}_{test})  
+                \\
+                \text{IF } J_{test} &\leq J(\bm{u}_k) - c \cdot \alpha_{test} \cdot \|\nabla J(\bm{u}_k)\|^2: \\
+                    \alpha_k &= \alpha_{test} \\
+                    \Rightarrow &\text{Break}
+            \end{align*}
+        \end{itemize}
+\end{itemize}
+
+\newpage
+
+\section{Reinforcement Learning in Optimal Control}
+
+\newpage
+
+%------------------------------------------------------------------------------------------------------------
+
+\printbibliography
+
+\end{document}
