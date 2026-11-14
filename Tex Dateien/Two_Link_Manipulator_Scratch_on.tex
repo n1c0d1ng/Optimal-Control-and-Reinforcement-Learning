@@ -1,0 +1,1344 @@
+\documentclass[a4paper, 12pt]{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\setlength{\parindent}{0em}
+\usepackage{eurosym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{polynom}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{tikz}
+\usepackage[a4paper,portrait,left=1.0cm,right=1.0cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{pgf} % Zur Einbindung der PGF Files
+\usepackage{bm}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}  % pseudocode-Umgebung (\begin{algorithmic}, \State, \For, ...)
+
+
+% Light Mode Customization
+\usepackage{xcolor}
+\pagecolor{white}  % Hintergrund auf Weiß
+\color{black}      % Text auf Schwarz
+
+% Eigene Farben definiert (nun optimiert für hellen Hintergrund)
+\definecolor{rot}{RGB}{204,0,0}
+\definecolor{blau}{RGB}{0,102,204}
+\definecolor{orange}{RGB}{204,85,0}
+\definecolor{gruen}{RGB}{0,153,0}
+\definecolor{dunkelgruen}{RGB}{0,153,0}
+\definecolor{dunkelblau}{RGB}{0,128,128}
+\definecolor{backcolor}{RGB}{235,245,255}
+\definecolor{frontcolor}{RGB}{0,153,0}
+\definecolor{hellblau}{RGB}{180,210,235}
+\definecolor{lila}{RGB}{153,0,153}
+\definecolor{gelb}{RGB}{204,153,0}
+\definecolor{dunkelrot}{RGB}{153,0,51}
+\definecolor{dunkelgelb}{RGB}{153,153,0}
+\definecolor{boxgray}{RGB}{245,245,245}        % Sehr helles Grau für Box-Hintergründe
+\definecolor{boxframe}{RGB}{200,200,200}       % Helles Grau für Box-Rahmen
+
+\usepackage{footnotehyper}
+\BeforeBeginEnvironment{tcolorbox}{\savenotes}
+\AfterEndEnvironment{tcolorbox}{\spewnotes}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newcounter{satzcnt}[section]
+\renewcommand{\thesatzcnt}{\thesection.\arabic{satzcnt}}
+
+\NewDocumentEnvironment{satz}{o}{%
+    \begin{tcolorbox}[
+        enhanced, frame hidden, breakable, sharp corners,
+        colback=white,
+        borderline east={1pt}{0pt}{rot},
+        left=-3pt, right=10pt, top=6pt, bottom=6pt,
+    ]%
+    \refstepcounter{satzcnt}\textbf{Satz~\thesatzcnt\IfValueT{#1}{: #1}.}%
+}{%
+    \end{tcolorbox}%
+}
+
+\NewDocumentEnvironment{definition}{o}{%
+    \begin{tcolorbox}[
+        enhanced, frame hidden, breakable, sharp corners,
+        colback=white,
+        borderline east={1pt}{0pt}{gelb},
+        left=-3pt, right=10pt, top=6pt, bottom=6pt,
+    ]%
+    \refstepcounter{satzcnt}\textbf{Definition~\thesatzcnt\IfValueT{#1}{: #1}.}\quad%
+}{%
+    \end{tcolorbox}%
+}
+
+\NewDocumentEnvironment{beispiel}{o}{%
+    \begin{tcolorbox}[
+        enhanced, frame hidden, breakable, sharp corners,
+        colback=white,
+        borderline east={1pt}{0pt}{lila},
+        left=-3pt, right=10pt, top=6pt, bottom=6pt,
+    ]%
+    \refstepcounter{satzcnt}\textbf{Beispiel~\thesatzcnt\IfValueT{#1}{: #1}.}\quad%
+}{%
+    \end{tcolorbox}%
+}
+
+\NewDocumentEnvironment{bem}{o}{%
+    \begin{tcolorbox}[
+        enhanced, frame hidden, breakable, sharp corners,
+        colback=white,
+        %borderline east={1pt}{0pt}{lila},
+        left=-3pt, right=10pt, top=6pt, bottom=6pt,
+    ]%
+    \refstepcounter{satzcnt}\textbf{Korollar \thesatzcnt\IfValueT{#1}{: #1}.}%\quad%
+}{%
+    \end{tcolorbox}%
+}
+
+\NewDocumentEnvironment{beweis}{}{%
+    \begin{tcolorbox}[
+        enhanced, frame hidden,breakable, sharp corners,
+        colback=white,
+        borderline east={1pt}{0pt}{gruen},
+        left=-3pt, right=10pt, top=6pt, bottom=6pt,
+    ]%
+    \textbf{Beweis:}\quad%
+}{%
+    \hfill$\Box$%
+    \end{tcolorbox}%
+}
+
+
+% Listings für Python
+%\usepackage[german,tworuled]{algorithm2e}
+\usepackage{listings}
+\lstset{
+    commentstyle=\color{gruen},
+    keywordstyle=\color{blau},
+    language=Python,
+    backgroundcolor=\color{boxgray},
+    basicstyle=\ttfamily\color{black},
+    stringstyle=\color{rot},
+    tabsize=2,
+    literate={@}{{@}}1,
+    title=\lstname
+}
+
+% Hyperref Settings
+\usepackage[pdfstartview=Fit,plainpages=false,colorlinks=true,linkcolor=gruen,linktocpage=true,hyperfootnotes=false,bookmarksopen=false]{hyperref}
+
+% Eigene Kommandos
+\newcommand{\e}[1]{\text{e}^{#1}}
+\newcommand{\rot}[2][rot]{\textcolor{#1}{#2}}
+\newcommand{\gruen}[2][gruen]{\textcolor{#1}{#2}}
+\newcommand{\frontcolor}[2][frontcolor]{\textcolor{#1}{#2}}
+\newcommand{\gelb}[2][gelb]{\textcolor{#1}{#2}}
+\newcommand{\orange}[2][orange]{\textcolor{#1}{#2}}
+\newcommand{\blau}[2][blau]{\textcolor{#1}{#2}}
+\newcommand{\hellblau}[2][hellblau]{\textcolor{#1}{#2}}
+\newcommand{\lila}[2][lila]{\textcolor{#1}{#2}}
+\newcommand{\dunkelrot}[2][dunkelrot]{\textcolor{#1}{#2}}
+\newcommand{\dunkelgelb}[2][dunkelgelb]{\textcolor{#1}{#2}}
+
+
+\newcommand{\norm}[1]{\left\lVert#1\right\lVert}
+\newcommand{\dv}{\thinspace \mathsf{d}v}
+\newcommand{\dw}{\thinspace \mathsf{d}w}
+\newcommand{\dx}{\thinspace \mathsf{dx}}
+\newcommand{\dy}{\thinspace \mathsf{d}y}
+\newcommand{\dt}{\thinspace \mathsf{dt}}
+\newcommand{\dr}{\thinspace \mathsf{d}r}
+\newcommand{\ds}{\thinspace \mathsf{ds}}
+\newcommand{\du}{\thinspace \mathsf{du}}
+\newcommand{\dz}{\thinspace \mathsf{d}z}
+\newcommand{\dH}{\thinspace \mathsf{d}H}
+\newcommand{\dS}{\thinspace \mathsf{d}S}
+\newcommand{\dW}{\thinspace \mathsf{d}W}
+\newcommand{\dX}{\thinspace \mathsf{d}X}
+\newcommand{\dY}{\thinspace \mathsf{d}Y}
+\newcommand{\dZ}{\thinspace \mathsf{d}Z}
+\newcommand{\dP}{\thinspace \mathsf{d}P}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{references.bib}
+\definecolor{codebg}{rgb}{0.92,0.92,0.92}
+\definecolor{keywordcolor}{rgb}{0.2,0.2,0.7}
+\definecolor{stringcolor}{rgb}{0.8,0.1,0.1}
+\definecolor{commentcolor}{rgb}{0.4,0.4,0.4}
+
+
+\begin{document}
+
+\section{Mathematische Formulierung}
+
+\begin{satz}%[Standardform]
+    \label{satz:christoffel}
+    Sei $L \in C^2$ aus \ref{satz:ELE} gegeben durch
+    %
+    \begin{align*}
+        L(\bm{q},\bm{\dot{q}}) 
+        = 
+        T(\bm{q},\bm{\dot{q}}) - V(\bm{q})
+        =
+        \frac{1}{2} \bm{\dot{q}}^T M(\bm{q}) \bm{\dot{q}} - V(\bm{q})
+    \end{align*}
+    
+    mit $M \in C^2(\mathbb{R}^n; \mathbb{R}^{n \times n})$ symmetrisch und
+    positiv definit, $V \in C^2(\mathbb{R}^n; \mathbb{R})$. 
+    Dann ist die notwendige Bedingung aus \ref{satz:ELE} äquivalent zu
+    %
+    \begin{align*}
+        M(\bm{q}) \ddot{\bm{q}}
+        +
+        C(\bm{q},\bm{\dot{q}}) \bm{\dot{q}}
+        +
+        G(\bm{q})
+        =
+        \bm{u}(t)
+    \end{align*}
+    mit den \emph{Christoffel-Symbolen}
+    %
+    \begin{align*}
+        \Gamma_{ijk}(\bm{q})
+        &:=
+        \frac{1}{2}
+        \left(
+            \frac{\partial M_{ij}}{\partial q_k}(\bm{q})
+            +
+            \frac{\partial M_{ik}}{\partial q_j}(\bm{q})
+            -
+            \frac{\partial M_{kj}}{\partial q_i}(\bm{q})
+        \right),
+        \\
+        C_{ij}(\bm{q},\bm{\dot{q}})
+        &:=
+        \sum_{k=1}^n \Gamma_{ijk}(\bm{q}) \dot{q}_k,
+        \\
+        G_i(\bm{q})
+        &:=
+        \frac{\partial V}{\partial q_i}(\bm{q}).
+    \end{align*}
+\end{satz}
+
+\begin{beweis}
+    Es gilt $\frac{\partial L}{\partial \bm{\dot{q}}} = \frac{\partial T}{\partial \bm{\dot{q}}}$
+    und wir berechnen die Ableitung von $T$ komponentenweise
+    % dT/dq'
+    \begin{align*}
+        \frac{\partial T}{\partial \dot{q}_i}
+        =
+        \frac{\partial}{\partial \dot{q}_i}
+        \left(
+            \frac{1}{2} 
+            \sum_{j=1}^{n}
+            \sum_{k=1}^{n} \dot{q}_k M_{kj}(\bm{q}) \dot{q}_j
+        \right)
+        =
+        \frac{1}{2} 
+        \sum_{j=1}^{n}
+        \sum_{k=1}^{n} M_{kj}(\bm{q})
+        \cdot 
+        \underbrace{
+            \frac{\partial}{\partial \dot{q}_i} 
+            \left(
+                \dot{q}_k  \dot{q}_j
+            \right)
+        }_{
+            \delta_{ik} \dot{q}_j +  \delta_{ij} \dot{q}_k
+        }
+        =
+        \frac{1}{2} \sum_{j=1}^{n}
+        M_{ij}(\bm{q}) \dot{q}_j 
+        +
+        \frac{1}{2}  
+        \sum_{k=1}^{n} M_{ki}(\bm{q}) \dot{q}_k
+    \end{align*}
+    %
+    Da $M$ symmetrisch ist $M_{ij} = M_{ji}$ gilt mit dem Indexshift $k=j$:
+    %
+    \begin{align*}
+        \frac{\partial T}{\partial \dot{q}_i}
+        =
+        \frac{1}{2} \sum_{j=1}^{n}
+        M_{ij}(\bm{q}) \dot{q}_j 
+        +
+        \frac{1}{2}  
+        \sum_{j=1}^{n} M_{ji}(\bm{q}) \dot{q}_j
+        =
+        \sum_{j=1}^{n} M_{ij}(\bm{q}) \dot{q}_j
+    \end{align*}
+    %
+    Die Zeitableitung ist nach der Produktregel:
+    %
+    \begin{align*}
+        \frac{\mathsf{d}}{\mathsf{d}t}
+        \frac{\partial L}{\partial \dot{q}_i}
+        =
+        \frac{\mathsf{d}}{\mathsf{d}t}
+        \frac{\partial T}{\partial \dot{q}_i}
+        =
+        \sum_{j=1}^{n} M_{ij}(\bm{q}) \ddot{q}_j
+        +
+        \sum_{j=1}^{n}
+        \underbrace{
+            \sum_{k=1}^{n} 
+            \frac{\partial M_{ij}(\bm{q})}{\partial q_k} \cdot \dot{q}_k
+        }_{
+            \frac{\mathsf{d}M_{ij}(\bm{q}(t))}{\mathsf{d}t}
+        }
+        \cdot
+        \dot{q}_j
+    \end{align*}
+    %
+    Weiter ist
+    %
+    \begin{align*}
+        \frac{\partial L}{\partial q_i}
+        =
+        \frac{\partial}{\partial q_i}
+        \left(
+            \frac{1}{2} 
+            \sum_{j=1}^{n}
+            \sum_{k=1}^{n} \dot{q}_k M_{kj}(\bm{q}) \dot{q}_j
+        \right)
+        -
+        \frac{\partial V(\bm{q})}{\partial q_i}
+        =
+        \frac{1}{2} 
+        \sum_{j=1}^{n}
+        \sum_{k=1}^{n} 
+        \frac{\partial M_{kj}(\bm{q})}{\partial q_i} 
+        \dot{q}_k 
+        \dot{q}_j
+        -
+        \frac{\partial V(\bm{q})}{\partial q_i}.
+    \end{align*}
+
+    Eingesetzt in Gleichung (\ref{eq:ELE_control})
+    %
+    \begin{align*}
+        \sum_{j=1}^n M_{ij}(\bm{q}) \ddot{q}_j
+        +
+        \sum_{j=1}^{n}
+        \sum_{k=1}^{n} 
+        \left(
+            \frac{\partial M_{ij}(\bm{q})}{\partial q_k} 
+            -
+            \frac{1}{2} 
+            \cdot 
+            \frac{\partial M_{kj}(\bm{q})}{\partial q_i} 
+        \right)
+        \cdot \dot{q}_k \cdot \dot{q}_j
+        +
+        \frac{\partial V(\bm{q})}{\partial q_i}
+        =
+        u_i.
+    \end{align*}
+
+    Wir schreiben den Term um:
+    %
+    \begin{align*}
+        \frac{1}{2}
+        \sum_{j=1}^{n}
+        \sum_{k=1}^{n} 
+        \frac{\partial M_{ij}(\bm{q})}{\partial q_k} 
+        \cdot \dot{q}_k \cdot \dot{q}_j
+        =
+        \frac{1}{2}
+        \sum_{j=1}^{n}
+        \sum_{k=1}^{n} 
+        \frac{\partial M_{ik}(\bm{q})}{\partial q_j} 
+        \cdot \dot{q}_j \cdot \dot{q}_k
+    \end{align*}
+    %
+    und erhalten abschließend:
+    %
+    \begin{align*}
+        \sum_{j=1}^n M_{ij}(\bm{q}) \ddot{q}_j
+        +
+        \sum_{j=1}^{n}
+        \underbrace{
+            \sum_{k=1}^{n} 
+            \underbrace{
+                \frac{1}{2} 
+                \left(
+                    \frac{\partial M_{ij}(\bm{q})}{\partial q_k} 
+                    +
+                    \frac{\partial M_{ik}(\bm{q})}{\partial q_j}
+                    -
+                    \frac{\partial M_{kj}(\bm{q})}{\partial q_i} 
+                \right)
+            }_{
+                =: \Gamma_{ijk}(\bm{q})
+            }
+            \cdot \dot{q}_k 
+        }_{
+            C_{ij}(\bm{q},\bm{\dot{q}}) 
+        }
+        \cdot \dot{q}_j
+        +
+        \underbrace{
+            \frac{\partial V(\bm{q})}{\partial q_i}
+        }_{
+            G_i(\bm{q})
+        }
+        =
+        u_i.
+    \end{align*}
+\end{beweis}
+
+\section{Two Link Revolute Manipulator}
+
+Wir bezeichnen $\textbf{q} = 
+\begin{bmatrix} \gruen{\theta_1} \\ \dunkelrot{\theta_2} \end{bmatrix}$ 
+als die generalisierten Koordinaten des Systems. Die Schwerpunkte der beiden Links
+bezeichnen wir mit $(x_1, y_1)$ und $(x_2, y_2)$. Die Abstände der Schwerpunkte
+von den Gelenken werden mit $a_1$ und $a_2$ bezeichnet.
+
+% Graphik des Roboterarms
+%--------------------------------------------------------------------------------------------------------
+\begin{center}
+\begin{tikzpicture}[scale = 1.75, every node/.style={transform shape}]
+    % Koordinatensystem
+    %\draw[very thin, gray] (-5,-5) grid (5,5); % Raster
+    %\draw[->] (-5,0) -- (5,0); % x-Achse
+    %\draw[->] (0,-5) -- (0,5); % y-Achse
+    
+    % Achsen und Hilfslinien
+    \draw[white, dashed, ->] (0.0,-1.0) -- (3.5,-1.0);
+    \draw[white, dashed, ->] (0.0,-1.0) -- (0.0,3.0);
+    
+    % Schwerpunkte
+    \draw[dashed] (1.0,-0.5) -- (1.0,-1.0);
+    \draw[dashed] (1.0,-0.5) -- (0,-0.5);
+    \node at (-0.2, -0.5) {\tiny $y_1$};  % Punktbeschriftung
+    \node at (1, -1.2) {\tiny $x_1$}; 
+    \draw[dashed] (2.5,1) -- (0.0,1);
+    \draw[dashed] (2.5,1) -- (2.5,-1);
+    \node at (-0.2, 1.0) {\tiny $y_2$};  % Punktbeschriftung
+    \node at (2.5, -1.2) {\tiny $x_2$}; 
+
+    % Erste Zeichnung (Original)
+    \fill[hellblau] (-4,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+    \draw[white, line width = 0.2mm] (-4,-1) circle (0.25);  % Weißer Rand um das Objekt
+    
+    \draw[white, line width = 0.2mm] (-4.25,-1.4) rectangle (-3.75,-1);  % Weißer Rand um das Rechteck
+    \fill[hellblau] (-4.25,-1.4) rectangle (-3.75,-1);  % Füllt das Rechteck mit hellblau
+    \draw[thick, white] (-4.5,-1.4) -- (-3.5,-1.4);
+    
+    % Grüne Linie angepasst (Endpunkt auf (-2.0, 0.0))
+    \draw[thick, gruen] (-4,-1) -- (-2.0,0.0);
+    
+    % Rote Linie angepasst (von (-2.0, 0.0) nach (-1.0, 2.0))
+    \draw[thick, dunkelrot] (-2.0,0.0) -- (-1.0,2.0);
+    
+    % Glieder
+    \fill[blau] (-2.0,0.0) circle (0.1);
+    \draw[white, thin] (-2.0,0.0) circle (0.1);  % Weißer Rand um das Objekt
+    \fill[blau] (-4.0,-1.0) circle (0.1);
+    \draw[white, thin] (-4.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+    
+	% Beschriftungen
+	\node at (-3, -0.75) {\tiny $\gruen{l_1}$};  % 
+	\node at (-1.5, 1.5) {\tiny $\dunkelrot{l_2}$};  % 
+	
+	% Schwerpunkte 
+	\fill[white] (-3.0,-0.5) circle (0.05);
+	\fill[white] (-1.5,1) circle (0.05);
+	
+	\draw[white, <->] (-1.85,0.15) -- (-1.5,0.85);
+	\draw[white, <->] (-3.85,-0.85) -- (-3.1,-0.45);
+	
+	% Beschriftungen
+	\node at (-3.5, -0.4) {\tiny $a_1$};  % 
+	\node at (-1.5, 0.5) {\tiny $a_2$};  % 
+    
+    % Zweite Zeichnung (verschoben um 4 Einheiten entlang der x-Achse)
+    \fill[hellblau] (0,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+    \draw[white, line width = 0.2mm] (0,-1) circle (0.25);  % Weißer Rand um das Objekt
+    
+    \draw[white, line width = 0.2mm] (-0.25,-1.4) rectangle (0.25,-1);  % Weißer Rand um das Rechteck
+    \fill[hellblau] (-0.25,-1.4) rectangle (0.25,-1);  % Füllt das Rechteck mit hellblau
+    \draw[thick, white] (-0.5,-1.4) -- (0.5,-1.4);
+    
+    % Grüne Linie (verschoben)
+    \draw[thick, gruen] (0,-1) -- (2.0,0.0);
+    \draw[thick, gruen, dotted] (0,-1) -- (3.5,0.75);
+    
+    % Rote Linie (verschoben)
+    \draw[thick, dunkelrot] (2.0,0.0) -- (3.0,2.0);
+    
+    % Glieder
+    \fill[blau] (2.0,0.0) circle (0.1);
+    \draw[white, thin] (2.0,0.0) circle (0.1);  % Weißer Rand um das Objekt
+    \fill[blau] (0.0,-1.0) circle (0.1);
+    \draw[white, thin] (0.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+    \fill[blau] (3.0,2.0) circle (0.1);
+    \draw[white, thin] (3.0,2.0) circle (0.1);  % Weißer Rand um das Objekt
+    
+    % Winkel
+    \draw [gruen, thick] (1,-1)  arc[start angle=0,end angle=45,radius=0.5cm];
+	\node at (0.75, -0.85) {\tiny $\gruen{\theta_1}$};  % Winkelbeschriftung
+	
+	\draw [dunkelrot, thick] (3,0.5)  arc[start angle=0,end angle=80,radius=0.5cm];
+	\node at (2.7, 0.6) {\tiny $\dunkelrot{\theta_2}$};  % Winkelbeschriftung
+\end{tikzpicture}
+\end{center}
+%--------------------------------------------------------------------------------------------------------
+
+Für die Koordinaten der Schwerpunkte gilt:
+% Koordinaten der Schwerpunkte
+\begin{align*}
+    \begin{pmatrix}
+        x_1 \\
+        y_1 \\
+        z_1
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        a_1 \cdot \cos(\gruen{\theta_1}) \\
+        a_1 \cdot \sin(\gruen{\theta_1}) \\
+        0
+    \end{pmatrix}
+    \quad
+    \begin{pmatrix}
+        x_2 \\
+        y_2 \\  
+        z_2
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        l_1 \cdot \cos(\gruen{\theta_1}) 
+        + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        l_1 \cdot \sin(\gruen{\theta_1}) 
+        + a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        0
+    \end{pmatrix}
+\end{align*}
+
+\subsubsection{Formulierung der Massenmatrix}
+
+Für die Massenmatrix gilt hier:
+% M(q)
+\begin{align*}
+    M(\textbf{q}) 
+    = m_1 J_{v_{\gruen{1}}}^T J_{v_{\gruen{1}}} 
+    + J_{\omega_{\gruen{1}}}^T I_1 J_{\omega_{\gruen{1}}}  
+    + m_2 J_{v_{\dunkelrot{2}}}^T J_{v_{\dunkelrot{2}}} 
+    + J_{\omega_{\dunkelrot{2}}}^T I_2 J_{\omega_{\dunkelrot{2}}} 
+\end{align*}
+
+Hierbei bezeichnet $J$ die Jacobi-Matrix, $I_i$ das Trägheitstensor 
+und $m_i$ die Masse des $i$-ten Links.
+% Berechnung der Jacobi-Matrizen J_v
+\begin{align*}
+    J_{v_1} &=
+    \frac{\partial \textbf{r}_1}{\partial \textbf{q}}
+    =
+    \frac{\partial (x_1,y_1,z_1)}{\partial (\gruen{\theta_1}, \dunkelrot{\theta_2})}
+    =
+    \begin{pmatrix}
+        \frac{\partial x_1}{\partial \gruen{\theta_1}} 
+        & \frac{\partial x_1}{\partial \dunkelrot{\theta_2}} \\
+        \frac{\partial y_1}{\partial \gruen{\theta_1}} 
+        & \frac{\partial y_1}{\partial \dunkelrot{\theta_2}} \\
+        \frac{\partial z_1}{\partial \gruen{\theta_1}} 
+        & \frac{\partial z_1}{\partial \dunkelrot{\theta_2}} 
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        -a_1 \sin(\gruen{\theta_1}) & 0 \\
+        a_1 \cos(\gruen{\theta_1}) & 0 \\
+        0 & 0
+    \end{pmatrix}
+    \\
+    J_{v_2} &=
+    \frac{\partial \textbf{r}_2}{\partial \textbf{q}}
+    =
+    \frac{\partial (x_2,y_2,z_2)}{\partial (\gruen{\theta_1}, \dunkelrot{\theta_2})}
+    =
+    \begin{pmatrix}
+        \frac{\partial x_2}{\partial \gruen{\theta_1}} 
+        & \frac{\partial x_2}{\partial \dunkelrot{\theta_2}} \\
+        \frac{\partial y_2}{\partial \gruen{\theta_1}} 
+        & \frac{\partial y_2}{\partial \dunkelrot{\theta_2}} \\
+        \frac{\partial z_2}{\partial \gruen{\theta_1}}
+        & \frac{\partial z_2}{\partial \dunkelrot{\theta_2}}
+    \end{pmatrix} 
+    =
+    \begin{pmatrix}
+        -l_1 \sin(\gruen{\theta_1}) - a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & -a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        0 & 0
+    \end{pmatrix}
+\end{align*}
+
+Für das Matrizenprodukt $J_{v_1}^T J_{v_1}$ gilt:
+% Berechnung der Matrizenprodukte J_v1^T * J_v1
+\begin{align*}
+    J_{v_1}^T J_{v_1} 
+    &=
+    \begin{pmatrix}
+        -a_1 \sin(\gruen{\theta_1}) & a_1 \cos(\gruen{\theta_1}) & 0 \\
+        0 & 0 & 0
+    \end{pmatrix}
+    \cdot
+    \begin{pmatrix}
+        -a_1 \sin(\gruen{\theta_1}) & 0 \\
+        a_1 \cos(\gruen{\theta_1}) & 0 \\
+        0 & 0
+    \end{pmatrix}
+    \\
+    &=
+    \begin{pmatrix}
+        a_1^2 \sin^2(\gruen{\theta_1}) + a_1^2 \cos^2(\gruen{\theta_1}) & 0 \\
+        0 & 0
+    \end{pmatrix}
+    \\
+    &=
+    \begin{pmatrix}
+        a_1^2 & 0 \\
+        0 & 0
+    \end{pmatrix}
+\end{align*}
+
+Für das Matrizenprodukt $J_{v_2}^T J_{v_2}$ gilt:
+% Berechnung der Matrizenprodukte J_v2^T * J_v2
+\begin{align*}
+    J_{v_2}^T J_{v_2} 
+    &=
+    \begin{pmatrix}
+        -l_1 \sin(\gruen{\theta_1}) - a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & 0 \\
+        -a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2})
+        & 0
+    \end{pmatrix}
+    \\
+    &\quad \cdot
+    \begin{pmatrix}
+        -l_1 \sin(\gruen{\theta_1}) - a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & -a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        & a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \\
+        0 & 0
+    \end{pmatrix}
+    \\
+    &=
+    \begin{pmatrix}
+        (l_1^2 + a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}})) 
+        & (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) \\
+        (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) 
+        & a_2^2
+    \end{pmatrix}
+\end{align*}
+
+Für die Winkelgeschwindigkeiten setzen wir   
+$\bm{\omega}_1 = \begin{pmatrix}0 & 0 & \gruen{\theta_1'}\end{pmatrix}^T$ und 
+$\bm{\omega}_2 = \begin{pmatrix} 0 & 0 &\gruen{\theta_1'} + \dunkelrot{\theta_2'}\end{pmatrix}^T$.
+% Berechnung der Jacobi-Matrizen J_\omega
+\begin{align*}
+    J_{\omega_1} &=
+    \frac{\partial \bm{\omega}_1}{\partial \dot{\textbf{q}}}
+    =
+    \frac{\partial (\omega_1)}{\partial (\gruen{\theta_1}', \dunkelrot{\theta_2}')}
+    =
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \frac{\partial \omega_1}{\partial \gruen{\theta_1}'} 
+        & \frac{\partial \omega_1}{\partial \dunkelrot{\theta_2}'} 
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \gruen{1} & \dunkelrot{0}
+    \end{pmatrix}
+    \\
+    J_{\omega_2} &=
+    \frac{\partial \bm{\omega}_2}{\partial \dot{\textbf{q}}}
+    =
+    \frac{\partial (\omega_2)}{\partial (\gruen{\theta_1}', \dunkelrot{\theta_2}')}
+    =
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \frac{\partial \omega_2}{\partial \gruen{\theta_1}'} 
+        & \frac{\partial \omega_2}{\partial \dunkelrot{\theta_2}'} 
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \gruen{1} & \dunkelrot{1}
+    \end{pmatrix}
+\end{align*}
+
+Für den Trägheitstensor $I_i$ gilt:
+% Allgemeiner Trägheitstensor
+\begin{align*}
+    I = 
+    \begin{pmatrix}
+        I_{xx} & I_{xy} & I_{xz} \\
+        I_{yx} & I_{yy} & I_{yz} \\
+        I_{zx} & I_{zy} & I_{zz}
+    \end{pmatrix}   
+    =
+    \begin{pmatrix}
+        \int (y^2 + z^2) \mathsf{d}m & -\int xy \mathsf{d}m & -\int xz \mathsf{d}m \\
+        -\int yx \mathsf{d}m & \int (x^2 + z^2) \mathsf{d}m & -\int yz \mathsf{d}m \\
+        -\int zx \mathsf{d}m & -\int zy \mathsf{d}m & \int (x^2 + y^2) \mathsf{d}m
+    \end{pmatrix}
+\end{align*}
+
+Für symmetrische Körper (z.B. Zylinder, Kugel, Quader) 
+gilt: $I_{xy} = I_{xz} = I_{yz} = 0$ also erhalten wir eine Diagonalmatrix. 
+% Symmetrischer Trägheitstensor
+\begin{align*}
+    I_i 
+    =
+    \begin{pmatrix}
+        \int_ y^2 \mathsf{d}m & 0 & 0 \\
+        0 & \int x^2 \mathsf{d}m & 0 \\
+        0 & 0 & \int (x^2 + y^2) \mathsf{d}m
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        \int_V \rho y^2 \mathsf{d}V & 0 & 0 \\
+        0 & \int_V \rho x^2 \mathsf{d}V & 0 \\
+        0 & 0 & \int_V \rho (x^2 + y^2) \mathsf{d}V
+    \end{pmatrix}
+\end{align*}
+
+
+Für die Massenmatrix $M(\textbf{q})$ gilt somit:
+% Berechnung der Massenmatrix M(q)
+\begin{align*}
+    M(\textbf{q}) 
+    &= m_1 J_{v_{\gruen{1}}}^T J_{v_{\gruen{1}}} 
+    + J_{\omega_{\gruen{1}}}^T I_1 J_{\omega_{\gruen{1}}}  
+    + m_2 J_{v_{\dunkelrot{2}}}^T J_{v_{\dunkelrot{2}}} 
+    + J_{\omega_{\dunkelrot{2}}}^T I_2 J_{\omega_{\dunkelrot{2}}}    
+    \\
+    &=
+    m_1 
+    \begin{pmatrix}
+        a_1^2 & 0 \\
+        0 & 0
+    \end{pmatrix}
+    +
+    \underbrace{
+        \begin{pmatrix}
+            0 & 0 & \gruen{1} \\
+            0 & 0 & \dunkelrot{0}
+        \end{pmatrix}
+        \cdot
+        \begin{pmatrix}
+            I_{1,xx} & 0 & 0 \\
+            0 & I_{1,yy} & 0 \\
+            0 & 0 & I_{1,zz}
+        \end{pmatrix}}_{
+        = 
+        \begin{pmatrix}
+            0 & 0 & I_{1,zz} \\
+            0 & 0 & 0
+        \end{pmatrix}
+    }
+    \cdot   
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \gruen{1} & \dunkelrot{0}
+    \end{pmatrix}
+    \\
+    &\quad +
+    m_2
+    \begin{pmatrix}
+        (l_1^2 + a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}})) 
+        & (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) \\
+        (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) 
+        & a_2^2
+    \end{pmatrix}
+    \\
+    &\quad +
+    \underbrace{
+        \begin{pmatrix}
+            0 & 0 & \gruen{1} \\
+            0 & 0 & \dunkelrot{1}
+        \end{pmatrix}
+        \cdot
+        \begin{pmatrix}
+            I_{2,xx} & 0 & 0 \\
+            0 & I_{2,yy} & 0 \\
+            0 & 0 & I_{2,zz}
+        \end{pmatrix}}_{
+        = 
+        \begin{pmatrix}
+            0 & 0 & I_{2,zz} \\
+            0 & 0 & I_{2,zz}
+        \end{pmatrix}
+    }   
+    \cdot
+    \begin{pmatrix}
+        0 & 0 \\
+        0 & 0 \\
+        \gruen{1} & \dunkelrot{1}
+    \end{pmatrix}
+    \\
+    &=
+    \begin{pmatrix}
+        m_1 a_1^2 + I_{1,zz} + m_2 \cdot (l_1^2 + a_2^2 + 2 l_1 a_2  \cos(\dunkelrot{\theta_{2}})) + I_{2,zz}
+        & m_2 (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) +I_{2,zz}  \\
+        m_2 (a_2^2 + l_1 a_2  \cos(\dunkelrot{\theta_{2}})) + I_{2,zz}
+        & m_2 a_2^2 +I_{2,zz} 
+    \end{pmatrix}
+\end{align*}
+
+Die Trägheitselemente $I_{i,xx}$ und $I_{i,yy}$ sind nicht relevant.
+Für unser Model verwenden wir den Standardansatz eines 
+dünnen Stabes der Länge $l_i$ und Masse $m_i$. 
+Somit gilt $z= y \approx 0$ und wir erhalten: $I_{i,xx} = I_{i,yy} =0$
+% Tensor langer dünner Stab
+\begin{align*}
+    I_{i,zz} \approx \int_{-\frac{l_{i}}{2}}^{\frac{l_{i}}{2}} 
+    \underbrace{\rho}_{\frac{m_{i}}{l_{i}}} x^2 \mathsf{d}x
+    = \frac{1}{3} \cdot \frac{m_{i}}{l_{i}} 
+    \cdot 
+    \left[ 
+        \left( \frac{l_{i}}{2} \right)^3 -  \left( -\frac{l_{i}}{2} \right)^3 
+    \right]
+    = \frac{1}{12} m_{i} l_{i}^{2}
+    \Rightarrow
+    I_i     
+    = 
+    \begin{pmatrix}
+        0 & 0 & 0 \\
+        0 & 0 & 0 \\
+        0 & 0 & \frac{1}{12} m_{i} l_{i}^{2}
+    \end{pmatrix}
+\end{align*}
+
+
+\subsubsection{Aufstellen der Coriolis-Matrix}
+
+Aus der Symmetrie der Massenmatrix $M_{jk}=M_{kj}$ folgt direkt für die 
+Christoffel-Symbole (\ref{satz:christoffel}) die Symmetrie $\Gamma_{ijk} = \Gamma_{ikj}$. 
+Weiter gilt für den Fall $n=2$ explizit:
+% Berechnung der Christoffel Symbole:
+\begin{align*}
+    \Gamma_{111} 
+    &=
+    \frac{1}{2} 
+    \left(
+        \frac{\partial M_{11}}{\partial q_1} 
+        +
+        \frac{\partial M_{11}}{\partial q_1} 
+        -
+        \frac{\partial M_{11}}{\partial q_1} 
+    \right)
+    =
+    0
+    \\
+    \Gamma_{121}
+    &= 
+    \Gamma_{112}
+    =
+    \frac{1}{2} 
+    \left(
+        \frac{\partial M_{12}}{\partial q_1} 
+        +
+        \frac{\partial M_{11}}{\partial q_2} 
+        -
+        \frac{\partial M_{12}}{\partial q_1} 
+    \right)
+    =
+    -m_2 l_1 a_2 \sin(\theta_2)
+    \\
+    \Gamma_{122} 
+    &=
+    \frac{1}{2} 
+    \left(
+        \frac{\partial M_{12}}{\partial q_2} 
+        +
+        \frac{\partial M_{12}}{\partial q_2} 
+        -
+        \frac{\partial M_{22}}{\partial q_1} 
+    \right)
+    =
+    -m_2 l_1 a_2 \sin(\theta_2)
+    \\
+    \Gamma_{211} 
+    &=
+    \frac{1}{2} 
+    \left(
+        \frac{\partial M_{21}}{\partial q_1} 
+        +
+        \frac{\partial M_{21}}{\partial q_1} 
+        -
+        \frac{\partial M_{11}}{\partial q_2} 
+    \right)
+    =
+    m_2 l_1 a_2 \sin(\theta_2)
+    \\
+    \Gamma_{221} 
+    &=
+    \Gamma_{212} 
+    =
+    \frac{1}{2} 
+    \left(
+        \frac{\partial M_{22}}{\partial q_1} 
+        +
+        \frac{\partial M_{21}}{\partial q_2} 
+        -
+        \frac{\partial M_{12}}{\partial q_2} 
+    \right)
+    =
+    0
+    \\
+    \Gamma_{222} 
+    &=
+    \frac{1}{2} 
+    \left(
+        \frac{\partial M_{22}}{\partial q_2} 
+        +
+        \frac{\partial M_{22}}{\partial q_2} 
+        -
+        \frac{\partial M_{22}}{\partial q_2} 
+    \right)
+    =
+    0 
+\end{align*}
+
+Für die partiellen Ableitungen der kinetischen Energie 
+$T(\textbf{q}, \dot{\textbf{q}}) = \frac{1}{2} \dot{\textbf{q}}^T M(\textbf{q}) \dot{\textbf{q}}$ gilt:
+% Ableitung dT/d theta
+\begin{align*}
+    \frac{\partial T}{\partial \gruen{\theta_{1}}}
+    &= 
+    \frac{1}{2}  \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} 
+    \gruen{\theta_{1}'}^2 
+    + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} 
+    \dunkelrot{\theta_{2}'} 
+    + \frac{1}{2} \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}} 
+    \dunkelrot{\theta_{2}'}(t)^2
+    \\
+    \frac{\partial T}{\partial \dunkelrot{\theta_{2}}}
+    &= 
+    \frac{1}{2} \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'}^2
+    + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+    + \frac{1}{2} \frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}(t)^2
+    \\
+    \frac{\partial T}{\partial \gruen{\theta_{1}'}} 
+    &= M_{\gruen{1 1}} \gruen{\theta_{1}'} + M_{\gruen{1}\dunkelrot{2}}  \dunkelrot{\theta_{2}'}
+    \\
+    \frac{\partial T}{\partial \dunkelrot{\theta_{2}'}} 
+    &=
+    M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}'} + M_{\dunkelrot{22}} \dunkelrot{\theta_{2}'}
+\end{align*}
+
+Für die zeitlichen Ableitungen der Größen gilt 
+% Ableitung d/dt dT/d theta_1'
+\begin{align*}
+    \frac{\mathsf{d}}{\dt} \frac{\partial T}{\partial \gruen{\theta_{1}'}} 
+    &=
+    \underbrace{
+        \frac{\mathsf{d}}{\dt} M_{\gruen{1 1}}
+    }_{
+        \frac{\partial M_{11}}{\partial \theta_{1}} \theta_{1}' 
+        + \frac{\partial M_{11}}{\partial \theta_{2}} \theta_{2}'
+        } 
+    \cdot \gruen{\theta_{1}'} + M_{\gruen{1 1}} \gruen{\theta_{1}''} + 
+    \underbrace{
+        \frac{\mathsf{d}}{\dt} M_{\gruen{1}\dunkelrot{2}}
+        }_{
+            \frac{\partial M_{12}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial M_{12}}{\partial \theta_{2}} \theta_{2}'
+            } 
+        \cdot \dunkelrot{\theta_{2}'} + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} 
+    \\
+    &= \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
+    + \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
+    +  M_{\gruen{1 1}} \gruen{\theta_{1}''} 
+    + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+    + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
+    + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''} \\
+    &=
+    \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'}^2
+    + \left[ 
+        \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} 
+        \right] 
+    \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
+    + \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \dunkelrot{\theta_{2}'}^2 
+    + M_{\gruen{1 1}} \gruen{\theta_{1}''} + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+% Ableitung d/dt dT/d theta_2'
+\begin{align*}
+\frac{\mathsf{d}}{\dt} \frac{\partial T}{\partial \dunkelrot{\theta_{2}'}} 
+&=
+\underbrace{\frac{\mathsf{d}}{\dt} M_{\gruen{1}\dunkelrot{2}}}_{\frac{\partial M_{12}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial M_{12}}{\partial \theta_{2}} \theta_{2}'} \cdot \gruen{\theta_{1}'} + M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''} + \underbrace{\frac{\mathsf{d}}{\dt} M_{\dunkelrot{22}}}_{\frac{\partial M_{22}}{\partial \theta_{1}} \theta_{1}' + \frac{\partial M_{22}}{\partial \theta_{2}} \theta_{2}'} \cdot \dunkelrot{\theta_{2}'} + M_{\dunkelrot{22}} \dunkelrot{\theta_{2}''} \\
+&= 
+\frac{\partial M_{12}}{\partial \theta_{1}}  \gruen{\theta_{1}'}^2 
+ + \frac{\partial M_{12}}{\partial \theta_{2}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+ + M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''}
+ + \frac{\partial M_{22}}{\partial \theta_{1}} \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
+ + \frac{\partial M_{22}}{\partial \theta_{2}}  \dunkelrot{\theta_{2}'}^2 
+ + M_{\dunkelrot{22}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+Es gilt 
+% Ableitung d/dt dT/d theta_1' - dT/d theta_1
+\begin{align*}
+    \frac{\mathsf{d}}{\dt} \frac{\partial T}{\partial \gruen{\theta_{1}'}}  - \frac{\partial T}{\partial \gruen{\theta_{1}}}
+    &=
+    \left[ \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} - \frac{1}{2}  \frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} \right] \gruen{\theta_{1}'}^2
+    + \left[ \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} -  \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \right] \gruen{\theta_{1}'} \dunkelrot{ \theta_{2}'} 
+    + \left[\frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} - \frac{1}{2} \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}} \right] \dunkelrot{\theta_{2}'}^2 \\
+    & \quad
+    +  M_{\gruen{1 1}} \gruen{\theta_{1}''} 
+    + M_{\gruen{1}\dunkelrot{2}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+% Ableitung d/dt dT/d theta_2' - dT/d theta_2
+\begin{align*}
+\frac{\mathsf{d}}{\dt} \frac{\partial T}{\partial \dunkelrot{\theta_{2}'}} - \frac{\partial T}{\partial \dunkelrot{\theta_{2}}}
+&= 
+\left[ \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} - \frac{1}{2} \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \right] \gruen{\theta_{1}'}^2 
++ \left[ \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} + \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}} - \frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}} \right] \gruen{\theta_{1}'} \dunkelrot{\theta_{2}'} 
++ \left[ \frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}} - \frac{1}{2} \frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}} \right]  \dunkelrot{\theta_{2}'}^2 \\
+& \quad + M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''} + D_{\dunkelrot{22}} \dunkelrot{\theta_{2}''} \\
+&=
+\underbrace{\left[ \frac{\partial M_{12}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} - \frac{1}{2} \frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}} \gruen{\theta_{1}'} \right]}_{C_{\dunkelrot{2}\gruen{1}}} \gruen{\theta_{1}'}
++ \underbrace{\left[ \frac{1}{2} \frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}}  \dunkelrot{\theta_{2}'} + \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}} \gruen{\theta_{1}'} \right]}_{C_{\dunkelrot{22}}}  \dunkelrot{\theta_{2}'}
++ M_{\gruen{1}\dunkelrot{2}} \gruen{\theta_{1}''} + M_{\dunkelrot{22}} \dunkelrot{\theta_{2}''}
+\end{align*}
+
+Für die Einträge der Matrix $C$ gilt
+% Berechnung der Einträge der Coriolis-Matrix C
+\begin{align*}
+C_{11} 
+&=
+\frac{1}{2}  \underbrace{\frac{\partial M_{11}}{\partial \gruen{\theta_{1}}} }_{= 0} \gruen{\theta_{1}'} + \underbrace{\frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}}}_{ =  -2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})} \dunkelrot{ \theta_{2}'}
+=
+-2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{ \theta_{2}'} 
+\\
+C_{12}
+&=
+\underbrace{\frac{\partial M_{12}}{\partial \dunkelrot{\theta_{2}}}}_{= - m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})} \dunkelrot{\theta_{2}'} - \frac{1}{2} \underbrace{\frac{\partial M_{22}}{\partial \gruen{\theta_{1}}}}_{ = 0} \dunkelrot{\theta_{2}'}
+=
+- m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{\theta_{2}'}
+\\
+C_{21} 
+&= \underbrace{\frac{\partial M_{12}}{\partial \gruen{\theta_{1}}}}_{= 0} \gruen{\theta_{1}'} - \frac{1}{2} \underbrace{\frac{\partial M_{11}}{\partial \dunkelrot{\theta_{2}}}}_{= -2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) } \gruen{\theta_{1}'}
+=
+m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})\gruen{\theta_{1}'}
+\\
+C_{22} 
+&=
+\frac{1}{2} \underbrace{\frac{\partial M_{22}}{\partial \dunkelrot{\theta_{2}}}}_{ = 0} \dunkelrot{\theta_{2}'} + \underbrace{ \frac{\partial M_{22}}{\partial \gruen{\theta_{1}}}}_{ = 0} \gruen{\theta_{1}'}
+= 0
+\end{align*}
+
+Es gilt somit 
+% Resultat Coriolis-Matrix C(q, qdot) * qdot
+\begin{align*}
+C(\textbf{q}, \dot{\textbf{q}}) \cdot \dot{\textbf{q}}
+=
+\begin{pmatrix}
+    -2m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{ \theta_{2}'} 
+    &
+    - m_2 l_1 a_2 \sin(\dunkelrot{\theta_2}) \dunkelrot{\theta_{2}'} 
+    \\
+    m_2 l_1 a_2 \sin(\dunkelrot{\theta_2})\gruen{\theta_{1}'}
+    &
+    0
+\end{pmatrix}
+\begin{pmatrix}
+    \gruen{\theta_{1}'} \\
+    \dunkelrot{\theta_{2}'} 
+\end{pmatrix}
+\end{align*}
+
+\subsubsection{Gravitationsterme}
+
+Für die potenzielle Energie $V$ gilt:
+% V = m*g*h als Potenzielle Energie
+\begin{align*}
+    V 
+    &= m_1 \cdot g \cdot y_1 + m_2 \cdot g \cdot y_2 
+    = m_1  g  a_1 \sin(\gruen{\theta_1}) 
+    + m_2  g \left( l_1 \sin(\gruen{\theta_1}) 
+    + a_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) \right)
+\end{align*}
+
+Für die partiellen Ableitungen erhalten wir
+% Berechnung der Gravitationsterme G(q) = dV/dq
+\begin{align*}
+    G(\textbf{q})
+    =
+    \frac{\partial V}{\partial \textbf{q}}
+    =
+    \begin{pmatrix}
+        \frac{\partial V}{\partial \gruen{\theta_1}} \\
+        \frac{\partial V}{\partial \dunkelrot{\theta_2}}
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+        m_1  g  a_1 \cos(\gruen{\theta_1}) + m_2  g \left( l_1 \cos(\gruen{\theta_1}) 
+        + a_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) \right) \\
+        m_2  g \left( l_1 \cos(\gruen{\theta_1}) + a_2 \cos(\gruen{\theta_1} 
+        + \dunkelrot{\theta_2}) \right)
+    \end{pmatrix}
+\end{align*}
+
+% Hier Berechnung für zusätzliches Gewicht an link2
+\newpage
+
+\subsection{Einfaches Greifobjekt}
+Wir modellieren ein Variables Greifobjekt, welches am Ende von Link 2 gehalten wird. 
+Wir betrachten nachfolgend das Greifobjekt als Punktmasse mit Masse $m_G$. 
+
+% Greifobjekt
+%--------------------------------------------------------------------------------------------------------
+\begin{center}
+    \begin{tikzpicture}[scale = 1.75, every node/.style={transform shape}]
+        % Koordinatensystem
+        %\draw[very thin, gray] (-5,-5) grid (5,5); % Raster
+        %\draw[->] (-5,0) -- (5,0); % x-Achse
+        %\draw[->] (0,-5) -- (0,5); % y-Achse
+        
+        % Erste Zeichnung (Original)
+        \fill[hellblau] (-4,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+        %\draw[white, line width = 0.2mm] (-4,-1) circle (0.25);  % Weißer Rand um das Objekt
+        
+        %\draw[white, line width = 0.2mm] (-4.25,-1.4) rectangle (-3.75,-1);  % Weißer Rand um das Rechteck
+        \fill[hellblau] (-4.25,-1.4) rectangle (-3.75,-1);  % Füllt das Rechteck mit hellblau
+        %\draw[thick, white] (-4.5,-1.4) -- (-3.5,-1.4);
+        
+        % Grüne Linie angepasst (Endpunkt auf (-2.0, 0.0))
+        \draw[thick, gruen] (-4,-1) -- (-3.0,1.0);
+        
+        % Rote Linie angepasst (von (-2.0, 0.0) nach (-1.0, 2.0))
+        \draw[thick, dunkelrot] (-3.0,1.0) -- (-1.0,1.0);
+        
+        % Glieder
+        \fill[blau] (-3.0,1.0) circle (0.1);
+        \draw[white, thin] (-3.0,1.0) circle (0.1);  % Weißer Rand um das Objekt
+        \fill[blau] (-4.0,-1.0) circle (0.1);
+        \draw[white, thin] (-4.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+        
+        % Beschriftungen
+        \node at (-3, -0.75) {\tiny $\gruen{l_1}$};  % 
+        \node at (-1.5, 1.5) {\tiny $\dunkelrot{l_2}$};  % 
+        
+        % Schwerpunkte 
+        %\fill[white] (-3.0,-0.5) circle (0.05);
+        %\fill[white] (-1.5,1) circle (0.05);
+        
+        %\draw[white, <->] (-1.85,0.15) -- (-1.5,0.85);
+        %\draw[white, <->] (-3.85,-0.85) -- (-3.1,-0.45);
+        
+        % Beschriftungen
+        \node at (-3.5, -0.4) {\tiny $a_1$};  % 
+        \node at (-1.5, 0.5) {\tiny $a_2$};  % 
+
+        \draw[dunkelrot, thick] (-1.0,0.9) -- (-1.0, 1.1);
+        \draw[dunkelrot, thick] (-1.0,0.9) -- ++(0.1,0.0);
+        \draw[dunkelrot, thick] (-1.0,1.1) -- ++(0.1,0.0);
+        \node at (-0.6,0.7) {\tiny $m_G$}; % Beschriftung
+
+        % Erste Zeichnung (Original) verschoben um +4 in x
+        \fill[hellblau] (0,-1) circle (0.25);  % Füllt das Objekt mit hellblau
+        \draw[white, line width = 0.2mm] (0,-1) circle (0.25);  % Weißer Rand um das Objekt
+        
+        \draw[white, line width = 0.2mm] (-0.25,-1.4) rectangle (0.25,-1);  % Weißer Rand um das Rechteck
+        \fill[hellblau] (-0.25,-1.4) rectangle (0.25,-1);  % Füllt das Rechteck mit hellblau
+        \draw[thick, white] (-0.5,-1.4) -- (0.5,-1.4);
+        
+        % Grüne Linie angepasst (Endpunkt auf (1.0, 1.0))
+        \draw[thick, gruen] (0,-1) -- (1.0,1.0);
+        
+        % Rote Linie angepasst (von (1.0, 1.0) nach (3.0, 1.0))
+        \draw[thick, dunkelrot] (1.0,1.0) -- (3.0,1.0);
+
+        % Orange Linie zum Greifobjekt
+        \draw[thick, orange] (3.0,1.0) -- (3.3,1.4);
+        \draw[thick, orange] (3.364,1.352) -- (3.236,1.448);
+        \draw[thick, orange] (3.364,1.352) -- ++(0.072,0.096);
+        \draw[thick, orange] (3.236,1.448) -- ++(0.072,0.096);
+
+        % Winkel
+        \draw [orange, thick] (3.35,1.0)  arc[start angle=0,end angle=45,radius=0.35cm];
+	    \node at (3.25, 0.9) {\tiny $\orange{\theta_3}$};  % Winkelbeschriftung
+        \draw[thick, dunkelrot, dotted] (3,1) -- (4.0,1.0);
+        \node at (3.0, 1.3) {\tiny $\orange{l_3}$};
+
+        \fill[blau] (3.0,1.0) circle (0.1);
+        \draw[white, thin] (3.0,1.0) circle (0.1);  % Weißer Rand um das Objekt
+
+        % Glieder
+        \fill[blau] (1.0,1.0) circle (0.1);
+        \draw[white, thin] (1.0,1.0) circle (0.1);  % Weißer Rand um das Objekt
+        \fill[blau] (0.0,-1.0) circle (0.1);
+        \draw[white, thin] (0.0,-1.0) circle (0.1);  % Weißer Rand um das Objekt
+    \end{tikzpicture}
+\end{center}
+%--------------------------------------------------------------------------------------------------------
+
+Für die Masse von Link 2 inklusive Greifobjekt gilt:
+% m_i' = m_i + m_G
+\begin{align*}
+    m_{i}' = m_{i} + m_{G}
+\end{align*}
+
+Für den Schwerpunkt von Link 2 inklusive Greifobjekt gilt:
+% a_i' = (m_i * a_i + m_G * d) / (m_i + m_G)
+\begin{align*}
+    \textbf{a}_{2}'
+    &= \frac{m_{i} \cdot \textbf{a}_{2} + m_{G} \cdot \textbf{d}}{m_{i} + m_{G}}
+    \quad
+    \textbf{d}(\orange{\theta_3}) =
+    \begin{pmatrix}
+        l_2 + r \cdot \cos(\orange{\theta_3}) \\
+        r \cdot \sin(\orange{\theta_3}) \\
+        0
+    \end{pmatrix}
+\end{align*}
+
+Für den Trägheitstensor von Link 2 inklusive Greifobjekt gilt:
+% I_i' = I_i + m_i * S(a_i - a_i') + m_G * S(d - a_i')
+\begin{align*}
+    I_{i}' 
+    &= 
+    I_{i} + m_{i} \cdot S(\textbf{a}_{i} - \textbf{a}_{i}') 
+    + m_{G} \cdot S(\textbf{d} - \textbf{a}_{i}')
+    \quad
+    S(\textbf{v}) =
+    \begin{pmatrix}
+        v_{y}^2 + v_{z}^2 & -v_{x} v_{y} & -v_{x} v_{z} \\
+        -v_{x} v_{y} & v_{x}^2 + v_{z}^2 & -v_{y} v_{z} \\
+        -v_{x} v_{z} & -v_{y} v_{z} & v_{x}^2 + v_{y}^2
+    \end{pmatrix}
+\end{align*}
+
+Wobei $S(\textbf{v})$ die Steiner-Matrix ist. 
+Wir erhalten die Matrix direkt aus der Definition des Trägheitstensors (\ref{eq:traegheitstensor}) einer Punktmasse
+mit $\rho(\textbf{r}) = m \cdot \delta(\text{r}-\textbf{d})$.
+Für die Verschiebungsvektoren gilt:
+% Berechnung a_2'
+\begin{align*}
+    \textbf{d}
+    =
+    \begin{pmatrix}
+        l_2 \\
+        0 \\
+        0 
+    \end{pmatrix}
+    \textbf{a}_{2} =
+    \begin{pmatrix}
+        \frac{l_2}{2} \\
+        0 \\
+        0 
+    \end{pmatrix}
+    \Rightarrow
+    \textbf{a}_{2}'
+    =
+    \frac{l_2}{m_{2} + m_{G}}
+    \begin{pmatrix}
+        \frac{m_{2}}{2} + m_{G} \\
+        0 \\
+        0
+    \end{pmatrix}
+\end{align*}
+
+Für die Steiner-Matrizen gilt entsprechend
+% Berechnung der Steiner-Matrizen
+\begin{align*}
+    S(\textbf{a}_{2} - \textbf{a}_{2}')
+    =
+    \begin{pmatrix}
+        0 & 0 & 0 \\
+        0 & \left[\frac{l_2}{2} - a_{2}'\right]^2 & 0 \\
+        0 & 0 & \left[\frac{l_2}{2} - a_{2}'\right]^2
+    \end{pmatrix}
+    \quad
+    S(\textbf{d} - \textbf{a}_{2}')
+    =
+    \begin{pmatrix}
+        0 & 0 & 0 \\
+        0 & \left[l_2^2 - a_{2}'\right]^2 & 0 \\
+        0 & 0 & \left[l_2^2 - a_{2}'\right]^2
+    \end{pmatrix}
+\end{align*}
+
+Somit erhalten wir für den Trägheitstensor von Link 2 inklusive Greifobjekt:
+% Berechnung I_2'
+\begin{align*}
+    I_{2}'
+    &=
+    \begin{pmatrix}
+        I_{2,xx} & 0 & 0 \\
+        0 & I_{2,yy} 
+        + m_2 \cdot \left[\frac{l_2^2}{2} - a_{2}'\right]^2 
+        + m_G \cdot \left[\frac{l_2^2}{2} - a_{2}'\right]^2 
+        & 0 \\
+        0 & 0 & I_{2,zz} 
+        + m_2 \cdot \left[\frac{l_2^2}{2} - a_{2}'\right]^2 
+        + m_G \cdot \left[\frac{l_2^2}{2} - a_{2}'\right]^2
+    \end{pmatrix}
+\end{align*}
+
+Für die Koordinaten des Schwerpunktes von Link 3 gilt:
+% Berechnung der Koordinaten des Schwerpunktes von Link 3
+\begin{align*}
+    \textbf{r}_3
+    &=
+    \begin{pmatrix}
+        l_1 \cos(\gruen{\theta_1}) 
+        + l_2 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        + l_3 \cos(\gruen{\theta_1} + \dunkelrot{\theta_2} + \orange{\theta_3}) \\
+        l_1 \sin(\gruen{\theta_1}) 
+        + l_2 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2}) 
+        + l_3 \sin(\gruen{\theta_1} + \dunkelrot{\theta_2} + \orange{\theta_3}) \\
+        0
+    \end{pmatrix}
+\end{align*}
+Berechnung der Jacobi-Matrizen für Link 3 bezüglich der Geschwindigkeiten:
+% Jacobi-Matrizen für Link 3
+\begin{align*}
+    J_{v_3} &=
+    \frac{\partial \textbf{r}_3}{\partial \textbf{q}}
+\end{align*}
+
+Für die Winkelgeschwindigkeit des Links 3 setzen wir 
+$\bm{\omega_3}= 
+\begin{pmatrix} 
+    0 & 0 & \gruen{\theta_1'} + \dunkelrot{\theta_2'} + \orange{\theta_3'} 
+\end{pmatrix}$
+
+und erhalten für die Jacobi-Matrix bezüglich der Winkelgeschwindigkeit:
+% Jacobi-Matrizen für Link 3
+\begin{align*}
+    J_{\omega_3} &=
+    \frac{\partial \bm{\omega_3}}{\partial \dot{\textbf{q}}} 
+    =
+    \begin{pmatrix}
+        0 & 0 & 0 \\
+        0 & 0 & 0 \\
+        1 & 1 & 1
+    \end{pmatrix}
+\end{align*}
+
+
+\end{document}
+
+
+
+%------------------------------------------------------------------------------------------------------------

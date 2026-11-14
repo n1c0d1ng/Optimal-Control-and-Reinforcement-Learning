@@ -55,11 +55,14 @@
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{booktitle}{Advances in Neural Information Processing Systems 31 (NeurIPS 2018)}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{journaltitle}{arXiv preprint arXiv:1806.07366}
       \field{title}{Neural Ordinary Differential Equations}
-      \field{volume}{31}
       \field{year}{2018}
-      \field{pages}{6571\bibrangedash 6583}
-      \range{pages}{13}
+      \verb{eprint}
+      \verb 1806.07366
+      \endverb
     \endentry
     \entry{LLN}{inproceedings}{}{}
       \name{author}{6}{}{%
@@ -139,6 +142,216 @@
       \field{title}{Optimal Control of ODEs and DAEs}
       \field{year}{2012}
     \endentry
+    \entry{Goodfellow-et-al-2016}{book}{}{}
+      \name{author}{3}{}{%
+        {{hash=5d2585c11210cf1d4512e6e0a03ec315}{%
+           family={Goodfellow},
+           familyi={G\bibinitperiod},
+           given={Ian},
+           giveni={I\bibinitperiod}}}%
+        {{hash=40a8e4774982146adc2688546f54efb2}{%
+           family={Bengio},
+           familyi={B\bibinitperiod},
+           given={Yoshua},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=ccec1ccd2e1aa86960eb2e872c6b7020}{%
+           family={Courville},
+           familyi={C\bibinitperiod},
+           given={Aaron},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {MIT Press}%
+      }
+      \strng{namehash}{3ae53fe582e8a815b118d26947eaa326}
+      \strng{fullhash}{3ae53fe582e8a815b118d26947eaa326}
+      \strng{fullhashraw}{3ae53fe582e8a815b118d26947eaa326}
+      \strng{bibnamehash}{3ae53fe582e8a815b118d26947eaa326}
+      \strng{authorbibnamehash}{3ae53fe582e8a815b118d26947eaa326}
+      \strng{authornamehash}{3ae53fe582e8a815b118d26947eaa326}
+      \strng{authorfullhash}{3ae53fe582e8a815b118d26947eaa326}
+      \strng{authorfullhashraw}{3ae53fe582e8a815b118d26947eaa326}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{\url{https://www.deeplearningbook.org/contents/mlp.html}}
+      \field{title}{Deep Learning}
+      \field{year}{2016}
+    \endentry
+    \entry{num_ODEs}{book}{}{}
+      \name{author}{2}{}{%
+        {{hash=b7c7962951203ad3f8cf6ab7997edce2}{%
+           family={Griffiths},
+           familyi={G\bibinitperiod},
+           given={David\bibnamedelima F.},
+           giveni={D\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=595c1684f5fe70f9a29914bdda6d2e9e}{%
+           family={Higham},
+           familyi={H\bibinitperiod},
+           given={Desmond\bibnamedelima J.},
+           giveni={D\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {London}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{143cc7a69b814d28c921ffec60b3ba08}
+      \strng{fullhash}{143cc7a69b814d28c921ffec60b3ba08}
+      \strng{fullhashraw}{143cc7a69b814d28c921ffec60b3ba08}
+      \strng{bibnamehash}{143cc7a69b814d28c921ffec60b3ba08}
+      \strng{authorbibnamehash}{143cc7a69b814d28c921ffec60b3ba08}
+      \strng{authornamehash}{143cc7a69b814d28c921ffec60b3ba08}
+      \strng{authorfullhash}{143cc7a69b814d28c921ffec60b3ba08}
+      \strng{authorfullhashraw}{143cc7a69b814d28c921ffec60b3ba08}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-1-84882-512-3}
+      \field{title}{Numerical Methods for Ordinary Differential Equations: Initial Value Problems}
+      \field{year}{2010}
+    \endentry
+    \entry{PMP_controller}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=7527e03ebe6e24c08c40e25de226bc8c}{%
+           family={Gu},
+           familyi={G\bibinitperiod},
+           given={Chengyang},
+           giveni={C\bibinitperiod}}}%
+        {{hash=aa0c7ab0b9dad5902ab8fc501f57cd77}{%
+           family={Xiong},
+           familyi={X\bibinitperiod},
+           given={Hui},
+           giveni={H\bibinitperiod}}}%
+        {{hash=c993cde90de097e2a0e2757215025032}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Yize},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{9e3115a2a5ee59a248b6d723f0741a2f}
+      \strng{fullhash}{9e3115a2a5ee59a248b6d723f0741a2f}
+      \strng{fullhashraw}{9e3115a2a5ee59a248b6d723f0741a2f}
+      \strng{bibnamehash}{9e3115a2a5ee59a248b6d723f0741a2f}
+      \strng{authorbibnamehash}{9e3115a2a5ee59a248b6d723f0741a2f}
+      \strng{authornamehash}{9e3115a2a5ee59a248b6d723f0741a2f}
+      \strng{authorfullhash}{9e3115a2a5ee59a248b6d723f0741a2f}
+      \strng{authorfullhashraw}{9e3115a2a5ee59a248b6d723f0741a2f}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{eess.SY}
+      \field{eprinttype}{arXiv}
+      \field{journaltitle}{arXiv preprint arXiv:2212.14566}
+      \field{title}{Pontryagin Optimal Control via Neural Networks}
+      \field{year}{2022}
+      \verb{eprint}
+      \verb 2212.14566
+      \endverb
+    \endentry
+    \entry{HAC_controller}{article}{}{}
+      \name{author}{4}{}{%
+        {{hash=7527e03ebe6e24c08c40e25de226bc8c}{%
+           family={Gu},
+           familyi={G\bibinitperiod},
+           given={Chengyang},
+           giveni={C\bibinitperiod}}}%
+        {{hash=b188b3c5077bcd11d72b0c3136b6d039}{%
+           family={Pan},
+           familyi={P\bibinitperiod},
+           given={Yuxin},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=aa0c7ab0b9dad5902ab8fc501f57cd77}{%
+           family={Xiong},
+           familyi={X\bibinitperiod},
+           given={Hui},
+           giveni={H\bibinitperiod}}}%
+        {{hash=c993cde90de097e2a0e2757215025032}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Yize},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{89bd440d1ceb8d5ad35a8a553841e218}
+      \strng{fullhash}{6dd826bad11ba5a9d93b72617ed87758}
+      \strng{fullhashraw}{6dd826bad11ba5a9d93b72617ed87758}
+      \strng{bibnamehash}{89bd440d1ceb8d5ad35a8a553841e218}
+      \strng{authorbibnamehash}{89bd440d1ceb8d5ad35a8a553841e218}
+      \strng{authornamehash}{89bd440d1ceb8d5ad35a8a553841e218}
+      \strng{authorfullhash}{6dd826bad11ba5a9d93b72617ed87758}
+      \strng{authorfullhashraw}{6dd826bad11ba5a9d93b72617ed87758}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{journaltitle}{arXiv preprint arXiv:2603.28971}
+      \field{title}{A Pontryagin Method of Model-based Reinforcement Learning via Hamiltonian Actor-Critic}
+      \field{year}{2026}
+      \verb{eprint}
+      \verb 2603.28971
+      \endverb
+    \endentry
+    \entry{HessPathwise}{inproceedings}{}{}
+      \name{author}{6}{}{%
+        {{hash=231312991eab5915498d6c19c2a8cd4e}{%
+           family={Heess},
+           familyi={H\bibinitperiod},
+           given={Nicolas},
+           giveni={N\bibinitperiod}}}%
+        {{hash=f96594cc1d20df4a987bf8b9770d1ef0}{%
+           family={Wayne},
+           familyi={W\bibinitperiod},
+           given={Greg},
+           giveni={G\bibinitperiod}}}%
+        {{hash=89dbd30410c2085cd059f32c57d4593e}{%
+           family={Silver},
+           familyi={S\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=3a6fdf4df9a25f1d2d506ad9e86e1f6c}{%
+           family={Lillicrap},
+           familyi={L\bibinitperiod},
+           given={Timothy},
+           giveni={T\bibinitperiod}}}%
+        {{hash=58112cb88a80c1bc045b6eaab26a8695}{%
+           family={Tassa},
+           familyi={T\bibinitperiod},
+           given={Yuval},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=3b79ca47f08451987877fd8682e971e5}{%
+           family={Erez},
+           familyi={E\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{05493209e36cf53f4eaf3ec616399962}
+      \strng{fullhash}{f4d260ccf6031ebb4d66326f3fc62588}
+      \strng{fullhashraw}{f4d260ccf6031ebb4d66326f3fc62588}
+      \strng{bibnamehash}{05493209e36cf53f4eaf3ec616399962}
+      \strng{authorbibnamehash}{05493209e36cf53f4eaf3ec616399962}
+      \strng{authornamehash}{05493209e36cf53f4eaf3ec616399962}
+      \strng{authorfullhash}{f4d260ccf6031ebb4d66326f3fc62588}
+      \strng{authorfullhashraw}{f4d260ccf6031ebb4d66326f3fc62588}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Advances in Neural Information Processing Systems (NeurIPS)}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{title}{Learning Continuous Control Policies by Stochastic Value Gradients}
+      \field{volume}{28}
+      \field{year}{2015}
+      \verb{eprint}
+      \verb 1510.09142
+      \endverb
+    \endentry
     \entry{ICIIECS2017}{inproceedings}{}{}
       \name{author}{3}{}{%
         {{hash=d6e7552c865637927e1649455d2326f4}{%
@@ -175,6 +388,99 @@
       \field{booktitle}{2017 International Conference on Innovations in Information Embedded and Communication Systems (ICIIECS)}
       \field{title}{Optimal Control of 2-Link Underactuated Robot Manipulator}
       \field{year}{2017}
+    \endentry
+    \entry{lillicrap2015ddpg}{article}{}{}
+      \name{author}{8}{}{%
+        {{hash=2a321a868e44d49baf52b5e2d816fb71}{%
+           family={Lillicrap},
+           familyi={L\bibinitperiod},
+           given={Timothy\bibnamedelima P.},
+           giveni={T\bibinitperiod\bibinitdelim P\bibinitperiod}}}%
+        {{hash=e0c5cec59a932511b2af6220473fad61}{%
+           family={Hunt},
+           familyi={H\bibinitperiod},
+           given={Jonathan\bibnamedelima J.},
+           giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=4295e4094c426f01903ac60155866130}{%
+           family={Pritzel},
+           familyi={P\bibinitperiod},
+           given={Alexander},
+           giveni={A\bibinitperiod}}}%
+        {{hash=231312991eab5915498d6c19c2a8cd4e}{%
+           family={Heess},
+           familyi={H\bibinitperiod},
+           given={Nicolas},
+           giveni={N\bibinitperiod}}}%
+        {{hash=3b79ca47f08451987877fd8682e971e5}{%
+           family={Erez},
+           familyi={E\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+        {{hash=58112cb88a80c1bc045b6eaab26a8695}{%
+           family={Tassa},
+           familyi={T\bibinitperiod},
+           given={Yuval},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=89dbd30410c2085cd059f32c57d4593e}{%
+           family={Silver},
+           familyi={S\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=d7805381550fb5f8360345f7f72c0b49}{%
+           family={Wierstra},
+           familyi={W\bibinitperiod},
+           given={Daan},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{e9929f8db9dd2c08064f17b4d9a7c551}
+      \strng{fullhash}{9f2f0357b439f9ae4a3953d81392aaa0}
+      \strng{fullhashraw}{9f2f0357b439f9ae4a3953d81392aaa0}
+      \strng{bibnamehash}{e9929f8db9dd2c08064f17b4d9a7c551}
+      \strng{authorbibnamehash}{e9929f8db9dd2c08064f17b4d9a7c551}
+      \strng{authornamehash}{e9929f8db9dd2c08064f17b4d9a7c551}
+      \strng{authorfullhash}{9f2f0357b439f9ae4a3953d81392aaa0}
+      \strng{authorfullhashraw}{9f2f0357b439f9ae4a3953d81392aaa0}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{journaltitle}{arXiv preprint arXiv:1509.02971}
+      \field{title}{Continuous control with deep reinforcement learning}
+      \field{year}{2015}
+      \verb{eprint}
+      \verb 1509.02971
+      \endverb
+    \endentry
+    \entry{Lutter}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=ea28cc6441701681edf0680b2a1e52af}{%
+           family={Lutter},
+           familyi={L\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=c2cb77a864f65a21da0f69121b89835b}{%
+           family={Peters},
+           familyi={P\bibinitperiod},
+           given={Jan},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{a300de213b6c7448e24956b960f966a7}
+      \strng{fullhash}{a300de213b6c7448e24956b960f966a7}
+      \strng{fullhashraw}{a300de213b6c7448e24956b960f966a7}
+      \strng{bibnamehash}{a300de213b6c7448e24956b960f966a7}
+      \strng{authorbibnamehash}{a300de213b6c7448e24956b960f966a7}
+      \strng{authornamehash}{a300de213b6c7448e24956b960f966a7}
+      \strng{authorfullhash}{a300de213b6c7448e24956b960f966a7}
+      \strng{authorfullhashraw}{a300de213b6c7448e24956b960f966a7}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Journal of Robotics Research (IJRR)}
+      \field{title}{Combining Physics and Deep Learning to Learn Continuous-Time Dynamics Models}
+      \field{year}{2023}
     \endentry
     \entry{ulbrich}{book}{}{}
       \name{author}{1}{}{%
@@ -274,6 +580,69 @@
       \field{isbn}{978-1849964507}
       \field{title}{Robotics: Modelling, Planning and Control}
       \field{year}{2010}
+      \verb{urlraw}
+      \verb https://people.disim.univaq.it/~costanzo.manes/EDU_stuff/Robotics_Modelling,%20Planning%20and%20Control_Sciavicco_extract.pdf
+      \endverb
+      \verb{url}
+      \verb https://people.disim.univaq.it/~costanzo.manes/EDU_stuff/Robotics_Modelling,%20Planning%20and%20Control_Sciavicco_extract.pdf
+      \endverb
+    \endentry
+    \entry{DPG_Silver}{inproceedings}{}{}
+      \name{author}{6}{}{%
+        {{hash=89dbd30410c2085cd059f32c57d4593e}{%
+           family={Silver},
+           familyi={S\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=56f0d34650d75bc4863946b239695751}{%
+           family={Lever},
+           familyi={L\bibinitperiod},
+           given={Guy},
+           giveni={G\bibinitperiod}}}%
+        {{hash=231312991eab5915498d6c19c2a8cd4e}{%
+           family={Heess},
+           familyi={H\bibinitperiod},
+           given={Nicolas},
+           giveni={N\bibinitperiod}}}%
+        {{hash=6598b6ed3c197bb4292561d14d01436f}{%
+           family={Degris},
+           familyi={D\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+        {{hash=d7805381550fb5f8360345f7f72c0b49}{%
+           family={Wierstra},
+           familyi={W\bibinitperiod},
+           given={Daan},
+           giveni={D\bibinitperiod}}}%
+        {{hash=9449802bcb467309c0ebced658096818}{%
+           family={Riedmiller},
+           familyi={R\bibinitperiod},
+           given={Martin},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {PMLR}%
+      }
+      \strng{namehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{fullhash}{1df55ae175f24449994c9c4842700a18}
+      \strng{fullhashraw}{1df55ae175f24449994c9c4842700a18}
+      \strng{bibnamehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{authorbibnamehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{authornamehash}{4ccacac34637df06f749428b6ec5052e}
+      \strng{authorfullhash}{1df55ae175f24449994c9c4842700a18}
+      \strng{authorfullhashraw}{1df55ae175f24449994c9c4842700a18}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 31st International Conference on Machine Learning}
+      \field{number}{1}
+      \field{series}{Proceedings of Machine Learning Research}
+      \field{title}{Deterministic Policy Gradient Algorithms}
+      \field{volume}{32}
+      \field{year}{2014}
+      \field{pages}{387\bibrangedash 395}
+      \range{pages}{9}
     \endentry
     \entry{spong2004}{book}{}{}
       \name{author}{3}{}{%
@@ -313,8 +682,39 @@
       \field{labeltitlesource}{title}
       \field{edition}{2nd}
       \field{isbn}{978-0471649908}
+      \field{note}{\url{https://www.kramirez.net/Robotica/Tareas/Kinematics.pdf}}
       \field{title}{Robot Dynamics and Control}
       \field{year}{2004}
+    \endentry
+    \entry{CTRNN_Yang2022}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{hash=8efc7dd679d014395ea91d0acc418317}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Alan},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{c57bd6a6c7fd1cdf955ea96709c673e9}
+      \strng{fullhash}{c57bd6a6c7fd1cdf955ea96709c673e9}
+      \strng{fullhashraw}{c57bd6a6c7fd1cdf955ea96709c673e9}
+      \strng{bibnamehash}{c57bd6a6c7fd1cdf955ea96709c673e9}
+      \strng{authorbibnamehash}{c57bd6a6c7fd1cdf955ea96709c673e9}
+      \strng{authornamehash}{c57bd6a6c7fd1cdf955ea96709c673e9}
+      \strng{authorfullhash}{c57bd6a6c7fd1cdf955ea96709c673e9}
+      \strng{authorfullhashraw}{c57bd6a6c7fd1cdf955ea96709c673e9}
+      \field{sortinit}{Y}
+      \field{sortinithash}{fd67ad5a9ef0f7456bdd9aab10fe1495}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprinttype}{arXiv}
+      \field{journaltitle}{arXiv preprint arXiv:2202.06453}
+      \field{title}{Input-to-State Stable Neural Ordinary Differential Equations with Applications to Transient Modeling of Circuits}
+      \field{year}{2022}
+      \verb{eprint}
+      \verb 2202.06453v1
+      \endverb
     \endentry
   \enddatalist
 \endrefsection

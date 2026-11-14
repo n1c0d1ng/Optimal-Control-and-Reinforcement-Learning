@@ -2375,16 +2375,29 @@
   <bcf:section number="0">
     <bcf:citekey order="1" intorder="1">spong2004</bcf:citekey>
     <bcf:citekey order="2" intorder="1">siciliano2010</bcf:citekey>
-    <bcf:citekey order="3" intorder="1">gerdts2012</bcf:citekey>
-    <bcf:citekey order="4" intorder="1">ulbrich</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">ICIIECS2017</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">Plaat_RL</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">Plaat_RL</bcf:citekey>
-    <bcf:citekey order="8" intorder="1">Plaat_RL</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">spong2004</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">siciliano2010</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">Lutter</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">spong2004</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">gerdts2012</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">ICIIECS2017</bcf:citekey>
     <bcf:citekey order="9" intorder="1">Plaat_RL</bcf:citekey>
     <bcf:citekey order="10" intorder="1">Plaat_RL</bcf:citekey>
-    <bcf:citekey order="11" intorder="1">Chen2018NeuralODE</bcf:citekey>
-    <bcf:citekey order="12" intorder="1">LLN</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">HessPathwise</bcf:citekey>
+    <bcf:citekey order="12" intorder="1">HessPathwise</bcf:citekey>
+    <bcf:citekey order="13" intorder="1">Goodfellow-et-al-2016</bcf:citekey>
+    <bcf:citekey order="14" intorder="1">Chen2018NeuralODE</bcf:citekey>
+    <bcf:citekey order="15" intorder="1">CTRNN_Yang2022</bcf:citekey>
+    <bcf:citekey order="16" intorder="1">num_ODEs</bcf:citekey>
+    <bcf:citekey order="17" intorder="1">PMP_controller</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">ulbrich</bcf:citekey>
+    <bcf:citekey order="19" intorder="1">LLN</bcf:citekey>
+    <bcf:citekey order="20" intorder="1">Lutter</bcf:citekey>
+    <bcf:citekey order="21" intorder="1">Lutter</bcf:citekey>
+    <bcf:citekey order="22" intorder="1">PMP_controller</bcf:citekey>
+    <bcf:citekey order="23" intorder="1">HAC_controller</bcf:citekey>
+    <bcf:citekey order="24" intorder="1">DPG_Silver</bcf:citekey>
+    <bcf:citekey order="25" intorder="1">lillicrap2015ddpg</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nty">

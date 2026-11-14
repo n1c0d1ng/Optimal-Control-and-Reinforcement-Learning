@@ -1,6 +1,6 @@
 # Stochastic Evironment
 # min_u \int_0^1 (X_t + u_t^2) dt + X_1^2
-# dX_t = (X_t + u_t +1) dt + dW_t, X_0 = 
+# dX_t = (X_t + u_t +1) dt + dW_t, X_0 = 0
 import numpy as np
 
 class SOCP:

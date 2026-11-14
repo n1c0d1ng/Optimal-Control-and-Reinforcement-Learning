@@ -1,4 +1,4 @@
-# Implementierung einfacher Neuronal Networks
+# Implementierung einfacher Neural Networks
 import numpy as np
 
 # z_1 = W_1 * [t \\ x] + b_1 
@@ -87,9 +87,176 @@ class Neural_Network_One_Layer:
         grad_x = delta_1 @ self.W1                    # (input_dim,)
         return grad_x
 
-# x'=f(x,u) = W^N tanh(W^1 x + b^1) + b^N 
-# u =(W^1, b^1, W^N , b^N)
 
+# Hier explizit die Neural ODE als Funktionsapproximator:
+class NeuralODE:
+    def __init__(self, layers=10, integration_steps =10, input_dim = 2 , output_dim =1):
+        self.h = layers
+        self.output_dim = output_dim
+        self.input_dim = input_dim
+        self.integration_steps = integration_steps
+        self.step_size = 1/self.integration_steps
+        self.augmented_dimension = self.h - input_dim
+        self.W = np.random.randn(self.h,self.h)                                     # (h, h)
+        self.b = np.random.randn(self.h)                                            # (h,)
+        self.WN = np.random.randn(output_dim, self.h)                               # (output_dim, h)
+        self.bN = np.random.randn(output_dim)                                       # (output_dim,)
+        self.a_hist = np.zeros(
+            (self.integration_steps, self.h))                                       # (integration_steps, h)
+        self.alpha_hist = np.zeros(
+            (self.integration_steps, self.h))                                       # (integration_steps, h)
+        self.p_hist = np.zeros(
+            (self.integration_steps, self.h, output_dim))                           # (integration_steps, h, output_dim)
+        self.parameter_dim = (self.h)**2 + self.h + self.output_dim * self.h + self.output_dim
+
+    def compute(self, input_vector):
+        # Augmentieren: a0 = [x_1, x_2, 0, 0, ..., 0] ->  (h,)
+        a0 = np.pad(input_vector, (0, self.augmented_dimension), 'constant')
+
+        # Integration a' = tanh(W a + b) - a
+        a = a0[:,None]       
+        self.a_hist[0] = a0                                                         # (h,1)
+        for i in range(self.integration_steps):
+            # RK4 a'(s) = h(a(s)) = tanh(W*a(s)+b) - a(s) -> autonom
+            #------------------------------------------------
+            h = self.step_size
+            k1 = np.tanh(self.W @ a + self.b[:,None]) - a
+            k2 = np.tanh(self.W @ (a+h/2 * k1) + self.b[:,None]) - (a+ h/2 *k1)
+            k3 = np.tanh(self.W @ (a+h/2 * k2) + self.b[:,None]) - (a+ h/2 *k2)
+            k4 = np.tanh(self.W @ (a+h * k3) + self.b[:,None]) - (a+ h*k3)
+            ode_step = 1/6 * (k1 + 2*k2 + 2*k3 + k4)
+            a = a + h * ode_step
+            if i < self.integration_steps - 1:
+                self.a_hist[i+1] = a[:,0]  
+
+        # Ausgabe: (output_dim,1) = (output_dim,h) @ (h,1) + (output_dim,1)
+        self.a_final = a[:,0]                                                       # (h,)
+        output = (self.WN @ a + self.bN)[:,0]
+        if self.output_dim == 1:
+            return output  # Rückgabe als Skalar
+        return output
+
+    def solve_adjoint(self, input_vector):
+        self.compute(input_vector)
+        p = self.WN.T.copy()
+
+        for i in range(self.integration_steps - 1, -1, -1):
+            a_i = self.a_hist[i]
+            if i < self.integration_steps -1:
+                a_ip1 = self.a_hist[i+1]
+            else:
+                a_ip1 = self.a_final
+            a_mid = 0.5 * (a_i + a_ip1)
+
+            # a linear interpolieren und damit auch alpha
+            #-------------------------------------------------
+            alpha = 1 - np.tanh(self.W @ a_i + self.b)**2
+            alpha_mid = 1 - np.tanh(self.W @ a_mid + self.b)**2
+            alpha_next = 1 - np.tanh(self.W @ a_ip1 + self.b)**2
+            self.alpha_hist[i] = alpha
+            # RK4: p'(s) = - dh/da(s) * p(s) und p(1)= (W^N)^T
+            #-------------------------------------------------
+            # k1 = f(t,x)
+            # k2 = f(t + h/2, x + h/2 k1)
+            # k3 = f(t + h/2, x + h/2 k2)
+            # k4 = f(t + h,   x + h k3)
+            # x_n+1 = x_n + h/6 k1 + h/3 k2 + h/3 k3 + h/6 k4
+            M = -(self.W.T @ np.diag(alpha) - np.eye(self.h))                       # (h,h)
+            M_mid = -(self.W.T @ np.diag(alpha_mid) - np.eye(self.h)) 
+            M_next = -(self.W.T @ np.diag(alpha_next) - np.eye(self.h)) 
+            h = -self.step_size
+            k1 = M_next @ p
+            k2 = M_mid @ (p + 0.5*h*k1)
+            k3 = M_mid @ (p + 0.5*h*k2)
+            k4 = M @ (p + h*k3)
+            p = p + h/6 * (k1 + 2*k2 + 2*k3 + k4)
+            self.p_hist[i] = p
+
+        if self.output_dim == 1:
+            return p[:self.input_dim,0]                                             # (input_dim,)
+        else:
+            return p[:self.input_dim]                                               # (input_dim, output_dim)
+
+
+    def computeDerivative(self, input_vector):
+        d = self.output_dim
+        dgdW  = np.zeros((d, self.h, self.h))                                       # (d, h, h)
+        dgdb  = np.zeros((d, self.h))                                               # (d, h)
+        dgdWN = np.zeros((d, d, self.h))                                            # (d, d, h)
+        dgbN  = np.zeros((d, d))                                                    # (d, d)
+        p0 = self.solve_adjoint(input_vector)                                       # (input_dim, d)
+
+        for i in range(self.integration_steps):
+            alpha_i = self.alpha_hist[i]                                            # (h,)
+            a_i     = self.a_hist[i]                                                # (h,)
+            p_i     = self.p_hist[i]                                                # (h, d) = (h, 1)
+            for m in range(d):
+                # dg/dW = int_0^1 (alpha_i * p_i[:, m]) @ a_i^T ds
+                dgdW[m] += self.step_size * (alpha_i * p_i[:, m])[:, None] * a_i[None, :]
+                # dg/db = int_0^1 (alpha_i * p_i[:, m]) ds
+                dgdb[m] += self.step_size * (alpha_i * p_i[:, m])
+
+        for m in range(d):
+            # dg/WN = a(1)^T
+            dgdWN[m, m, :] = self.a_final
+        dgbN = np.eye(d)
+
+        # dg/dbN = 1
+        if self.output_dim == 1:
+            return (dgdW[0], dgdb[0], dgdWN[0], dgbN[0], p0)
+        else:
+            return (dgdW, dgdb, dgdWN, dgbN, p0)
+
+    # Schnitstelle für Policy Gradient Methode:
+    #---------------------------------------------------------------
+    def ForwardPass(self, Input_Vector):
+        return self.compute(Input_Vector)
+
+    def Backpropagation(self, Input_Vector):
+        dgdW, dgdb, dgdWN, dgbN, _ = self.computeDerivative(Input_Vector)
+        grad = np.concatenate([
+            dgdW.flatten(),
+            dgdb.flatten(),
+            dgdWN.flatten(),
+            dgbN.flatten()
+        ])
+        return grad
+
+    def sensitivities(self, Input_Vector):
+        _, _, _, _, p0 = self.computeDerivative(Input_Vector)
+        return p0
+    
+    def get_parameters(self):
+        params = np.concatenate([
+            self.W.flatten(),
+            self.b,
+            self.WN.flatten(),
+            self.bN
+        ])
+        return params
+
+    def set_parameters(self, params):
+        index = 0
+        W_size = self.h * self.h
+        self.W = params[index:index + W_size].reshape(self.h, self.h)
+        index += W_size
+
+        b_size = self.h
+        self.b = params[index:index + b_size]
+        index += b_size
+
+        WN_size = self.output_dim * self.h
+        self.WN = params[index:index + WN_size].reshape(self.output_dim, self.h)
+        index += WN_size
+
+        bN_size = self.output_dim
+        self.bN = params[index:index + bN_size]
+
+
+
+# Hier Adjoint und Sensitivity Methode 
+# für allgemeine Neural ODE um Dynamik zu lernen:
+#----------------------------------------------------------------------------
 class Neural_ODE_MLP:
     def __init__(self, layers =10 ,dim_state=1, method='adjoint'):
         # h: layers n: dim_state
@@ -322,69 +489,273 @@ class LNN_trjectory:
         self.b1 = np.zeros(layers)
         self.WN = 0.1*np.abs(np.random.randn(1, layers)) 
         self.bN = (-5)*np.ones(1)
+        self.epsilon = 0.1
+        self.sub = 4
 
 
     def read_data(self,path):
         raw = np.loadtxt(path, delimiter=",", skiprows=0)
-        self.time_grid  = raw[:self.N, 1]
         self.M          = int(raw[:, 0].max()) + 1
         self.N          = raw.shape[0] // self.M
+        self.time_grid  = raw[:self.N, 1]
+        self.colNumber = 5                              
+        self.reset_interval = int(self.N // self.colNumber)         # 500/5 = 100
+        self.mask_hist = np.zeros((self.N,self.M))
 
-        self.X = np.zeros((self.N,2,self.M))
-        self.Z = np.zeros((self.N,self.h,self.M))
-        self.A = np.zeros((self.N,self.h,self.M))
-        self.alpha = np.zeros((self.N,self.h,self.M))
-        self.beta = np.zeros((self.N,self.h,self.M))
-        self.gamma = np.zeros((self.N,self.h,self.M))
-        self.C = np.zeros((self.N,1, self.M))
-        self.H = np.zeros((self.N,1, self.M))
-        self.dLdq = np.zeros((self.N,1, self.M))
+        self.X = np.zeros((self.N,2,self.M))                        # (N,2,M)
+        self.X_sub = np.zeros((self.N,self.sub,2,self.M))           # (N,sub=4,2,M)
+        self.Z = np.zeros((self.N,self.h,self.M))                   # (N,h,M)
+        self.A = np.zeros((self.N,self.h,self.M))                   # (N,h,M)
+        self.alpha = np.zeros((self.N,self.h,self.M))               # (N,h,M)
+        self.beta = np.zeros((self.N,self.h,self.M))                # (N,h,M)
+        self.gamma = np.zeros((self.N,self.h,self.M))               # (N,h,M)
+        self.C = np.zeros((self.N,1, self.M))                       # (N,1,M)
+        self.H = np.zeros((self.N,1, self.M))                       # (N,1,M)
+        self.dLdq = np.zeros((self.N,1, self.M))                    # (N,1,M)
+
+        # Historien für die Rückwärtsintegration:
+        self.dHdq       = np.zeros((self.N, 1, self.M))             # (N,1,M)
+        self.dHdqdot    = np.zeros((self.N, 1, self.M))             #
+        self.dCdq       = np.zeros((self.N, 1, self.M))             #
+        self.dCdqdot    = np.zeros((self.N, 1, self.M))             # 
+        self.dLdqq      = np.zeros((self.N, 1, self.M))             #
 
         # Spalten: traj_id, t, q, qdot, u, qddot
-        self.Q_start        = raw[:, 2]                             # (K,)
+        self.Q_start        = np.zeros(self.M)                      # (M,)
         self.Qdot_start     = np.zeros(self.M)                      # (M,)
+        self.Q_data         = np.zeros((self.N,self.M))             # (N,M)
+        self.Qdot_data      = np.zeros((self.N,self.M))             # (N,M)
         self.U              = raw[:, 4].reshape(self.M, self.N).T
 
         # Startwerte Speichern
         for k in range(self.M):
             self.Q_start[k]     = raw[k*self.N,2]
             self.Qdot_start[k]  = raw[k*self.N,3]
+            for i in range(self.N):
+                self.Q_data[i,k]        = raw[k*self.N+i,2]
+                self.Qdot_data[i,k]     = raw[k*self.N+i,3]
 
         # vstack -> [ [Werte Q] ; [Werte Qdot] ]
         self.X[0] = np.vstack([self.Q_start, self.Qdot_start])  # (2,M)
 
     def forward_pass(self):
-        for i in range(self.N-1):
+        for i in range(self.N):
             self.Z[i] = self.W1 @ self.X[i] + self.b1[:,None] @ np.ones((1,self.M))
             self.A[i] = np.log(1+ np.exp(self.Z[i]))
             self.alpha[i] = np.exp(self.Z[i])/(1+np.exp(self.Z[i]))
             self.beta[i] = self.alpha[i]*(1-self.alpha[i])
             self.gamma[i] = self.beta[i]*(1-2*self.alpha[i])
-            self.C[i],self.H[i], self.dLdq[i] = self.L_derivates(self.alpha[i],self.beta[i],self.gamma[i])
+            self.C[i], self.H[i], self.dLdq[i], self.dHdq[i], \
+                self.dLdqq[i], self.dCdq[i], self.dHdqdot[i], \
+                self.dCdqdot[i], self.mask_hist[i] = (
+                    self.L_derivates(
+                        self.alpha[i], 
+                        self.beta[i], 
+                        self.gamma[i]
+                    )
+                )
+            
+            # Euler Schritt für X außer am letzten Schritt:
+            if i < self.N-1:
+                dt = self.time_grid[i+1] - self.time_grid[i]
+                step_size  = dt / self.sub
+                q       = self.X[i, 0].copy()
+                qdot    = self.X[i, 1].copy()
+                u_i     = self.U[i]
+                for k in range(self.sub):
+                    q, qdot = self.RK4_step(q, qdot, u_i, step_size)
+                    self.X_sub[i, k, 0] = q
+                    self.X_sub[i, k, 1] = qdot
+                self.X[i+1, 0] = q
+                self.X[i+1, 1] = qdot
 
-            # Euler Schritt für X
-            dt = self.time_grid[i+1] - self.time_grid[i]
-            self.X[i+1,0] = self.X[i,0] + dt*(self.X[i,1])
-            self.X[i+1,1] = self.X[i,1] + dt*((self.dLdq[i, 0] - self.C[i, 0] * self.X[i,1] + self.U[i]) / self.H[i, 0])
+    # Skalare Auswertung für einen konkreten Punkt
+    def forward(self, q, qdot):
+        X = np.array([q, qdot])                             # (2,)
+        Z = self.W1 @ X + self.b1                           # (h,)
+        A = np.log(1+np.exp(Z))
+        alpha = np.exp(Z)/(1+np.exp(Z))
+        beta = alpha*(1 - alpha)
+        gamma = beta*(1-2*alpha)
+        W1_1 = self.W1[:, 0]                            # (h,)
+        W1_2 = self.W1[:, 1]
 
-
-    def L_derivates(self,alpha,beta,gamma):
-        W1_1 = self.W1[:, 0][:,None]                       
-        W1_2 = self.W1[:, 1][:,None]
-
-        C = self.WN @ (beta* (W1_1 @ np.ones((1,self.M))) * (W1_2 @ np.ones((1,self.M))))
-        # Lq = W^N (alpha * W1^1)
-        dLdq = self.WN @ (alpha * (W1_1 @ np.ones((1,self.M))))
-        # H = W^N (beta * W1^2 * W1^2)
-        H = self.WN @ (beta * (W1_2 @ np.ones((1,self.M))) * (W1_2 @ np.ones((1,self.M))))
-        return C ,H,dLdq
-
-    def gradient_descent(self,X):
-        return 0
-
-    def train_step(self,X):
-        return 0
+        dLdq    = self.WN @ (alpha * W1_1)              # (1,)
+        dLdqdot = self.WN @ (alpha * W1_2)
+        C       = self.WN @ (beta  * W1_1 * W1_2)
+        H       = np.maximum(self.WN @ (beta  * W1_2 * W1_2),self.epsilon)
+        return dLdq, dLdqdot, C, H
     
+    def lagrangian_term(self, q , qdot):
+        X = np.vstack([q, qdot])                                    # (2, M)
+        Z = self.W1 @ X + self.b1[:, None] @ np.ones((1,self.M))    # (h, M)
+        # softplus:
+        A     = np.log(1 + np.exp(Z))
+        alpha = np.exp(Z) / (1 + np.exp(Z))
+        beta  = alpha * (1 - alpha)
+        W1_1  = self.W1[:, 0:1]
+        W1_2  = self.W1[:, 1:2]
+        dLdq  = self.WN @ (alpha * W1_1)
+        C     = self.WN @ (beta * W1_1 * W1_2)
+        H_raw = self.WN @ (beta * W1_2 * W1_2)
+        H     = np.maximum(H_raw, self.epsilon)
+        return dLdq[0], C[0], H[0]
+    
+    def f(self, q, qdot, u):
+        Lq, C, H = self.lagrangian_term(q, qdot)
+        qddot = (Lq - C*qdot + u) / H
+        return qdot, qddot
+
+    def RK4_step(self, q, qdot, u, step_size):
+        k1q, k1qdot = self.f(q, qdot, u)
+        k2q, k2qdot = self.f(q + 0.5*step_size*k1q, qdot + 0.5*step_size*k1qdot, u)
+        k3q, k3qdot = self.f(q + 0.5*step_size*k2q, qdot + 0.5*step_size*k2qdot, u)
+        k4q, k4qdot = self.f(q + step_size*k3q, qdot + step_size*k3qdot, u)
+        q_new = q + step_size/6 * (k1q + 2*k2q + 2*k3q + k4q)
+        qdot_new = qdot + step_size/6 * (k1qdot + 2*k2qdot + 2*k3qdot + k4qdot)
+        return q_new, qdot_new
+    
+    def L_derivates(self,alpha,beta,gamma):
+        W1_1 = self.W1[:, 0][:,None] @ np.ones((1,self.M))                      
+        W1_2 = self.W1[:, 1][:,None] @ np.ones((1,self.M))
+
+        C = self.WN @ (beta*W1_1*W1_2)
+        # Lq = W^N (alpha * W1^1)
+        dLdq = self.WN @ (alpha * W1_1)
+        # H = W^N (beta * W1^2 * W1^2)
+        H_raw = self.WN @ (beta * W1_2* W1_2)
+        mask = H_raw > self.epsilon                # (1,M)
+        H = np.maximum(H_raw, self.epsilon)
+
+        # Ergänzen im Pseudo Code: Broadcast für jede spalte mit M 
+        dHdq = mask * (self.WN @ ((gamma*W1_1*W1_2*W1_2)))
+        dLdqq = self.WN @ ((beta*W1_1*W1_1))
+        dCdq = self.WN @ ((gamma*W1_1*W1_1*W1_2))
+        dHdqdot = mask * (self.WN @ ((gamma*W1_2*W1_2*W1_2)))
+        dCdqdot = self.WN @ ((gamma*W1_2*W1_1*W1_2))
+
+        return C ,H,dLdq , dHdq, dLdqq, dCdq, dHdqdot, dCdqdot, mask
+
+    def compute_f_x(self,i):
+        # X zum Zeitpunkt i auswerten: 
+        qdot    = self.X[i,1]                                       # (M,)
+        N       = self.dLdq[i,0] - self.C[i,0] * qdot + self.U[i]   # (M,)
+
+        # Erste Komponente von (f_x)*P:
+        # p_2 * ((1/H^2) * H_q (L_q - C q' + u) +1/H (L_qq - C_q *q'))
+        fxP_1 = self.P[i,1]*( \
+            -(1/(self.H[i,0]*self.H[i,0])) * self.dHdq[i,0] * N \
+            + 1/self.H[i,0] *(self.dLdqq[i,0]- self.dCdq[i,0]*qdot))
+
+        # Zweite Komponente von (f_x)*P:
+        # p_1 + p_2 *(-1/H^2 * H_q' (L_q - C q' + u) + 1/H (C- C_q' q' - C))
+        fxP_2 = self.P[i,0]+self.P[i,1]*(-1/(self.H[i,0]*self.H[i,0]) * self.dHdqdot[i,0]*N \
+                                        + 1/self.H[i,0] * (- self.dCdqdot[i,0] * qdot) ) 
+        return fxP_1, fxP_2
+
+    def compute_f_x_single(self, i, p1, p2):
+        # Auswertung von f_x * P an beliebigen Werten von P
+        qdot    = self.X[i,1]                                       # (M,)
+        N       = self.dLdq[i,0] - self.C[i,0] * qdot + self.U[i]   # (M,)
+        H       = self.H[i,0]
+        Hq      = self.dHdq[i,0]
+        Lqq     = self.dLdqq[i,0]
+        Cq      = self.dCdq[i,0]
+        Hqdot   = self.dHdqdot[i,0]
+        Cqdot   = self.dCdqdot[i,0]
+
+        fxP_1 = p2 * ( -Hq / H**2 * N + (Lqq - Cq * qdot) / H)
+        fxP_2 = p1 + p2 * (-Hqdot / H**2 * N - Cqdot * qdot / H)
+        return fxP_1, fxP_2
+
+    def backward_pass(self):
+        self.P = np.zeros((self.N,2,self.M))
+        for i in range(self.N-1,0,-1):
+            dt  = self.time_grid[i] - self.time_grid[i-1]
+            p1 = self.P[i, 0].copy()
+            p2 = self.P[i, 1].copy()
+            res_q       = 2 * (self.X[i, 0] - self.Q_data[i])   # Loss-Gradient
+            res_qdot    = np.zeros_like(res_q)
+
+            def rhs(p1, p2):
+                fxP_1, fxP_2 = self.compute_f_x_single(i, p1, p2)
+                return -fxP_1 - res_q, -fxP_2 - res_qdot
+
+            k1q, k1qdot = rhs(p1,             p2)
+            k2q, k2qdot = rhs(p1 - 0.5*dt*k1q, p2 - 0.5*dt*k1qdot)
+            k3q, k3qdot = rhs(p1 - 0.5*dt*k2q, p2 - 0.5*dt*k2qdot)
+            k4q, k4qdot = rhs(p1 - dt*k3q,     p2 - dt*k3qdot)
+            self.P[i-1, 0] = np.clip(p1 - dt/6 * (k1q + 2*k2q + 2*k3q + k4q),-10,10)
+            self.P[i-1, 1] = np.clip(p2 - dt/6 * (k1qdot + 2*k2qdot + 2*k3qdot + k4qdot),-10,10)
+
+
+    def compute_gradient(self):
+        # Broadcast der Gewichte:
+        WN_T = (self.WN.T) @ np.ones((1,self.M))                                        # (h,M)
+        W1_1 = self.W1[:, 0:1] @ np.ones((1,self.M))                                    # (h,M)
+        W1_2 = self.W1[:, 1:2] @ np.ones((1,self.M))            
+
+
+        # Anlegen der Arrays für den Gradienten:
+        grad_W1 = np.zeros((self.h, 2))                                                 # (h,2)
+        grad_b1 = np.zeros(self.h)                                                      # (h,)
+        grad_WN = np.zeros(self.h)                                                      # (h,)
+
+        dt = self.time_grid[1] - self.time_grid[0]
+        for i in range(self.N):
+            q_i         = np.ones((self.h,1)) @ self.X[i, 0][None, :]                   # (h,M)
+            qdot_i      = self.X[i, 1][None, :]                                         # (1,M)
+            qdot_i_B    = np.ones((self.h,1)) @ qdot_i                                  # (h,M)
+            H_i         = self.H[i, 0][None, :]                                         # (1,M)
+            N_i         = self.dLdq[i, 0] - self.C[i, 0]*qdot_i + self.U[i]             # (M,)
+            # Berechnung der Preciction von q'' nach dem aktuellen Modell:
+            # q'' = H^-1 (L_q - C q' + u)
+            qddot_i = N_i / H_i                                                         # (1,M)
+            qddot_i_B = np.ones((self.h,1)) @ qddot_i                                   # (h,M)
+            P2      = self.P[i, 1]                                                      # (1,M)
+            mask = (np.ones((self.h,1)) @ self.mask_hist[i][None,:])                    # (h,M)
+
+            # Berechnung dH/dtheta
+            dHdW1_1 = mask * WN_T * W1_2 * W1_2 * self.gamma[i] * q_i                           # (h,M)
+            dHdW1_2 = mask * WN_T * W1_2 * (self.gamma[i] * W1_2 * qdot_i_B + 2*self.beta[i])   # (h,M)
+            dHdb1   = mask * self.gamma[i]* W1_2 * W1_2                                         # (h,M)
+            dHdWN   = mask * self.beta[i] * W1_2 * W1_2                                         # (h,M)
+
+            # Berechnung dC/dtheta
+            dCdW1_1 = WN_T * W1_2 * (self.gamma[i] * W1_1 * q_i + self.beta[i])
+            dCdW1_2 = WN_T * W1_1 * (self.gamma[i] * W1_2 * qdot_i_B + self.beta[i])
+            dCdb1   = WN_T * self.gamma[i] * W1_1 * W1_2
+            dCdWN   = self.beta[i] * W1_1 * W1_2
+
+            # Berechnung dL/dtheta
+            dLqdW1_1    = WN_T * (self.beta[i] * W1_1 * q_i + self.alpha[i])
+            dLqdW1_2    = WN_T * (self.beta[i] * W1_1 * qdot_i_B)
+            dLqdb1      = WN_T * (self.beta[i] * W1_1)
+            dLqdWN      = self.alpha[i] * W1_1
+
+            # Gradient berechnen: J_theta = sum_i 1/H *(-H_theta q'' + d/dtheta N) * p_2
+            # N = L_q - C q' + u 
+            grad_W1[:,0] += dt * 1/(np.ones((self.h,1)) @ self.H[i]) * (-dHdW1_1 * qddot_i_B + dLqdW1_1 - dCdW1_1 * qdot_i_B) @ P2
+            grad_W1[:,1] += dt * 1/(np.ones((self.h,1)) @ self.H[i]) * (-dHdW1_2 * qddot_i_B + dLqdW1_2 - dCdW1_2 * qdot_i_B) @ P2
+            grad_b1[:]   += dt * 1/(np.ones((self.h,1)) @ self.H[i]) * (-dHdb1 * qddot_i_B + dLqdb1 - dCdb1 * qdot_i_B) @ P2
+            grad_WN[:]   += dt * 1/(np.ones((self.h,1)) @ self.H[i]) * (-dHdWN * qddot_i_B + dLqdWN - dCdWN * qdot_i_B) @ P2
+
+        return grad_W1/(self.M * self.N), grad_b1/(self.M * self.N) , grad_WN.reshape(1,self.h)/(self.M * self.N)
+        
+    def train_step(self,learning_rate= 0.01):
+        self.forward_pass()
+        self.backward_pass()
+        grad_W1, grad_b1, grad_WN = self.compute_gradient()
+    
+        self.W1 -= learning_rate * grad_W1          # (h,2)
+        self.b1 -= learning_rate * grad_b1          # (h,)
+        self.WN -= learning_rate * grad_WN          # (1,h)
+
+    def loss(self):
+        # sum_i (q-q_data)^2 
+        error = self.X[:,0,:] - self.Q_data                 # (N,M)
+        #dt = self.time_grid[1] - self.time_grid[0]
+        return float(np.mean((error**2)))
 
 class LNN_Regression:
     def __init__(self, layers =10 , activation_method = 'tanh' ,dim_state=1):
@@ -590,6 +961,374 @@ class LNN_Regression:
         qddot_pred = N / H
         error = qddot_pred - Qdd
         return float(np.mean(error**2))
+
+class LNN_structured:
+    def __init__(self,layers =10, dim_state =1):
+        self.h = layers
+        self.dim_state = dim_state
+        self.W1z = np.random.randn(layers, 1) 
+        self.W1v = np.random.randn(layers, 1)
+        self.b1z = np.zeros(layers)
+        self.b1v = np.zeros(layers)
+        self.WNz = np.abs(np.random.randn(1, layers))
+        self.WNv = np.random.randn(1, layers)
+        self.bNz = np.abs(np.random.randn(1))
+        self.bNv = np.random.randn(1)
+        self.epsilon = 0.1
+        self.sub = 4
+
+
+    def read_data(self,path):
+        raw = np.loadtxt(path, delimiter=",", skiprows=0)
+        self.M          = int(raw[:, 0].max()) + 1
+        self.N          = raw.shape[0] // self.M
+        self.time_grid  = raw[:self.N, 1]                        
+
+        self.X = np.zeros((self.N,2,self.M))                        # (N,2,M)
+        self.f2 = np.zeros((self.N,1,self.M))                       # (N,1,M)
+        self.A = np.zeros((self.N,1,self.M))                        # (N,1,M)
+        self.S = np.zeros((self.N,1,self.M))                        # (N,1,M)
+        self.X_sub = np.zeros((self.N,self.sub,2,self.M))           # (N,sub=4,2,M)
+        self.Z = np.zeros((self.N,1,self.M))                        # (N,1,M)
+        self.Zq = np.zeros((self.N,1,self.M))                       # (N,1,M)
+        self.M_hist = np.zeros((self.N,1,self.M))                   # (N,1,M)
+        self.Mq = np.zeros((self.N,1,self.M))                       # (N,1,M)
+        self.Mqq = np.zeros((self.N,1,self.M))                      # (N,1,M)
+        self.Vq = np.zeros((self.N,1,self.M))                       # (N,1,M)
+        self.Vqq = np.zeros((self.N,1,self.M))                      # (N,1,M)
+        self.alphaZ = np.zeros((self.N,self.h,self.M))              # (N,h,M)
+        self.betaZ = np.zeros((self.N,self.h,self.M))               # (N,h,M)
+        self.alphaV = np.zeros((self.N,self.h,self.M))              # (N,h,M)
+        self.betaV = np.zeros((self.N,self.h,self.M))               # (N,h,M)
+
+        # Spalten: traj_id, t, q, qdot, u, qddot
+        self.Q_start        = np.zeros(self.M)                      # (M,)
+        self.Qdot_start     = np.zeros(self.M)                      # (M,)
+        self.Q_data         = np.zeros((self.N,self.M))             # (N,M)
+        self.Qdot_data      = np.zeros((self.N,self.M))             # (N,M)
+        self.U              = raw[:, 4].reshape(self.M, self.N).T
+
+        # Startwerte Speichern
+        for k in range(self.M):
+            self.Q_start[k]     = raw[k*self.N,2]
+            self.Qdot_start[k]  = raw[k*self.N,3]
+            for i in range(self.N):
+                self.Q_data[i,k]        = raw[k*self.N+i,2]
+                self.Qdot_data[i,k]     = raw[k*self.N+i,3]
+
+        # vstack -> [ [Werte Q] ; [Werte Qdot] ]
+        self.X[0] = np.vstack([self.Q_start, self.Qdot_start])      # (2,M)
+
+    def forward_pass(self):
+        for i in range(self.N):
+            q    = self.X[i, 0]
+            qdot = self.X[i, 1]
+
+            (M, 
+            zq, 
+            A, 
+            S, 
+            Mq, 
+            Mqq, 
+            Vq, 
+            Vqq, 
+            alpha_z, 
+            beta_z, 
+            alpha_v, 
+            beta_v) = self.lagrangian_term(q)
+
+            self.M_hist[i] = M
+            self.A[i]      = A
+            self.S[i]      = S
+            self.Mq[i]     = Mq
+            self.Mqq[i]    = Mqq
+            self.Zq[i]     = zq
+            self.Vq[i]     = Vq
+            self.Vqq[i]    = Vqq
+            self.alphaZ[i] = alpha_z
+            self.betaZ[i]  = beta_z
+            self.alphaV[i] = alpha_v
+            self.betaV[i]  = beta_v
+            self.f2[i]     = (1 / M) * (-0.5 * Mq * qdot**2 - Vq + self.U[i])
+            
+            # Integration der ODE
+            if i < self.N-1:
+                dt = self.time_grid[i+1] - self.time_grid[i]
+                step_size  = dt / self.sub
+                q       = self.X[i, 0].copy()
+                qdot    = self.X[i, 1].copy()
+                u_i     = self.U[i]
+                for k in range(self.sub):
+                    q, qdot = self.RK4_step(q, qdot, u_i, step_size)
+                    self.X_sub[i, k, 0] = q
+                    self.X_sub[i, k, 1] = qdot
+                self.X[i+1, 0] = q
+                self.X[i+1, 1] = qdot
+
+    #  Berechnung von q'' basierend auf q und q' im skalaren Fall:
+    # q'' = 1/H * (L_q - C*q' + u) mit H=M, C=M'*q' L_q = 1/2 M' * (q')^2 - V'
+    # => q'' = 1/M (-1/2 M' * (q')^2 - V' +u)
+    def forward(self,q,qdot,u=0):
+        # Berechnung von z im skalaren Fall: z = WN * log(1+exp(W1 q + b1)) + bN
+        z = self.WNz@(np.log(1+np.exp(self.W1z[:,0]*q+self.b1z)))+self.bNz
+
+        # Berechnung von A im skalren Fall: A= log(1+exp(z))
+        A = np.log(1+np.exp(z))
+
+        # Berechnung von M im skalaren Fall: M = A^2 + epsilon 
+        M = A**2 + self.epsilon
+
+        # Berechnung von M' = 2 A(q) s(q) * z'(q)
+        S = 1/(1+np.exp(-z))
+        alpha_z = np.exp(self.W1z[:,0]*q+self.b1z)/(1+np.exp(self.W1z[:,0]*q+self.b1z))
+        Zq = self.WNz@(alpha_z*self.W1z[:,0])
+        Mq = 2*A*S*Zq
+
+        # Berechnung V' = W_N (alpha_V * W_1)
+        alpha_v = np.exp(self.W1v[:,0]*q+self.b1v)/(1+np.exp(self.W1v[:,0]*q+self.b1v))
+        Vq = self.WNv @ (alpha_v * self.W1v[:,0])
+
+        return M[0],Mq[0], Vq[0]
+
+    # Hier eine Funktion die immer eine volle Berechnung macht.
+    # Hier später full als Option einfügen 
+    def lagrangian_term(self,q):
+        z_pre = self.W1z @ q[None, :] + self.b1z[:, None]       # (h, M)
+        v_pre = self.W1v @ q[None, :] + self.b1v[:, None]       # (h, M)
+
+        # softplus: Z=log(1+e^z_pre)
+        sigma_z = np.log(1 + np.exp(z_pre))
+        sigma_v = np.log(1 + np.exp(v_pre))
+        alpha_z = np.exp(z_pre) / (1 + np.exp(z_pre))
+        beta_z  = alpha_z * (1 - alpha_z)
+        alpha_v = np.exp(v_pre) / (1 + np.exp(v_pre))
+        beta_v  = alpha_v * (1 - alpha_v)
+
+        Z   = self.WNz @ sigma_z + self.bNz[:, None]            # (1, M)
+        A   = np.log(1+np.exp(Z))                               # (1, M)
+        S   = 1/(1+np.exp(-Z))                                  #
+        M   = A*A + self.epsilon                                # (1, M)
+        zq  = self.WNz @ (alpha_z * self.W1z)                   # (1, M)
+        zqq = self.WNz @ (beta_z * self.W1z**2)
+        Mq  = 2*A*S*zq
+        Mqq = 2*(S**2 * zq**2 + A*S*(1-S)* zq**2 + A*S*zqq)     # (1, M)
+        Vq  = self.WNv @ (alpha_v * self.W1v)
+        Vqq = self.WNv @ (beta_v * self.W1v**2)
+
+        # M[0] -> Rückgabe als Vektor (M,)
+        return (
+            M[0], 
+            zq[0], 
+            A[0], 
+            S[0], 
+            Mq[0], 
+            Mqq[0], 
+            Vq[0], 
+            Vqq[0], 
+            alpha_z, 
+            beta_z, 
+            alpha_v, 
+            beta_v) # Rückgabe 12 Werte
+
+    # f2 = 1/M * (-1/2 M' * (q')^2 - V'(q) + u)
+    def f(self, q, qdot, u):
+        M, _ ,_ , _ , Mq ,_, Vq, _ , _ , _ , _ , _ = self.lagrangian_term(q)
+        qddot = (-1/2 * Mq * (qdot**2) - Vq + u) / M
+        return qdot, qddot
+
+    # Runge-Kutta Ordnung 4:
+    # k1, k1' = f(q,q')
+    # k2, k2' = f(q + h/2 k1, q' + h/2 k1')
+    # k3, k3' = f(q + h/2 k2, q' + h/2 k2')
+    # k4, k4' = f(q + h k3, q' + h k3')
+    # q_new = q + h/6 (k1 + 2k2 + 2k3 + k4)
+    # q'_new = q' + h/6 (k1' + 2k2' + 2k3' + k4')
+    
+    def RK4_step(self, q, qdot, u, step_size):
+        k1q, k1qdot = self.f(q, qdot, u)
+        k2q, k2qdot = self.f(q + 0.5*step_size*k1q, qdot + 0.5*step_size*k1qdot, u)
+        k3q, k3qdot = self.f(q + 0.5*step_size*k2q, qdot + 0.5*step_size*k2qdot, u)
+        k4q, k4qdot = self.f(q + step_size*k3q, qdot + step_size*k3qdot, u)
+        q_new = q + step_size/6 * (k1q + 2*k2q + 2*k3q + k4q)
+        qdot_new = qdot + step_size/6 * (k1qdot + 2*k2qdot + 2*k3qdot + k4qdot)
+        return q_new, qdot_new
+
+    def compute_f_x_single(self, i, p1, p2):
+        # Auswertung von f_x * P an beliebigen Werten von P wegen integration
+        q               = self.X[i,0]
+        qdot            = self.X[i,1]       
+        M, _ , _ , _ , Mq, Mqq, _, Vqq, _, _, _, _  = self.lagrangian_term(q)
+
+        # Erste Komponente von (f_x)*P:
+        # p_2 *  (-1)* ((V''+ 1/2 M'' q'^2)/M + f_2 M'/M)
+        fxP_1 = p2* (
+            -(Vqq + 1/2 * Mqq * qdot**2)/M - self.f2[i][0]*(Mq/M)
+        )
+        # Zweite Komponente von (f_x)*P:
+        # p_1 - (M'/M)q' p_2
+        fxP_2 = p1 - p2*(Mq/M)*qdot 
+        return fxP_1, fxP_2
+
+    def backward_pass(self):
+        self.P = np.zeros((self.N,2,self.M))
+        for i in range(self.N-1,0,-1):
+            dt  = self.time_grid[i] - self.time_grid[i-1]
+            p1 = self.P[i, 0].copy()
+            p2 = self.P[i, 1].copy()
+            res_q       = 2 * (self.X[i, 0] - self.Q_data[i])   # Loss-Gradient
+            res_qdot    = np.zeros_like(res_q)
+
+            def rhs(p1, p2):
+                fxP_1, fxP_2 = self.compute_f_x_single(i, p1, p2)
+                return -fxP_1 - res_q, -fxP_2 - res_qdot
+
+            k1q, k1qdot = rhs(p1,             p2)
+            k2q, k2qdot = rhs(p1 - 0.5*dt*k1q, p2 - 0.5*dt*k1qdot)
+            k3q, k3qdot = rhs(p1 - 0.5*dt*k2q, p2 - 0.5*dt*k2qdot)
+            k4q, k4qdot = rhs(p1 - dt*k3q,     p2 - dt*k3qdot)
+            self.P[i-1, 0] = p1 - dt/6 * (k1q + 2*k2q + 2*k3q + k4q)
+            self.P[i-1, 1] = p2 - dt/6 * (k1qdot + 2*k2qdot + 2*k3qdot + k4qdot)
+
+
+    def compute_gradient(self):
+        # Broadcast der Gewichte:
+        WNz = (self.WNz.T) @ np.ones((1,self.M))                        # (h,M)
+        WNv = (self.WNv.T) @ np.ones((1,self.M))                        # (h,M)
+        W1z = self.W1z @ np.ones((1,self.M))                            # (h,M)
+        W1v = self.W1v @ np.ones((1,self.M))                            # (h,M)
+        b1z = self.b1z[:, None] @ np.ones((1,self.M))
+        b1v = self.b1v[:, None] @ np.ones((1,self.M))
+        bNz = self.bNz[0] * np.ones((1,self.M))
+
+        # Anlegen der Arrays für den Gradienten:
+        grad_W1z = np.zeros(self.h)                                     # (h,)
+        grad_b1z = np.zeros(self.h)                                     # (h,)
+        grad_WNz = np.zeros(self.h)                                     # (h,)
+        grad_W1v = np.zeros(self.h)                                     # (h,)
+        grad_b1v = np.zeros(self.h)                                     # (h,)
+        grad_WNv = np.zeros(self.h)                                     # (h,)
+        grad_bNz = np.zeros(1)                                          # (1,)
+
+        dt = self.time_grid[1] - self.time_grid[0]
+        for i in range(self.N):
+            q       = np.ones((self.h,1)) @ self.X[i,0][None,:]         # (h,M)
+            qdot    = np.ones((self.h,1)) @ self.X[i,1][None,:]         # (h,1)*(1,M)=(h,M)
+            P2      = self.P[i,1]
+
+            # Block mit den ABleitungen dz/dtheta:
+            #----------------------------------------------------------------------
+            # dz/dW1z = (W^N)^T * alpha_z * q
+            dzdW1   = (WNz * self.alphaZ[i]) * q
+            # dz/db1 = (W^N)^T * alpha_z 
+            dzdb1   = WNz * self.alphaZ[i]
+            z_pre = W1z * q + b1z                                       # (h, M)
+            dzdWN   = np.log(1+ np.exp(z_pre))
+            dzdbN   = np.ones((1,self.M))
+
+            dzqdW1  = WNz * (self.betaZ[i] * (W1z * q) + self.alphaZ[i])
+            dzqdb1  = WNz * (self.betaZ[i] * W1z)
+            dzqdWN  = self.alphaZ[i]*W1z
+            dzqdbN  = np.zeros((1,self.M))
+
+            dVqdW1  = WNv * (self.betaV[i]*W1v*q + self.alphaV[i])
+            dVqdWN  = self.alphaV[i]*W1v
+            dVqdb1  = WNv * (self.betaV[i] * W1v)
+
+            M = self.M_hist[i]
+            Mq = self.Mq[i]
+            Vq = self.Vq[i]
+            u = self.U[i]
+            A = self.A[i]
+            S = self.S[i]
+            Zq = self.Zq[i]
+
+            # dM/dtheta = 2A(q) s(q) dz/dtheta:
+            #---------------------------------------------------------------
+            dMdW1 = 2*A*S*dzdW1
+            dMdb1 = 2*A*S*dzdb1
+            dMdWN = 2*A*S*dzdWN
+            dMdbN = 2*A*S*dzdbN
+
+            # dM'/dtheta = 2(s(q)^2 + A(q)s(q)(1-s(q)) dz/dtheta * z' + A(q)s(q) dz'/dtheta)
+            #---------------------------------------------------------------
+            dMqdW1 = 2*((S**2 + A*S*(1-S))*dzdW1*Zq + A*S*dzqdW1)
+            dMqdb1 = 2*((S**2 + A*S*(1-S))*dzdb1*Zq + A*S*dzqdb1)
+            dMqdWN = 2*((S**2 + A*S*(1-S))*dzdWN*Zq + A*S*dzqdWN)
+            dMqdbN = 2*((S**2 + A*S*(1-S))*dzdbN*Zq + A*S*dzqdbN)
+
+            # Block (-1/M dV'/dtheta_V)*p_2
+            grad_W1v += dt * ((-1/M)*dVqdW1) @ P2 
+            grad_b1v += dt * ((-1/M)*dVqdb1) @ P2 
+            grad_WNv += dt * ((-1/M)*dVqdWN) @ P2 
+
+            # [-1/M^2 dM/dtheta * (-1/2 Mq X_2^2 - Vq + U) + 1/M (-1/2 X_2^2 dM'/dtheta)]*p_2
+            grad_W1z += dt * (
+                -1/M**2 * dMdW1 * (
+                    -1/2 *Mq *qdot**2 - Vq + u
+                    ) + 1/M*(
+                        -1/2*qdot**2 * dMqdW1
+                    )
+                ) @ P2
+
+            grad_b1z += dt * (
+                -1/M**2 * dMdb1 * (
+                    -1/2 *Mq *qdot**2 - Vq + u
+                    ) + 1/M*(
+                        -1/2*qdot**2 * dMqdb1
+                    )
+                ) @ P2
+
+            grad_WNz += dt * (
+                -1/M**2 * dMdWN * (
+                    -1/2 *Mq *qdot**2 - Vq + u
+                    ) + 1/M*(
+                        -1/2*qdot**2 * dMqdWN
+                    )
+                ) @ P2
+
+            # Wichtig qdot ist (h,M) aber wir brauchen hier (1,M)
+            grad_bNz += dt * (
+                -1/M**2 * dMdbN * (
+                    -1/2 *Mq * self.X[i, 1][None, :]**2 - Vq + u
+                    ) + 1/M*(
+                        -1/2* self.X[i, 1][None, :]**2 * dMqdbN
+                    )
+                ) @ P2
+
+        return (grad_W1v/(self.N*self.M), 
+                grad_b1v/(self.N*self.M), 
+                grad_WNv/(self.N*self.M), 
+                grad_W1z/(self.N*self.M), 
+                grad_b1z/(self.N*self.M),
+                grad_WNz/(self.N*self.M),
+                grad_bNz/(self.N*self.M)
+        )
+    
+    def train_step(self,learning_rate= 0.01):
+        self.forward_pass()
+        self.backward_pass()
+        (   grad_W1v, 
+            grad_b1v,
+            grad_WNv,
+            grad_W1z, 
+            grad_b1z,
+            grad_WNz,
+            grad_bNz) = self.compute_gradient()
+    
+        self.W1z -= learning_rate * grad_W1z[:,None]        # (h,)
+        self.b1z -= learning_rate * grad_b1z                # (h,)
+        self.WNz -= learning_rate * grad_WNz                # (1,h)
+        self.bNz -= learning_rate * grad_bNz                # (1,)
+
+        self.W1v -= learning_rate * grad_W1v[:,None]
+        self.b1v -= learning_rate * grad_b1v
+        self.WNv -= learning_rate * grad_WNv
+
+    def loss(self):
+        # sum_i (q-q_data)^2 
+        error = self.X[:,0,:] - self.Q_data                 # (N,M)
+        #dt = self.time_grid[1] - self.time_grid[0]
+        return float(np.mean((error**2)))
 
 # z_1 = W_1 * [t \\ x] + b_1 
 # a_1 = tanh(z_1)

@@ -27,7 +27,8 @@
   publisher = {Wiley},
   year      = {2004},
   address   = {Hoboken, NJ},
-  isbn      = {978-0471649908}
+  isbn      = {978-0471649908},
+  note      = {\url{https://www.kramirez.net/Robotica/Tareas/Kinematics.pdf}},
 }
 @book{siciliano2010,
   author    = {Bruno Siciliano and Lorenzo Sciavicco and Luigi Villani and Giuseppe Oriolo},
@@ -35,7 +36,8 @@
   publisher = {Springer},
   year      = {2010},
   address   = {London},
-  isbn      = {978-1849964507}
+  isbn      = {978-1849964507},
+  url       = {https://people.disim.univaq.it/~costanzo.manes/EDU_stuff/Robotics_Modelling,%20Planning%20and%20Control_Sciavicco_extract.pdf}
 }
 
 @book{Plaat_RL,
@@ -51,6 +53,18 @@
   title     = {Reinforcement Learning: An Introduction},
   publisher = {MIT Press},
   year      = {2018},
+}
+
+@inproceedings{DPG_Silver,
+  title     = {Deterministic Policy Gradient Algorithms},
+  author    = {Silver, David and Lever, Guy and Heess, Nicolas and Degris, Thomas and Wierstra, Daan and Riedmiller, Martin},
+  booktitle = {Proceedings of the 31st International Conference on Machine Learning},
+  pages     = {387--395},
+  year      = {2014},
+  volume    = {32},
+  number    = {1},
+  series    = {Proceedings of Machine Learning Research},
+  publisher = {PMLR}
 }
 
 @article{lillicrap2015ddpg,
@@ -132,7 +146,66 @@
   author    = {Ricky T. Q. Chen and Yulia Rubanova and Jesse Bettencourt and David Duvenaud},
   title     = {Neural Ordinary Differential Equations},
   booktitle = {Advances in Neural Information Processing Systems 31 (NeurIPS 2018)},
-  volume    = {31},
-  pages     = {6571--6583},
-  year      = {2018}
+  year      = {2018},
+  journal = {arXiv preprint arXiv:1806.07366},
+  eprint  = {1806.07366},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG}
+}
+
+@inproceedings{HessPathwise,
+  author        = {Nicolas Heess and Greg Wayne and David Silver and Timothy Lillicrap and Yuval Tassa and Tom Erez},
+  title         = {Learning Continuous Control Policies by Stochastic Value Gradients},
+  booktitle     = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume        = {28},
+  year          = {2015},
+  eprint        = {1510.09142},
+  archiveprefix = {arXiv},
+  primaryclass  = {cs.LG}
+}
+
+@book{Goodfellow-et-al-2016,
+  title     = {Deep Learning},
+  author    = {Ian Goodfellow and Yoshua Bengio and Aaron Courville},
+  publisher = {MIT Press},
+  note      = {\url{https://www.deeplearningbook.org/contents/mlp.html}},
+  year      = {2016}
+}
+
+@article{CTRNN_Yang2022,
+  author  = {Yang, Alan and others},
+  title   = {Input-to-State Stable Neural Ordinary Differential Equations with Applications to Transient Modeling of Circuits},
+  journal = {arXiv preprint arXiv:2202.06453},
+  year    = {2022},
+  eprint  = {2202.06453v1},
+  archiveprefix = {arXiv}
+}
+
+@book{num_ODEs,
+  author    = {David F. Griffiths and Desmond J. Higham},
+  title     = {Numerical Methods for Ordinary Differential Equations: Initial Value Problems},
+  publisher = {Springer},
+  year      = {2010},
+  address   = {London},
+  isbn      = {978-1-84882-512-3}
+}
+
+@article{PMP_controller,
+  author        = {Chengyang Gu and Hui Xiong and Yize Chen},
+  title         = {Pontryagin Optimal Control via Neural Networks},
+  journal       = {arXiv preprint arXiv:2212.14566},
+  year          = {2022},
+  eprint        = {2212.14566},
+  archiveprefix = {arXiv},
+  primaryclass  = {eess.SY}
+}
+
+@article{HAC_controller,
+  author        = {Chengyang Gu and Yuxin Pan and Hui Xiong and Yize Chen},
+  title         = {A Pontryagin Method of Model-based Reinforcement Learning via Hamiltonian Actor-Critic},
+  journal       = {arXiv preprint arXiv:2603.28971},
+  year          = {2026},
+  eprint        = {2603.28971},
+  archiveprefix = {arXiv},
+  primaryclass  = {cs.LG}
 }
