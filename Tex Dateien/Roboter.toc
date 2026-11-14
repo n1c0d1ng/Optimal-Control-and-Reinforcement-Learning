@@ -21,7 +21,7 @@
 \contentsline {subsection}{\numberline {3.5}Experimente}{28}{subsection.3.5}%
 \contentsline {section}{\numberline {4}Learning of Dynamics}{31}{section.4}%
 \contentsline {subsection}{\numberline {4.1}Sensitivity Approach}{31}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Adjoint Approach}{33}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.2}Adjoint Approach}{34}{subsection.4.2}%
 \contentsline {subsection}{\numberline {4.3}PMP Controller}{35}{subsection.4.3}%
 \contentsline {section}{\numberline {5}Physics-Inspired Neural Networks}{37}{section.5}%
 \contentsline {subsection}{\numberline {5.1}Parametrisierung des Neural Networks}{37}{subsection.5.1}%

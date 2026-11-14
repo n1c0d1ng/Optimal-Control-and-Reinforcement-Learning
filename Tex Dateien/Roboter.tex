@@ -5012,7 +5012,7 @@ Die Gleichung lässt sich somit schreiben durch:
     \left[W^{(N)} \cdot \mathsf{diag}(\bm{\alpha})\right] \otimes \bm{u}^T
 \end{align*}
 
-Für $\bm{U}_{W^{(N)}}$ erhalten wir:
+Für $\bm{U}_{W^{(N)}} \in \mathbb{R}^{n \times nh}$ erhalten wir:
 %
 \begin{align*}
     \bm{U}_{W^{(N)}}^{(j,k)} 
@@ -5043,6 +5043,8 @@ Für $\bm{U}_{W^{(N)}}$ erhalten wir:
         \overset{\vert}{\underset{\vert}{\bm{a}_h \bm{e}_1}}
         &
         \bigg|
+        \cdots 
+        \bigg|
         &
         \overset{\vert}{\underset{\vert}{\bm{a}_1 \bm{e}_2}}
         &
@@ -5050,8 +5052,7 @@ Für $\bm{U}_{W^{(N)}}$ erhalten wir:
         &
         \overset{\vert}{\underset{\vert}{\bm{a}_h \bm{e}_n}}
     \end{bmatrix}
-    \\
-    &=
+    =
     \begin{bmatrix}
         \overset{\vert}{\underset{\vert}{\bm{e}_1 \otimes \bm{a}^T}}
         &
@@ -5059,10 +5060,9 @@ Für $\bm{U}_{W^{(N)}}$ erhalten wir:
         &
         \overset{\vert}{\underset{\vert}{\bm{e}_n \otimes \bm{a}^T}}
     \end{bmatrix}
-    \\
-    &=
+    =
     % Blockform
-    \bm{I}_n \otimes \bm{a}^T \in \mathbb{R}^{n \times nh}
+    \bm{I}_n \otimes \bm{a}^T 
 \end{align*}
 
 Wir erhalten für die anderen Matrizen $\bm{U}$:
