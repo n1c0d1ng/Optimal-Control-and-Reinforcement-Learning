@@ -258,68 +258,80 @@ class NeuralODE:
 # für allgemeine Neural ODE um Dynamik zu lernen:
 #----------------------------------------------------------------------------
 class Neural_ODE_MLP:
-    def __init__(self, layers =10 ,dim_state=1, method='adjoint'):
+    def __init__(self, layers =10 ,dim_state=1,dim_control =1 , method='adjoint'):
         # h: layers n: dim_state
         self.layers = layers
         self.dim_state = dim_state
+        self.dim_control = dim_control
 
-        # 2hn+h+n
-        self.parameter_dim = 2*layers*dim_state+dim_state+layers
-    
-        # Parameter initialisieren als (n,) statt (n,1) Vektoren ???
-        self.W1 = np.random.randn(layers, dim_state)    # (h, n)
-        self.b1 = np.random.randn(layers)               # (h,)
-        self.WN = np.random.randn(dim_state, layers)    # (n, h)
-        self.bN = np.random.randn(dim_state)            # (n,)
+        # 2hn+h+n+(hm)
+        self.parameter_dim = 2*layers*dim_state+dim_state+layers+layers*dim_control
         self.method = method
 
     # Einlesen der Daten: 
     def read_data(self, path):
-        raw = np.loadtxt(path, delimiter=",", skiprows=0)
-        M = (raw.shape[1] - 1) // self.dim_state       # Anzahl Trajektorien
-        N = raw.shape[0]
-        n = self.dim_state
+        raw = np.loadtxt(path, delimiter=",", skiprows=0)                   # (N*M,2+n+m)
+        # Spalten: traj_id, t, x_1 - x_n, u_1 - u_m
+        #-----------------------------------------------------------------
+        self.number_trajectories            = int(raw[:, 0].max()) + 1
+        self.time_steps                     = raw.shape[0] // self.number_trajectories
+        self.time_grid                      = raw[:self.time_steps, 1]      # (N,)
+        self.X_data = np.zeros((
+            self.time_steps, self.dim_state, self.number_trajectories))     # (N,n,M)
+        self.U_data = np.zeros((
+            self.time_steps, self.dim_control, self.number_trajectories))   # (N,m,M)
 
-        self.time_grid = raw[:, 0]                     # (N,)
-        self.data = np.zeros((N, n, M))
+        for j in range(self.number_trajectories):
+            for k in range(self.dim_state):
+                self.X_data[:,k,j] = raw[
+                    j*self.time_steps:(j+1)*self.time_steps,
+                    2+k] 
+            for k in range(self.dim_control):
+                self.U_data[:,k,j] = raw[
+                    j*self.time_steps:(j+1)*self.time_steps,
+                    2+self.dim_state+k] 
+                
+        # Hier LeChun Regel: Paper GLeichung 16
+        # Var(W) = 1/(fan-in * Var(Input))
+        # #-------------------------------------------------------------------------------    
+        self.W1x = np.random.randn(self.layers, self.dim_state)               # (h, n)
+        self.W1u = np.random.randn(self.layers, self.dim_control)             # (h, m)
+        self.b1 = np.random.randn(self.layers)                                # (h,)
+        self.WN = np.random.randn(self.dim_state, self.layers)                # (n, h)
+        self.bN = np.random.randn(self.dim_state)                             # (n,)
+        self.x0 = self.X_data[0]                                              # (n,M)
 
-        for j in range(M):
-            for k in range(n):
-                self.data[:, k, j] = raw[:, 1 + j * n + k]
-
-        self.x0 = self.data[0]                         # (n, M)
-        self.number_trajectories = M
-        self.time_steps = N
-        return self.time_grid, self.data
-
-    
     # Forward Computation
     def forward(self):
         # M Trajektorien, N Zeitpunkte, Zustandsdimension n
         M = self.number_trajectories
         N = self.time_steps
         n = self.dim_state
+        m = self.dim_control
+        h = self.layers
 
         # X_hist[i, :, j] = x^j(t_i) speichert zum Zeitpunkt i den Wert der Trajektorie j
         self.X_hist = np.zeros((N, n, M))
-        self.A_hist = np.zeros((N, self.layers, M))
-        self.alpha_hist = np.zeros((N,self.layers,M))
-        self.X_hist[0, :, :] = self.x0.reshape(n, M)
+        self.A_hist = np.zeros((N, h, M))
+        self.alpha_hist = np.zeros((N, h, M))
+        self.X_hist[0, :, :] = self.x0
 
         for i in range(N - 1):
             dt = self.time_grid[i + 1] - self.time_grid[i]
-            x = self.X_hist[i]                       
+            x = self.X_hist[i]     
+            u = self.U_data[i]                  
 
             # f = W^N tanh(W^1 x + b^1) + b^N
             # self.b1 ist (h,) self.b1[:,None] ist (h,1)
-            z = self.W1 @ x + self.b1[:,None] @ np.ones((1,M))          
+            z = self.W1x @ x + self.W1u @ u + self.b1[:,None] @ np.ones((1,M))          
             a = np.tanh(z)      
             self.A_hist[i] = a       
-            self.alpha_hist[i] = np.ones((self.layers,1)) @ np.ones((1,M)) - self.A_hist[i] * self.A_hist[i]         
+            self.alpha_hist[i] = np.ones((h,1)) @ np.ones((1,M)) - self.A_hist[i]**2   
             f = self.WN @ a + self.bN[:, None] @ np.ones((1,M))          
             self.X_hist[i + 1] = x + dt * f        
-        z_last = self.W1 @ self.X_hist[N-1] + self.b1[:, None] @ np.ones((1, M))
+        z_last = self.W1x @ self.X_hist[N-1] + self.W1u @ self.U_data[N-1] + self.b1[:, None] @ np.ones((1, M))
         self.A_hist[N-1, :, :] = np.tanh(z_last)  
+        self.alpha_hist[N-1,:,:] = np.ones((h,1)) @ np.ones((1,M)) - self.A_hist[N-1]**2
         return self.X_hist
 
 
@@ -328,7 +340,7 @@ class Neural_ODE_MLP:
         M = self.number_trajectories
         N = self.time_steps
         n = self.dim_state
-
+        m = self.dim_control
         self.P_hist = np.zeros((N, n, M))
         
         # Von Start:N-1 bis Ziel 0 (exklusiv, also 1) mit Schrittweite -1 (also Rückwärts)
@@ -336,11 +348,11 @@ class Neural_ODE_MLP:
         for i in range(N-1, 0 ,-1):
             dt = self.time_grid[i] - self.time_grid[i-1]
             p = self.P_hist[i]
-
-            # Warum bilde ich eigentlich alpha immer neu und speichere es nicht im forward pass ?
-            #alpha = np.ones((self.layers,1)) @ np.ones((1,M)) - self.A_hist[i] * self.A_hist[i]
-            res = 2*(self.X_hist[i] - self.data[i])
-            self.P_hist[i-1]=  p + dt * (res + self.W1.T @ (self.alpha_hist[i] * (self.WN.T @ p)))
+            res = 2*(self.X_hist[i] - self.X_data[i])
+            # Hier nur Euler: Mal auf RK gehen ?
+            #-------------------------------------------------------------------------
+            self.P_hist[i-1] =  p + dt * (
+                res + self.W1x.T @ (self.alpha_hist[i] * (self.WN.T @ p)))
         return self.P_hist
     
     # Sensitivity ODE:
@@ -349,6 +361,7 @@ class Neural_ODE_MLP:
         M = self.number_trajectories
         N = self.time_steps
         n = self.dim_state
+        m = self.dim_control
         h = self.layers
 
         # Für S_W^1 = [S^(1,1) S^(1,2) ... S^(h,n)] -> also h*n komponenten
@@ -356,40 +369,46 @@ class Neural_ODE_MLP:
         # Wir sammeln je Trajektorie eine Sammlung von S_W^1  -> M Komponenten
         # Nach b haben wir nur jeweils n oder h komponenten 
 
-        self.S_W1_hist = np.zeros((N,n,h*n,M))
-        self.S_b1_hist = np.zeros((N,n,h,M))
-        self.S_WN_hist = np.zeros((N,n,n*h,M))
-        self.S_bN_hist = np.zeros((N,n,n,M))
+        self.S_w1x = np.zeros((N,n,h*n,M))
+        self.S_w1u = np.zeros((N,n,h*m,M))
+        self.S_b1 = np.zeros((N,n,h,M))
+        self.S_wN = np.zeros((N,n,n*h,M))
+        self.S_bN = np.zeros((N,n,n,M))
 
         for j in range(M):
             for i in range(N-1):
                 dt = self.time_grid[i+1] - self.time_grid[i]
                 a_i     = self.A_hist[i,:,j]                                # (n,)
                 x_i     = self.X_hist[i,:,j]                                # (n,)
+                u_i     = self.U_data[i,:,j]                                # (m,)
                 alpha_i = self.alpha_hist[i,:,j]                            # (h,)
-                f_x     = self.WN @ np.diag(alpha_i) @ self.W1              # (n,n)
+                f_x     = self.WN @ np.diag(alpha_i) @ self.W1x             # (n,n)
 
                 # Berechnung der U Terme:
-                U_W1 = np.kron(self.WN @ np.diag(alpha_i), x_i[None,:])     # (n,h*n)
+                U_w1x = np.kron(self.WN @ np.diag(alpha_i), x_i[None,:])    # (n,h*n)
+                U_w1u = np.kron(self.WN @ np.diag(alpha_i), u_i[None,:])    # (n,h*m)
                 U_b1 = self.WN @ np.diag(alpha_i)                           # (n,h)
-                U_WN = np.kron(np.eye(n), a_i[None,:])                      # (n,n*h)
+                U_wN = np.kron(np.eye(n), a_i[None,:])                      # (n,n*h)
                 U_bN = np.eye(n)                                            # (n,n)
 
                 # Vorwärtsintegration von S
-                self.S_W1_hist[i+1,:,:,j] = self.S_W1_hist[i,:,:,j] + dt * (f_x @ self.S_W1_hist[i,:,:,j] + U_W1)   
-                self.S_b1_hist[i+1,:,:,j] = self.S_b1_hist[i,:,:,j] + dt * (f_x @ self.S_b1_hist[i,:,:,j] + U_b1)
-                self.S_WN_hist[i+1,:,:,j] = self.S_WN_hist[i,:,:,j] + dt * (f_x @ self.S_WN_hist[i,:,:,j] + U_WN)
-                self.S_bN_hist[i+1,:,:,j] = self.S_bN_hist[i,:,:,j] + dt * (f_x @ self.S_bN_hist[i,:,:,j] + U_bN)
+                # Parallel für jede Zustandsdimension und jeden Parameter von theta
+                self.S_w1x[i+1,:,:,j] = self.S_w1x[i,:,:,j] + dt * (f_x @ self.S_w1x[i,:,:,j] + U_w1x)   
+                self.S_w1u[i+1,:,:,j] = self.S_w1u[i,:,:,j] + dt * (f_x @ self.S_w1u[i,:,:,j] + U_w1u) 
+                self.S_b1[i+1,:,:,j] = self.S_b1[i,:,:,j] + dt * (f_x @ self.S_b1[i,:,:,j] + U_b1)
+                self.S_wN[i+1,:,:,j] = self.S_wN[i,:,:,j] + dt * (f_x @ self.S_wN[i,:,:,j] + U_wN)
+                self.S_bN[i+1,:,:,j] = self.S_bN[i,:,:,j] + dt * (f_x @ self.S_bN[i,:,:,j] + U_bN)
 
     # Gradient update
-    def gradient_descent(self):
+    def compute_gradient(self):
         M = self.number_trajectories
         N = self.time_steps
         n = self.dim_state
+        m = self.dim_control 
         h = self.layers
 
-        # self.layers = h
-        gradJ_W1 = np.zeros((h,n))
+        gradJ_W1x = np.zeros((h,n))
+        gradJ_W1u = np.zeros((h,m))
         gradJ_b1 = np.zeros(h)
         gradJ_WN = np.zeros((n,h))
         gradJ_bN = np.zeros(n)
@@ -401,7 +420,8 @@ class Neural_ODE_MLP:
                 dt = self.time_grid[i+1] - self.time_grid[i]
                 alpha = self.alpha_hist[i]
                 delta = self.WN.T @ self.P_hist[i]
-                gradJ_W1 += dt * (alpha*delta)  @ self.X_hist[i].T
+                gradJ_W1x += dt * (alpha*delta)  @ self.X_hist[i].T
+                gradJ_W1u += dt * (alpha*delta)  @ self.U_data[i].T
                 gradJ_b1 += dt * (alpha*delta)  @ np.ones(M)
                 gradJ_WN += dt * self.P_hist[i] @ self.A_hist[i].T
                 gradJ_bN += dt * self.P_hist[i] @ np.ones(M)
@@ -412,23 +432,33 @@ class Neural_ODE_MLP:
             self.Solve_SensitivityODE()
             for j in range(M):
                 for i in range(N-1):
-                    res = 2*(self.X_hist[i,:,j] - self.data[i,:,j])
+                    res = 2*(self.X_hist[i,:,j] - self.X_data[i,:,j])
                     dt = self.time_grid[i+1] - self.time_grid[i]
-                    gW1 = res @ self.S_W1_hist[i,:,:,j]
-                    gb1 = res @ self.S_b1_hist[i,:,:,j]
-                    gWN = res @ self.S_WN_hist[i,:,:,j]
-                    gbN = res @ self.S_bN_hist[i,:,:,j]
+                    gW1x = res @ self.S_w1x[i,:,:,j]
+                    gW1u = res @ self.S_w1u[i,:,:,j]
+                    gb1 = res @ self.S_b1[i,:,:,j]
+                    gWN = res @ self.S_wN[i,:,:,j]
+                    gbN = res @ self.S_bN[i,:,:,j]
 
                     # Summieren der Beiträge pro Zeitintervall
-                    gradJ_W1 += dt * gW1.reshape(h, n)
+                    gradJ_W1x += dt * gW1x.reshape(h, n)
+                    gradJ_W1u += dt * gW1u.reshape(h, m)
                     gradJ_b1 += dt * gb1
                     gradJ_WN += dt * gWN.reshape(n, h)
                     gradJ_bN += dt * gbN
-        return gradJ_W1, gradJ_b1, gradJ_WN, gradJ_bN
+        return gradJ_W1x, gradJ_W1u, gradJ_b1, gradJ_WN, gradJ_bN
 
     # Update:
-    def update(self, gradJ_W1, gradJ_b1, gradJ_WN, gradJ_bN, learning_rate = 0.01):
-        self.W1 -= learning_rate * gradJ_W1
+    def update(
+            self, 
+            gradJ_W1x, 
+            gradJ_W1u, 
+            gradJ_b1, 
+            gradJ_WN, 
+            gradJ_bN, 
+            learning_rate = 0.01):
+        self.W1x -= learning_rate * gradJ_W1x
+        self.W1u -= learning_rate * gradJ_W1u
         self.b1 -= learning_rate * gradJ_b1
         self.WN -= learning_rate * gradJ_WN
         self.bN -= learning_rate * gradJ_bN
@@ -436,32 +466,41 @@ class Neural_ODE_MLP:
     def loss(self):
         M = self.number_trajectories
         N = self.time_steps
+        dt = self.time_grid[1] - self.time_grid[0]
         loss = 0.0
-        for i in range(N - 1):
-            dt = self.time_grid[i + 1] - self.time_grid[i]
-            diff = self.X_hist[i] - self.data[i]      # (n, M)
+        for i in range(N):
+            diff = self.X_hist[i] - self.X_data[i]                      # (n, M)
             loss += dt * np.sum(diff**2)
         return loss
 
-    # Hier Schrittweitenbestimmung
+    # Ein Gradientenabstiegsschritt
     #-------------------------------------------------------------------------------
-    def train_step(self, learning_rate_init=1e-3, beta=0.5, growth=1.1, c=1e-4, max_iter=20):
+    def train_step(
+            self, 
+            learning_rate_init=1e-3, 
+            beta=0.5, 
+            growth=1.1, 
+            c=1e-4, 
+            max_iter=20):
+        
         # 1. Forward und Backward
         self.forward()
         loss_before = self.loss()
         self.backward()
-        grads = self.gradient_descent()
+        grads = self.compute_gradient()
 
         # 2. Armijo-Konstante: c * grad^2 
         grad_norm_sq = sum(np.sum(g**2) for g in grads)
 
         # 3. Parameter sichern
-        W1_old = self.W1.copy()
+        W1x_old = self.W1x.copy()
+        W1u_old = self.W1u.copy()
         b1_old = self.b1.copy()
         WN_old = self.WN.copy()
         bN_old = self.bN.copy()
 
         # 4. Backtracking
+        #-------------------------------------------------------------
         lr = learning_rate_init
         for _ in range(max_iter):
             self.update(*grads, learning_rate=lr)
@@ -473,13 +512,32 @@ class Neural_ODE_MLP:
                 return loss_after, lr * growth
 
             # Zurücksetzen und halbieren
-            self.W1 = W1_old.copy()
+            self.W1x = W1x_old.copy()
+            self.W1u = W1u_old.copy()
             self.b1 = b1_old.copy()
             self.WN = WN_old.copy()
             self.bN = bN_old.copy()
             lr *= beta
-
         return loss_before, lr
+
+    # Fertiges Netz auswerten:
+    #---------------------------------------------------------------------------------
+    def f_point(self, x, u):
+        x = np.atleast_1d(x); u = np.atleast_1d(u)
+        z = self.W1x @ x + self.W1u @ u + self.b1
+        return self.WN @ np.tanh(z) + self.bN
+
+    def dfdx(self, x, u):
+        x = np.atleast_1d(x); u = np.atleast_1d(u)
+        z = self.W1x @ x + self.W1u @ u + self.b1
+        alpha = 1 - np.tanh(z)**2
+        return self.WN @ np.diag(alpha) @ self.W1x
+
+    def dfdu(self, x, u):
+        x = np.atleast_1d(x); u = np.atleast_1d(u)
+        z = self.W1x @ x + self.W1u @ u + self.b1
+        alpha = 1 - np.tanh(z)**2
+        return self.WN @ np.diag(alpha) @ self.W1u
 
 class LNN_trjectory:
     def __init__(self,layers =10, dim_state =1):

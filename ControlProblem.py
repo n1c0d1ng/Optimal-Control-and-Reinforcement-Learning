@@ -11,15 +11,26 @@ class OCP:
         self.t = np.linspace(0, self.T, N + 1)
         self.u = np.zeros(N + 1)  # Initiale Steuerung
         self.x = np.zeros(N + 1)  # Initialer Zustand
-        self.J_numerical = 0
+        self.J_numerical = 0.0
         self.J_ANALYTICAL = 0.
         self.Space_Dimension = 2
+        self.dynamic = False
+
+    # Einlesen der Daten und lernen der Dynamik
+    # dazu anlegen des NN und trainingsschritt
+
+
+    # Methode zum Differenzieren der Dynamik nach x
+
+
+    # Methode zum Differenzieren der Dynamik nach u
 
     # x' = x + u + 1, x(0) = 0
-    def forward_integration(self, u):
+    def forward_integration(self, u ,x0 = 0.0):
         x  = np.zeros(self.N + 1)
+        x[0] = x0
         for i in range(self.N):
-            x[i + 1] = x[i] + self.h * (x[i] + u[i] + 1)
+            x[i+1] = x[i] + self.h * (x[i] + u[i] + 1)
         return x
     
     # p' = -(1+p) p(1) =  -> p_k = p_{k+1} - (- h*(1+p_{k+1}))
@@ -73,12 +84,14 @@ class OCP:
 
 
     # Interaktion mit Environment für den RL Algorithmus
+    # R(x_k,u_k) = -h*(x+u^2)
     def direct_reward(self, x, u):
         return - (self.h * (x + u**2))
 
     def terminal_reward(self, x):
         return - (x**2)
 
+    # Euler-Schritt 
     def get_next_state(self, x, u):
         return x + self.h * (x + u + 1)
     
@@ -112,52 +125,6 @@ class OCP:
             / (2 * (np.exp(2) + 1)) - 1.5
 
 
+    # Lernen der Dynamik f(x,u) = x+u+1
 
-class SimpleControlProblem:
-# min \int_0^1 u^2 dt + (x(1)-1)^2
-# mit der Zustandsgleichung x' = u, x(0) = 0
-# H = u^2 + p*u -> H_u = 2u + p , H_x = 0 -> p' = 0
 
-    def __init__(self, N=100):
-        self.N = N
-        self.T = 1
-        self.h = self.T / N
-        self.t = np.linspace(0, self.T, N + 1)
-        self.u = np.zeros(N + 1)  # Initiale Steuerung
-        self.x = np.zeros(N + 1)  # Initialer Zustand
-
-    def forward_integration(self, u):
-        x  = np.zeros(self.N + 1)
-        for i in range(self.N):
-            x[i + 1] = x[i] + self.h * (u[i])
-        return x
-
-    # p'=-H_x = 0 -> p = const -> p_k = p_{k+1}
-    def backward_integration(self):
-        p = np.zeros(self.N + 1)
-        p[self.N] = 2 * self.x[self.N]  # Endwert
-        for i in range(self.N):
-            p[self.N -i -1] = p[self.N - i]  # da p' = 0
-        return p
-    
-    # Gradient H_u = 2u + p 
-    def compute_gradient(self, p):
-        return -2 * self.u - p
-    
-    def compute_running_cost(self,x, u):
-        return self.h* np.sum(u**2) + x[self.N]**2
-    
-    def compute_terminal_cost(self,x, u):
-        return x[self.N]**2
-    
-    # x'=u=-p/2 -> x(t) = -(p/2)*t -> x(1) = -(p(1)/2)-> x(t)=t/2
-    def x_analytic(self):
-        return 0.5*self.t
-
-    # p'=-H_x =0 -> p(t)=p(1)=2(x(1)-1)=2(-p(1)/2 -1)-> p(t)=-1
-    def p_analytic(self):
-        return -1.0*np.ones(self.N + 1)
-    
-    # H_u = 2u+p = 0 -> u = -p/2 -> u = 1/2
-    def u_analytic(self):
-        return 0.5*np.ones(self.N + 1)

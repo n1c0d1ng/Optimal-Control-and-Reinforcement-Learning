@@ -3971,9 +3971,10 @@ $\bm{\theta}
 =
 (W^{(1)}, b^{(1)}, W^{(N)}, b^{(N)}) \in \mathbb{R}^{2hn+h+n}$ gilt.
 Hierbei bezeichnet $\bm{\sigma}:\mathbb{R}^{h} \to \mathbb{R}^{h}$ die 
-nichtlineare Aktivierungsfunktion. 
-Wir verwenden für die Aktivierungsfunktion $\tanh$ und $\mathsf{softplus}$:\footnote{
-    Let $u,v$ be defined as $u(z):= \tanh(z)$ and $v(z) = \log\left(1 + e^z\right)$, the derivatives are given by
+nichtlineare Aktivierungsfunktion. Wir verwenden für die Aktivierungsfunktion 
+$\tanh$ und $\mathsf{softplus}$:\footnote{
+    Let $u,v$ be defined as $u(z):= \tanh(z)$ and $v(z) = \log\left(1 + e^z\right)$, 
+    the derivatives are given by
     %
     \begin{align*}
         % f'' = -2 f f' 
@@ -4067,66 +4068,60 @@ Wir verwenden für die Aktivierungsfunktion $\tanh$ und $\mathsf{softplus}$:\foo
         \end{aligned}$ 
     \end{tabular}
 \end{center}
-
-For the components $\bm{g}_i$ we get
+%
+Für jede Komponente $g_i$ gilt:
+%For the components $\bm{g}_i$ we get
 %
 \begin{align*}
-    \bm{g}_i
+    g_i(\bm{x};\bm{\theta})
     =
     \sum_{\gruen{k} =1}^{h}
     W^{(N)}_{i \gruen{k}} \cdot
     \sigma
     \left(
-        \bm{z}_{\gruen{k}}
+        z_{\gruen{k}}
     \right)
     + b^{(N)}_i 
     \quad
-    \bm{z}_{\gruen{k}}
+    z_{\gruen{k}}
     =
     \sum_{\dunkelrot{s}=1}^{n} 
-    W^{(1)}_{\gruen{k} \dunkelrot{s}} \bm{x}_{\dunkelrot{s}} 
+    W^{(1)}_{\gruen{k} \dunkelrot{s}} x_{\dunkelrot{s}} 
     + 
     b^{(1)}_{\gruen{k}} 
     \quad
-    \bm{a}_{\gruen{k}} := \sigma(\bm{z}_{\gruen{k}})
+    a_{\gruen{k}} := \sigma(z_{\gruen{k}}).
 \end{align*}
 
-applying the chain rule leads to
+Anwendung der Kettenregel liefer die Ableitung nach dem Zustand komponentenweise:
+%applying the chain rule leads to
 %
-\begin{align*}
-    \frac{\partial \bm{g}_i}{\partial \bm{x}_{\blau{j}}}
+\begin{align}\label{NN:derivative_x}
+    \frac{\partial g_i}{\partial x_{\blau{j}}}
     =
-    \sum_{\gruen{l} =1}^{h}
+    \sum_{\gruen{k} =1}^{h}
     W^{(N)}_{i \gruen{k}} \cdot
-    \frac{\partial \sigma(z)}{\partial z} \bigg|_{z = \bm{z}_{\gruen{k}}}
+    \alpha_k
     \cdot 
-    \frac{\partial \bm{z}_{\gruen{k}}}{\partial \bm{x}_{\blau{j}}}
+    \frac{\partial z_{\gruen{k}}}{\partial x_{\blau{j}}}
     \qquad
-    \bm{\alpha}_{\gruen{k}} := \frac{\partial \sigma(z)}{\partial z} \bigg|_{z = \bm{z}_{\gruen{k}}}
+    \alpha_{\gruen{k}} := \frac{\partial \sigma(z)}{\partial z} \bigg|_{z = z_{\gruen{k}}}
     \quad
-    \frac{\partial \bm{z}_{\gruen{k}}}{\partial \bm{x}_{\blau{j}}} 
+    \frac{\partial z_{\gruen{k}}}{\partial x_{\blau{j}}} 
     =
-    W^{(1)}_{\gruen{k}{\blau{j}}}
-\end{align*}
-
-
-Für die Ableitung von $\bm{g}$ nach dem Zustand $\bm{x}$ gilt:
-
-% Ableitung f_x
-\begin{align*}
-    \frac{\partial \bm{g}}{\partial \bm{x}} &=
-    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W^{(1)}
-    \quad
-    \bm{\alpha}_k
-    = 
-    \frac{\partial \sigma(z)}{\partial \bm{z}} \bigg|_{z = \bm{z}_k}
-    \\
-    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W^{(1)}
-    &=
+    W^{(1)}_{\gruen{k}{\blau{j}}}.
+\end{align}
+%
+Für die entsprechende Jacobi-Matrix von $\bm{g}$ nach dem Zustand $\bm{x}$ folgt
+%
+% Ableitung f_x     
+\begin{align}\label{NN:jacobi_x}
+    \frac{\partial \bm{g}}{\partial \bm{x}} 
+    =
     \begin{bmatrix}
-        W^{(N)}_{11} \bm{\alpha}_1  & \cdots & W^{(N)}_{1h} \bm{\alpha}_h \\
-        \vdots                      & \ddots & \vdots \\
-        W^{(N)}_{n1} \bm{\alpha}_1  & \cdots & W^{(N)}_{nh} \bm{\alpha}_h
+        W^{(N)}_{11} \alpha_1  & \cdots & W^{(N)}_{1h} \alpha_h \\
+        \vdots                 & \ddots & \vdots \\
+        W^{(N)}_{n1} \alpha_1  & \cdots & W^{(N)}_{nh} \alpha_h
     \end{bmatrix}
     \cdot 
     \begin{bmatrix}
@@ -4134,47 +4129,54 @@ Für die Ableitung von $\bm{g}$ nach dem Zustand $\bm{x}$ gilt:
         \vdots       & \ddots & \vdots \\
         W^{(1)}_{h1} & \cdots & W^{(1)}_{hn}
     \end{bmatrix}
-\end{align*}
+    =
+    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W^{(1)}
+\end{align}
 
-Für die Ableitung nach den Parametern gilt:
+
+Für die Ableitung nach den Komponenten von $\bm{\theta}$ gilt:
 % Ableitung f_u
-\begin{align*}
-    \frac{\partial \bm{g}_i}{\partial W_{\blau{j} k}^{(1)}}
+\begin{align}
+    \frac{\partial g_i}{\partial W_{jk}^{(1)}}
     &=
-    W_{i \blau{j}}^{(N)} 
+    W_{ij}^{(N)} 
     \cdot 
-    \frac{\partial \sigma(z)}{\partial \bm{z}} \bigg|_{z = \bm{z}_j}
+    \frac{\partial \sigma(z)}{\partial z} \bigg|_{z = z_j}
     \cdot
-    \frac{\partial \bm{z}_j}{\partial W_{\blau{j} k}^{(1)}} 
+    \frac{\partial z_j}{\partial W_{jk}^{(1)}} 
     =
     % Ableitung df/dW^1
-    W_{i \blau{j}}^{(N)} 
+    W_{ij}^{(N)} 
     \cdot 
-    \bm{\alpha}_{\blau{j}}
+    \alpha_{j}
     \cdot 
-    \bm{x}_k
+    x_k
+    \label{NN:derivative_W1}
     \\
-    \frac{\partial \bm{g}_i}{\partial b^{(1)}_{\blau{j}}}
+    \frac{\partial g_i}{\partial b^{(1)}_{j}}
     &=
-    W_{i \blau{j}}^{(N)}  
+    W_{ij}^{(N)}  
     \cdot 
-    \frac{\partial \sigma(z)}{\partial \bm{z}} \bigg|_{z = \bm{z}_j}
+    \frac{\partial \sigma(z)}{\partial z} \bigg|_{z = z_j}
     =
     % Ableitung df/db^1 
-    W_{i \blau{j}}^{(N)} \cdot \bm{\alpha}_{\blau{j}}
+    W_{ij}^{(N)} \cdot \alpha_{j}
+    \label{NN:derivative_b1}
     \\
-    \frac{\partial \bm{g}_i}{\partial W_{\blau{j}k}^{(N)}}
+    \frac{\partial g_i}{\partial W_{jk}^{(N)}}
     &=
     % Ableitung df/dW^N
-    \delta_{i\blau{j}} \cdot  \sigma(\bm{z}_k)
+    \delta_{ij} \cdot  \sigma(z_k)
     =
-    \delta_{i\blau{j}} \cdot  \bm{a}_k
+    \delta_{ij} \cdot  a_k
+    \label{NN:derivative_WN}
     \\
-    \frac{\partial \bm{g}_i}{\partial b^{(N)}_{\blau{j}}}
+    \frac{\partial g_i}{\partial b^{(N)}_{j}}
     &=
     % Ableitung df/db^N
     \delta_{ij}
-\end{align*}
+    \label{NN:derivative_bN}
+\end{align}
 
 Betrachten wir konkret $\mu_{\bm{\theta}}:\mathbb{R} \times [0,1] \to \mathbb{R}$ 
 für die Lösung eines einfachen optimalen Steuerungsproblem und
@@ -4616,7 +4618,7 @@ Sei $\bm{x}:\mathbb{R} \to \mathbb{R}^n$ beobachtbare Daten.
 Wir modellieren die erzeugende Dynamik durch folgendes Vektorfeld:
 % x' = f(x) 
 \begin{align}
-    \bm{f}:\mathbb{R}^{n \times m} \to \mathbb{R}^n
+    \bm{f}:\mathbb{R}^{n} \times \mathbb{R}^{m} \to \mathbb{R}^n
     \quad
     \frac{\mathsf{d} \bm{x}(t)}{\dt} = \bm{f}(\bm{x}(t), \bm{u}(t); \bm{\theta}) 
     \label{eq:Neural_Dynamic}
@@ -4649,10 +4651,10 @@ und demonstrieren das konkrete Vorgehen für ein Hidden-Layer mit
     =
     W^{(N)} \bm{\sigma}
     \left(
-        W_{\bm{x}}^{(1)} \bm{x} + W_{\bm{u}}^{(1)} \bm{u}
+        W_{\bm{x}}^{(1)} \bm{x} + W_{\bm{u}}^{(1)} \bm{u} + b^{(1)}
     \right)
     +
-    b^{(1)}
+    b^{(N)}
 \end{align}
 
 wobei $W_{\bm{x}}^{(1)} \in \mathbb{R}^{h \times n}$ 
@@ -4677,10 +4679,58 @@ Der Parameter $\bm{\theta}$ wird als Lösung des quadratischen Problems
     \right)^2
 \end{align*}
 %
-zu $M$ Trajektorien und $N$ Zeitschritten bestimmt.
+zu $M$ Trajektorien und $N$ Zeitschritten bestimmt. 
+Die Ableitung der Zustandsdynamik nach dem State ist gegeben nach (\ref{NN:jacobi_x})
+% f_x als Matrizenprodukt
+\begin{align}\label{dynamics:f_x}
+    \frac{\partial \bm{f}}{\partial \bm{x}} 
+    =
+    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W^{(1)}_{\bm{x}}
+    \qquad
+    \alpha_k
+    =
+    \frac{\partial \sigma(z)}{\partial z}
+    \bigg|_{z= z_k}
+    \quad
+    z_k 
+    = 
+    \sum_{i=1}^{n} W_{\bm{x}, ki}^{(1)} x_i 
+    + 
+    \sum_{i=1}^{m} W_{\bm{u}, ki}^{(1)} u_i
+    +
+    b^{(1)}_k
+\end{align}
+
+für $k=1,\cdots , h$ und $\bm{\alpha} \in \mathbb{R}^h$. 
+Bezeichne $\left[W^{(N)}\right]^{(j)}$ die $j$-te Spalte von $W^{(N)}$, 
+dann gilt mit der komponentenweisen Ableitung:
+%
+\begin{align}\label{dynamics:f_W1}
+    % Hier der Block für x ---------------------------------------------
+    \frac{\partial f_i}{\partial W_{\bm{x}, j k}^{(1)}}
+    =
+    W_{ij}^{(N)} 
+    \cdot 
+    \alpha_{j}
+    \cdot 
+    x_k
+    \qquad
+    % Hier der Block für u ----------------------------------------------
+    \frac{\partial f_i}{\partial W_{\bm{u}, j k}^{(1)}}
+    &=
+    W_{i j}^{(N)} 
+    \cdot 
+    \alpha_{j}
+    \cdot 
+    u_k
+\end{align}
+
+die Ableitungen nach den anderen Parametern sind gegeben durch: 
+(\ref{NN:derivative_b1} - \ref{NN:derivative_bN}).
 
 \subsection{Sensitivity Approach}
 
+%
 Für den Gradienten der Loss Funktion gilt:
 % J'(\theta) = int 2(x-x_D) dx/dtheta
 \begin{align*}
@@ -4697,35 +4747,7 @@ Für den Gradienten der Loss Funktion gilt:
 \end{align*}
 
 Wir bezeichnen $\bm{S}(t) := \frac{\partial \bm{x}}{\partial \bm{\theta}}$ 
-als die Sensitivität und definieren blockweise:
-% Blockstruktur [S_u] nach den Parametern u
-\begin{align*}
-    \left[
-        \bm{S}_{W_{\bm{x}}^{(1)}}
-    \right]_{ijk} 
-    := 
-    \frac{\partial \bm{x}_i(t)}{\partial W^{(1)}_{\bm{x},jk}}
-    \quad
-    \left[
-        \bm{S}_{b^{(1)}}
-    \right]_{ij} 
-    := 
-    \frac{\partial \bm{x}_i(t)}{\partial b^{(1)}_{j}}
-    \quad
-    \left[
-        \bm{S}_{W^{(N)}}
-    \right]_{ijk} 
-    := 
-    \frac{\partial \bm{x}_i(t)}{\partial W^{(N)}_{jk}}
-    \quad
-    \left[
-        \bm{S}_{b^{(N)}}
-    \right]_{ijk} 
-    := 
-    \frac{\partial \bm{x}_i(t)}{\partial b^{(N)}}
-\end{align*}
-
-Für die Ableitung nach der Zeit gilt somit \footnote{
+als die Sensitivität erhalten für die Ableitung Blockweise\footnote{
     For a given dynamics $\bm{\dot{x}}(t) = \bm{f}(\bm{x}(t),\bm{u}(t); \bm{\theta})$ 
     the Sensitivity is defined as $\bm{S}(t):= \frac{\partial \bm{x}(t)}{\partial \bm{\theta}}$. 
     Using the Chain rule leads to:
@@ -4735,6 +4757,8 @@ Für die Ableitung nach der Zeit gilt somit \footnote{
         &= 
         \frac{\partial}{\partial \bm{\theta}}
         \frac{\mathsf{d} \bm{x}(t)}{\dt}
+        =
+        \frac{\mathsf{d}\bm{f}}{\mathsf{d}\bm{\theta}}
         =
         \frac{\partial \bm{f}}{\partial \bm{x}} 
         \cdot 
@@ -4747,83 +4771,126 @@ Für die Ableitung nach der Zeit gilt somit \footnote{
         \bm{S}(0) = \bm{0} 
     \end{align*}
 }
-% Hier 5 Sensitivity ODEs:
-\begin{align*}
+% Blockstruktur [S_u] nach den Parametern u
+\begin{center}
+    \begin{tabular}{l r}
     % Block für W^1
     % hier nur der Teil der von x abhängt also nur W^1_x
     %---------------------------------------------------------------------
-    \frac{\mathsf{d}}{\dt} \left[\bm{S}_{W_{\bm{x}}^{(1)}}\right]_{\gruen{i}jk}
-    &=
-    \frac{\partial \bm{f}_{\gruen{i}}}{\partial W^{(1)}_{\bm{x},jk}} 
-    =
-    \sum_{\dunkelrot{s}=1}^{n}
-    \frac{\partial \bm{f}_{\gruen{i}}}{\partial \bm{x}_{\dunkelrot{s}}}
-    \cdot 
-    \left[\bm{S}_{W_{\bm{x}}^{(1)}}\right]_{\dunkelrot{s}jk}
-    +
-    \frac{\partial \bm{f}_{\gruen{i}}}{\partial W^{(1)}_{\bm{x},jk}}
+    $\begin{aligned}
+        \frac{\mathsf{d}}{\dt} \left[\bm{S}_{W_{\bm{x}}^{(1)}}\right]_{\gruen{i}jk}
+        =
+        \sum_{\dunkelrot{s}=1}^{n}
+        \frac{\partial \bm{f}_{\gruen{i}}}{\partial \bm{x}_{\dunkelrot{s}}}
+        \cdot 
+        \left[\bm{S}_{W_{\bm{x}}^{(1)}}\right]_{\dunkelrot{s}jk}
+        +
+        \frac{\partial \bm{f}_{\gruen{i}}}{\partial W^{(1)}_{\bm{x},jk}}
+    \end{aligned}$
+    &
+    % Definition S_(W_x^1)
+    $\begin{aligned}
+        \left[
+            \bm{S}_{W_{\bm{x}}^{(1)}}
+        \right]_{ijk} 
+        := 
+        \frac{\partial \bm{x}_i(t)}{\partial W^{(1)}_{\bm{x},jk}}
+    \end{aligned}$
     \\
     % Block für W^1
     % hier nur der Teil der von u abhängt also nur W^1_u
     %---------------------------------------------------------------------
-    \frac{\mathsf{d}}{\dt} \left[\bm{S}_{W_{\bm{u}}^{(1)}}\right]_{\gruen{i}jk}
-    &=
-    \frac{\partial \bm{f}_{\gruen{i}}}{\partial W^{(1)}_{\bm{u},jk}} 
-    =
-    \sum_{\dunkelrot{s}=1}^{n}
-    \frac{\partial \bm{f}_{\gruen{i}}}{\partial \bm{x}_{\dunkelrot{s}}}
-    \cdot 
-    \left[\bm{S}_{W_{\bm{u}}^{(1)}}\right]_{\dunkelrot{s}jk}
-    +
-    \frac{\partial \bm{f}_{\gruen{i}}}{\partial W^{(1)}_{\bm{u},jk}}
+    $\begin{aligned}
+        \frac{\mathsf{d}}{\dt} \left[\bm{S}_{W_{\bm{u}}^{(1)}}\right]_{\gruen{i}jk}
+        =
+        \sum_{\dunkelrot{s}=1}^{n}
+        \frac{\partial \bm{f}_{\gruen{i}}}{\partial \bm{x}_{\dunkelrot{s}}}
+        \cdot 
+        \left[\bm{S}_{W_{\bm{u}}^{(1)}}\right]_{\dunkelrot{s}jk}
+        +
+        \frac{\partial \bm{f}_{\gruen{i}}}{\partial W^{(1)}_{\bm{u},jk}}
+    \end{aligned}$
+    &
+    % Definition S_(W_u^1)
+    $\begin{aligned}
+        \left[
+            \bm{S}_{W_{\bm{u}}^{(1)}}
+        \right]_{ijk} 
+        := 
+        \frac{\partial \bm{x}_i(t)}{\partial W^{(1)}_{\bm{u},jk}}
+    \end{aligned}$
     \\
     % Block für b^1
-    \frac{\mathsf{d}}{\dt} \left[\bm{S}_{b^{(1)}}\right]_{ij}
-    &=
-    \frac{\partial \bm{f}_i}{\partial b^{(1)}_{j}} 
-    =
-    \sum_{\dunkelrot{s}=1}^{n}
-    \frac{\partial \bm{f}_i}{\partial \bm{x}_{\dunkelrot{s}}}
-    \cdot 
-    \left[\bm{S}_{b^{(1)}}\right]_{\dunkelrot{s}j}
-    +
-    \frac{\partial \bm{f}_i}{\partial b^{(1)}_{j}}
+    %----------------------------------------------------------------------
+    $\begin{aligned}
+        \frac{\mathsf{d}}{\dt} \left[\bm{S}_{b^{(1)}}\right]_{ij}
+        =
+        \sum_{\dunkelrot{s}=1}^{n}
+        \frac{\partial \bm{f}_i}{\partial \bm{x}_{\dunkelrot{s}}}
+        \cdot 
+        \left[\bm{S}_{b^{(1)}}\right]_{\dunkelrot{s}j}
+        +
+        \frac{\partial \bm{f}_i}{\partial b^{(1)}_{j}}
+    \end{aligned}$
+    &
+    % Definition von S_b1
+    $\begin{aligned}
+        \left[
+            \bm{S}_{b^{(1)}}
+        \right]_{ij} 
+        := 
+        \frac{\partial \bm{x}_i(t)}{\partial b^{(1)}_{j}}
+    \end{aligned}$
     \\
     % Block für W^N
-    \frac{\mathsf{d}}{\dt} \left[\bm{S}_{W^{(N)}}\right]_{ijk}
-    &=
-    \frac{\partial \bm{f}_i}{\partial W^{(N)}_{jk}} 
-    =
-    \sum_{\dunkelrot{s}=1}^{n}
-    \frac{\partial \bm{f}_i}{\partial \bm{x}_{\dunkelrot{s}}}
-    \cdot 
-    \left[\bm{S}_{W^{(N)}}\right]_{\dunkelrot{s}jk}
-    +
-    \frac{\partial \bm{f}_i}{\partial W^{(N)}_{jk}}
+    %---------------------------------------------------------------------------
+    $\begin{aligned}
+        \frac{\mathsf{d}}{\dt} \left[\bm{S}_{W^{(N)}}\right]_{ijk}
+        =
+        \sum_{\dunkelrot{s}=1}^{n}
+        \frac{\partial \bm{f}_i}{\partial \bm{x}_{\dunkelrot{s}}}
+        \cdot 
+        \left[\bm{S}_{W^{(N)}}\right]_{\dunkelrot{s}jk}
+        +
+        \frac{\partial \bm{f}_i}{\partial W^{(N)}_{jk}}
+    \end{aligned}$
+    &
+    % Definition von S_WN
+    $\begin{aligned}
+        \left[
+            \bm{S}_{W^{(N)}}
+        \right]_{ijk} 
+        := 
+        \frac{\partial \bm{x}_i(t)}{\partial W^{(N)}_{jk}}
+    \end{aligned}$
     \\
     % Block für b^N
-    \frac{\mathsf{d}}{\dt} \left[\bm{S}_{b^{(N)}}\right]_{ij}
-    &=
-    \frac{\partial \bm{f}_i}{\partial b^{(N)}_{j}} 
-    =
-    \sum_{\dunkelrot{s}=1}^{n}
-    \frac{\partial \bm{f}_i}{\partial \bm{x}_{\dunkelrot{s}}}
-    \cdot 
-    \left[\bm{S}_{b^{(N)}}\right]_{\dunkelrot{s}j}
-    +
-    \frac{\partial \bm{f}_i}{\partial b^{(N)}_{j}}
-\end{align*}
+    %-----------------------------------------------------------------------
+    $\begin{aligned}
+        \frac{\mathsf{d}}{\dt} \left[\bm{S}_{b^{(N)}}\right]_{ij}
+        =
+        \sum_{\dunkelrot{s}=1}^{n}
+        \frac{\partial \bm{f}_i}{\partial \bm{x}_{\dunkelrot{s}}}
+        \cdot 
+        \left[\bm{S}_{b^{(N)}}\right]_{\dunkelrot{s}j}
+        +
+        \frac{\partial \bm{f}_i}{\partial b^{(N)}_{j}}
+    \end{aligned}$
+    &
+    % Definition von S_bN
+    $\begin{aligned}
+        \left[
+            \bm{S}_{b^{(N)}}
+        \right]_{ijk} 
+        := 
+        \frac{\partial \bm{x}_i(t)}{\partial b^{(N)}_{j}}
+    \end{aligned}$
+\end{tabular}
+\end{center}
 
-Die Ableitung der Zustandsdynamik nach dem State ist gegeben durch
-% f_x als Matrizenprodukt
-\begin{align*}
-    \frac{\partial \bm{f}}{\partial \bm{x}} 
-    =
-    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W^{(1)}_{\bm{x}}
-\end{align*}
-
-Für jestes $(j,k)$ lässt sich die Gleichung für $W^{(1)}_{\bm{x},jk}$ 
-als Matrix Gleichung schreiben:
+Für jedes feste $(j,k)$ erhalten wir eine Vektor Gleichung 
+wobei jede Komponente eine Zustandsdimension von $\bm{x} \in \mathbb{R}^n$ darstellt. 
+Wir schreiben:
 % Matrix Gleichung für ein festes paar (j,k): S^(j,k) = f_x S^(j,k) + U^(j,K)
 \begin{align*}
     \frac{\mathsf{d}}{\dt}
@@ -4852,66 +4919,51 @@ als Matrix Gleichung schreiben:
     \end{bmatrix}
 \end{align*}
 
-
-Bezeichne $\left[W^{(N)}\right]^{(j)}$ die $j$-te Spalte von $W^{(N)}$, 
-dann gilt mit der komponentenweisen Ableitung:
+Bezeichne $\left[W^{(N)}\right]^{(j)}$ die j-te Spalte von $W^{(N)}$, 
+dann gilt mit (\ref{dynamics:f_W1}):
 %
 \begin{align*}
     % Hier der Block für x ---------------------------------------------
-    \frac{\partial \bm{f}_i}{\partial W_{\bm{x}, \blau{j} k}^{(1)}}
-    &=
-    W_{i \blau{j}}^{(N)} 
-    \cdot 
-    \bm{\alpha}_{\blau{j}}
-    \cdot 
-    \bm{x}_k
-    \qquad
     \bm{U}_{W_{\bm{x}}^{(1)}}^{(j,k)} 
     =
     \begin{bmatrix}
-        W_{1j}^{(N)} \bm{\alpha}_j 
-        \bm{x}_k
+        W_{1j}^{(N)} \alpha_j 
+        x_k
         \\
         \vdots \\
-        W_{nj}^{(N)} \bm{\alpha}_j 
-        \bm{x}_k
+        W_{nj}^{(N)} \alpha_j 
+        x_k
     \end{bmatrix} 
     =
-    \bm{\alpha}_j 
+    \alpha_j 
     \cdot
     \left[W^{(N)}\right]^{(j)}
     \cdot 
-    \bm{x}_k
-    \\
-    % Hier der Block für u ----------------------------------------------
-    \frac{\partial \bm{f}_i}{\partial W_{\bm{u}, \blau{j} k}^{(1)}}
-    &=
-    W_{i \blau{j}}^{(N)} 
-    \cdot 
-    \bm{\alpha}_{\blau{j}}
-    \cdot 
-    \bm{u}_k
+    x_k
     \qquad
+    % Hier der Block für u ----------------------------------------------
     \bm{U}_{W_{\bm{u}}^{(1)}}^{(j,k)} 
     =
     \begin{bmatrix}
-        W_{1j}^{(N)} \bm{\alpha}_j 
-        \bm{u}_k
+        W_{1j}^{(N)} \alpha_j
+        u_k
         \\
         \vdots \\
-        W_{nj}^{(N)} \bm{\alpha}_j 
-        \bm{u}_k
+        W_{nj}^{(N)} \alpha_j
+        u_k
     \end{bmatrix} 
     =
-    \bm{\alpha}_j 
+    \alpha_j
     \cdot
     \left[W^{(N)}\right]^{(j)}
     \cdot 
-    \bm{u}_k
+    u_k
 \end{align*}
 
 Anordnen jeder Spalte $(j,k)$ in den Matrizen 
-$\bm{S}_{W^{(1)}},\bm{U}_{W^{(1)}} \in \mathbb{R}^{n \times (hn)}$ liefert:\footnote{
+$\bm{S}_{W_{\bm{x}}^{(1)}},\bm{U}_{W_{\bm{x}}^{(1)}} \in \mathbb{R}^{n \times (h \cdot n)}$ 
+und $\bm{S}_{W_{\bm{u}}^{(1)}},\bm{U}_{W_{\bm{u}}^{(1)}} \in \mathbb{R}^{n \times (h \cdot m)}$ 
+liefert:\footnote{
     Let $\bm{A} \in \mathbb{R}^{n \times m}$ and $\bm{B} \in \mathbb{R}^{r \times p}$, 
     then the Kronecker product $\otimes$ is defined as
     %
@@ -4992,28 +5044,8 @@ $\bm{S}_{W^{(1)}},\bm{U}_{W^{(1)}} \in \mathbb{R}^{n \times (hn)}$ liefert:\foot
     \end{bmatrix}
 \end{align*}
 
-Die Gleichung lässt sich somit schreiben durch: 
-% Matrix Gleichung für alles: S = f_x S + U
-\begin{align*}
-    \frac{\mathsf{d}}{\dt} \bm{S}_{W_{\bm{x}}^{(1)}} 
-    &= 
-    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W_{\bm{x}}^{(1)}
-    \cdot 
-    \bm{S}_{W_{\bm{x}}^{(1)}} 
-    +
-    \left[W^{(N)} \cdot \mathsf{diag}(\bm{\alpha})\right] \otimes \bm{x}^T
-    \\
-    \frac{\mathsf{d}}{\dt} \bm{S}_{W_{\bm{u}}^{(1)}} 
-    &= 
-    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W_{\bm{u}}^{(1)}
-    \cdot 
-    \bm{S}_{W_{\bm{u}}^{(1)}} 
-    +
-    \left[W^{(N)} \cdot \mathsf{diag}(\bm{\alpha})\right] \otimes \bm{u}^T
-\end{align*}
-
-Für $\bm{U}_{W^{(N)}} \in \mathbb{R}^{n \times nh}$ erhalten wir:
-%
+Für $\bm{U}_{W^{(N)}} \in \mathbb{R}^{n \times nh}$ erhalten wir mit (\ref{NN:derivative_WN}):
+% U_WN 
 \begin{align*}
     \bm{U}_{W^{(N)}}^{(j,k)} 
     &=
@@ -5065,82 +5097,42 @@ Für $\bm{U}_{W^{(N)}} \in \mathbb{R}^{n \times nh}$ erhalten wir:
     \bm{I}_n \otimes \bm{a}^T 
 \end{align*}
 
-Wir erhalten für die anderen Matrizen $\bm{U}$:
-
-% Tabelle Komponentenweise vs. Matrixform:
-\begin{center}
-    \begin{tabular}{l l l}
-        Block & Ableitung Komponentenform & Ableitung Matrizenform \\[0.5em] \hline
-        \noalign{\vspace{0.5em}}
-        $W_{\bm{x}}^{(1)}$ 
-        & 
-        $\begin{aligned}
-            W_{i \blau{j}}^{(N)} \cdot \bm{\alpha}_{\blau{j}} \cdot \bm{x}_k
-        \end{aligned}$
-        &
-        % Matrixform: W^1 
-        $\begin{aligned}
-            \left(W^{(N)} \cdot \mathsf{diag}(\bm{\alpha})\right) \otimes \bm{x}^T
-        \end{aligned}$ 
-        \\[0.5em] \hline
-        \noalign{\vspace{0.5em}}
-        % Block für W_u^1
-        $W_{\bm{u}}^{(1)}$ 
-        & 
-        $\begin{aligned}
-            W_{i \blau{j}}^{(N)} \cdot \bm{\alpha}_{\blau{j}} \cdot \bm{u}_k
-        \end{aligned}$
-        &
-        % Matrixform: W^1 
-        $\begin{aligned}
-            \left(W^{(N)} \cdot \mathsf{diag}(\bm{\alpha})\right) \otimes \bm{u}^T
-        \end{aligned}$ 
-        \\[0.5em] \hline
-        \noalign{\vspace{0.5em}}
-        $b^{(1)}$ 
-        & 
-        $\begin{aligned}
-            W_{i \blau{j}}^{(N)} \cdot \bm{\alpha}_{\blau{j}}
-        \end{aligned}$
-        &
-        % Matrixform: b^1
-        $\begin{aligned}
-            W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right)
-        \end{aligned}$  
-        \\ [0.5em]  \hline
-        \noalign{\vspace{0.5em}}
-        $W^{(N)}$ 
-        & 
-        $\begin{aligned}
-            \delta_{i\blau{j}} \cdot  \bm{a}_k
-        \end{aligned}$ 
-        & 
-        % Matrixform: W^N
-        $\begin{aligned}
-            \bm{I}_n \otimes \bm{a}^T
-        \end{aligned}$ 
-        \\ [0.5em] \hline
-        \noalign{\vspace{0.5em}}
-        $b^{(N)}$ 
-        & 
-        $\begin{aligned}
-            \delta_{ij}
-        \end{aligned}$ 
-        & 
-        % Matrixform: b^N
-        $\begin{aligned}
-            \bm{I}_n
-        \end{aligned}$ 
-    \end{tabular}  
-\end{center}
-    
-Analog erhalten wir für die anderen Sensitivitäten:
-% Fertige Sensitivity ODEs
+Wir erhalten für die Matrizen $\bm{U}_{b^{(1)}}$ und $\bm{U}_{b^{(N)}}$ mittels 
+(\ref{NN:derivative_b1}) und (\ref{NN:derivative_bN}):
+%
 \begin{align*}
+    \bm{U}_{b^{(1)}}
+    =
+    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right)
+    \quad
+    \bm{U}_{b^{(N)}}
+    =
+    \bm{I}_n
+\end{align*}
+
+Nutzen von (\ref{dynamics:f_x}) liefert die Sensitivity ODEs des Problems
+% Matrix Gleichung für alles: S = f_x S + U
+\begin{align*}
+    \frac{\mathsf{d}}{\dt} \bm{S}_{W_{\bm{x}}^{(1)}} 
+    &= 
+    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W_{\bm{x}}^{(1)}
+    \cdot 
+    \bm{S}_{W_{\bm{x}}^{(1)}} 
+    +
+    \left[W^{(N)} \cdot \mathsf{diag}(\bm{\alpha})\right] \otimes \bm{x}^T
+    \\
+    \frac{\mathsf{d}}{\dt} \bm{S}_{W_{\bm{u}}^{(1)}} 
+    &= 
+    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W_{\bm{x}}^{(1)}
+    \cdot 
+    \bm{S}_{W_{\bm{u}}^{(1)}} 
+    +
+    \left[W^{(N)} \cdot \mathsf{diag}(\bm{\alpha})\right] \otimes \bm{u}^T
+    \\
     % Gleichung für b^1 
     \frac{\mathsf{d}}{\dt} \bm{S}_{b^{(1)}} 
     &= 
-    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W^{(1)}
+    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W_{\bm{x}}^{(1)}
     \cdot 
     \bm{S}_{b^{(1)}} 
     +
@@ -5149,7 +5141,7 @@ Analog erhalten wir für die anderen Sensitivitäten:
     % Gleichung für W^N 
     \frac{\mathsf{d}}{\dt} \bm{S}_{W^{(N)}} 
     &= 
-    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W^{(1)}
+    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W_{\bm{x}}^{(1)}
     \cdot 
     \bm{S}_{W^{(N)}} 
     +
@@ -5158,11 +5150,11 @@ Analog erhalten wir für die anderen Sensitivitäten:
     % Gleichung für b^N 
     \frac{\mathsf{d}}{\dt} \bm{S}_{b^{(N)}} 
     &= 
-    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W^{(1)}
+    W^{(N)} \cdot \mathsf{diag}\left(\bm{\alpha}\right) \cdot W_{\bm{x}}^{(1)}
     \cdot 
     \bm{S}_{b^{(N)}} 
     +
-    \bm{I}_n
+    \bm{I}_n.
 \end{align*}
 
 % Algorithmus
@@ -5219,8 +5211,6 @@ Analog erhalten wir für die anderen Sensitivitäten:
     \end{algorithmic}
 \end{algorithm}
 
-
-
 \subsection{Adjoint Approach}
 
 Das Maximumprinzip liefert den Gradienten 
@@ -5247,51 +5237,72 @@ Für den Ausdruck $\left(\frac{\partial \bm{f}}{\partial \bm{x}}\right)^T \cdot 
 Zeitpunkt $t_i$ gilt somit:
 % 
 \begin{align*}
-    \bm{f}_{\bm{x}}(\bm{x}(t_i))^T 
+    \bm{f}_{\bm{x}}(\bm{x}(t_i),\bm{u}(t_i); \bm{\theta})^T 
     \cdot
     \bm{p}(t_i)
     &=
-    \left[
-        W^{(N)} 
-        \cdot
-        \mathsf{diag}
+    \underbrace{
+        \left[
+            W^{(N)} 
+            \cdot
+            \mathsf{diag}
+            \left(
+                \bm{\alpha}(t_i)
+            \right)
+            \cdot 
+            W_{\bm{x}}^{(1)}
+        \right]^T
+    }_{
+        \left(W_{\bm{x}}^{(1)}\right)^T
+            \mathsf{diag}
         \left(
             \bm{\alpha}(t_i)
         \right)
-        \cdot 
-        W^{(1)}
-    \right]^T
+        \left(W^{(N)}\right)^T
+    }
     \cdot
     \bm{p}(t_i)
-    \\
-    &=
-    W^{(1)T}
-    \mathsf{diag}
-    \left(
-        \bm{\alpha}(t_i)
-    \right)
-    W^{(N) T}
-    \cdot
-    \bm{p}(t_i) \\
-    &=
-    W^{(1)T}
+    =
+    \left(W_{\bm{x}}^{(1)}\right)^T
     \cdot
     \left[
         \bm{\alpha}(t_i)
         \odot 
         \left(
-            W^{(N) T}
+            \left(W^{(N)}\right)^T
             \cdot
             \bm{p}(t_i)
         \right)
     \right]
 \end{align*}
 
-
-Wir erhalten für die Matrizen der Kontraktion $\bm{f}_{\bm{\theta}}^T \cdot \bm{p}$
-mit $\bm{\delta} := \left(W^{(N)}\right)^T \cdot \bm{p}$
+Für die Kontraktion $\left(\frac{\partial \bm{f}}{\partial \bm{\theta}}\right)^T \cdot \bm{p}$ gilt
+mit (\ref{NN:derivative_W1}) für $\bm{\theta}= W_{\bm{x}}^{(1)}$
+%und (\ref{eq:partiell_derivative_u}):
+% Kontraktion df/dW^1_x  * p 
+\begin{align*}
+    \frac{\partial \bm{f}}{\partial W_{\bm{x}, jk}^{(1)}} \cdot \bm{p} 
+    =
+    \sum_{i=1}^{n} 
+        \frac{\partial f_i}{\partial W_{\bm{x}, jk}^{(1)}} \cdot p_i 
+    =
+    x_k 
+    \alpha_j 
+    \sum_{i=1}^{n} 
+    W_{ij}^{(N)} p_i
+    =    
+    \alpha_j 
+    \delta_j
+    x_k 
+    \quad
+    \delta_j := \sum_{i=1}^{n} W_{ij}^{(N)} p_i
+\end{align*}
+% \left(\left[W^{(N)}\right]^{(j)}\right)^{T} \odot \bm{p}^{(j)}
+Sei also $\bm{\delta} := \left(W^{(N)}\right)^T \cdot \bm{p} \in \mathbb{R}^h$, dann gilt
+ür die Matrizen der Kontraktion $\bm{f}_{\bm{\theta}}^T \cdot \bm{p}$
 \footnote{
-    Let $A,B \in \mathbb{R}^{n \times m}$, then the direct product (or Hadamard product) $\odot$ is defined as
+    Let $A,B \in \mathbb{R}^{n \times m}$, then the direct product 
+    (or Hadamard product) $\odot$ is defined as
     %
     \begin{align*}
         \left(A \odot B\right)_{ij} 
@@ -5302,24 +5313,47 @@ mit $\bm{\delta} := \left(W^{(N)}\right)^T \cdot \bm{p}$
 % Tabelle Komponentenweise vs. Matrixform:
 \begin{center}
     \begin{tabular}{l | l |l}
-        Block &  Komponentenform &  Matrizenform \\[0.5em] \hline
+        Block &  Partielle Ableitung &  Matrizenform \\[0.5em] \hline
         \noalign{\vspace{0.5em}}
-        $W^{(1)}$ 
-        % df/dW^1 * p
+        $W_{\bm{x}}^{(1)}$ 
+        % df/dW_x^1 * p
         & 
         $\begin{aligned}
-            % df/dW^1 * p
-            \sum_{i=1}^{n} \frac{\partial \bm{f}_i}{\partial W^{(1)}_{\blau{j}k}} \cdot \bm{p}_i
-            &=
-            \bm{\alpha}_{\blau{j}} \cdot \bm{\delta}_j \cdot \bm{x}_k 
+            \sum_{i=1}^{n}
+            \frac{\partial f_i}{\partial W^{(1)}_{\bm{x}, jk}}
+            p_i
             =
-            \left(\bm{\alpha} \odot \bm{\delta}\right)_{\blau{j}} \cdot \bm{x}_k
+            \sum_{i=1}^{n}
+            \alpha_j
+            W_{ij}^{(N)} p_i x_k
+            =
+            \alpha_j \cdot \delta_j \cdot x_k
         \end{aligned}$
         &
-        % Matrixform: W^1 * p
+        % Matrixform: W_x^1 * p
         $\begin{aligned}
             (\bm{\alpha} \odot \bm{\delta}) \cdot \bm{x}^T
         \end{aligned}$ 
+        %----------------------------------------------------------------------------------------
+        \\[0.5em] \hline
+        \noalign{\vspace{0.5em}}
+        $W_{\bm{u}}^{(1)}$ 
+        % df/dW_u^1 * p
+        & 
+        $\begin{aligned}
+            % df/dW^1 * p
+            \sum_{i=1}^{n} \frac{\partial f_i}{\partial W^{(1)}_{\bm{u}, jk}} \cdot p_i
+            =
+            \sum_{i=1}^{n} \alpha_j  W_{ij}^{(N)} p_i u_k
+            =
+            \alpha_j  \delta_j u_k
+        \end{aligned}$
+        &
+        % Matrixform: W_u^1 * p
+        $\begin{aligned}
+            (\bm{\alpha} \odot \bm{\delta}) \cdot \bm{u}^T
+        \end{aligned}$ 
+        %----------------------------------------------------------------------------------------
         \\[0.5em] \hline
         \noalign{\vspace{0.5em}}
         $b^{(1)}$ 
@@ -5327,11 +5361,11 @@ mit $\bm{\delta} := \left(W^{(N)}\right)^T \cdot \bm{p}$
         & 
         $\begin{aligned}
             % df/db^1 * p
-            \sum_{i=1}^{n} \frac{\partial \bm{f}_i}{\partial b^{(1)}_j} \cdot \bm{p}_i
-            &=
-            \bm{\alpha}_j \cdot \sum_{i=1}^{n} W^{(N)}_{ij} \bm{p}_i
+            \sum_{i=1}^{n} \frac{\partial f_i}{\partial b^{(1)}_j} \cdot p_i
             =
-            \bm{\alpha}_j \bm{\delta}_j
+            \alpha_j \cdot \sum_{i=1}^{n} W^{(N)}_{ij} p_i
+            =
+            \alpha_j \delta_j
         \end{aligned}$
         &
         % Matrixform: b^1 * p
@@ -5346,17 +5380,17 @@ mit $\bm{\delta} := \left(W^{(N)}\right)^T \cdot \bm{p}$
         $\begin{aligned}
             % df/dW^N * p
             \sum_{i=1}^{n} 
-            \frac{\partial \bm{f}_i}{\partial W^{(N)}_{jk}}
-            \cdot \bm{p}_i
+            \frac{\partial f_i}{\partial W^{(N)}_{jk}}
+            \cdot p_i
             &=
-            \bm{a}_k \cdot \sum_{i=1}^{n}  \delta_{i\blau{j}} \cdot \bm{p}_i
+            a_k \cdot \sum_{i=1}^{n}  \delta_{ij} \cdot p_i
             =
-            \bm{a}_k \cdot \bm{p}_j
+            a_k \cdot p_j
         \end{aligned}$ 
         & 
         % Matrixform: W^N
         $\begin{aligned}
-            \bm{p} \odot \bm{a}^T
+            \bm{p} \cdot \bm{a}^T
         \end{aligned}$ 
         \\ [0.5em] \hline
         \noalign{\vspace{0.5em}}
@@ -5364,11 +5398,11 @@ mit $\bm{\delta} := \left(W^{(N)}\right)^T \cdot \bm{p}$
         & 
         $\begin{aligned}
             % df/db^N * p
-            \sum_{i=1}^{n} \frac{\partial \bm{f}_i}{\partial b^{(N)}_j} \cdot \bm{p}_i
+            \sum_{i=1}^{n} \frac{\partial f_i}{\partial b^{(N)}_j} \cdot p_i
             &=
-            \sum_{i=1}^{n} \delta_{ij} \cdot \bm{p}_i
+            \sum_{i=1}^{n} \delta_{ij} \cdot p_i
             =
-            \bm{p}_j
+            p_j
         \end{aligned}$ 
         & 
         % Matrixform: b^N * p
@@ -5377,8 +5411,6 @@ mit $\bm{\delta} := \left(W^{(N)}\right)^T \cdot \bm{p}$
         \end{aligned}$ 
     \end{tabular}  
 \end{center}
-
-
 
 
 % Algorithmus
@@ -5392,29 +5424,31 @@ mit $\bm{\delta} := \left(W^{(N)}\right)^T \cdot \bm{p}$
         \For {epoch in Episodes}
             \For {$i=0$ to $N-1$}
                 \State Compute $\bm{X}_i, \bm{A}_i, \bm{\alpha}_i$
-                \State Integration of the state equation
-                \State 
+                \State Integrate:
+                %\State 
                 $\begin{aligned}
                     \bm{x}^{(j)}(t_{i+1})
                     = 
                     \bm{x}^{(j)}(t_{i})
                     +
                     \int_{t_i}^{t_{i+1}}
-                    \bm{f}(\bm{x}^{(j)}(t); \bm{\theta}) \dt
+                    \bm{f}(\bm{x}^{(j)}(t), \bm{u}^{(j)}(t); \bm{\theta}) \dt
                 \end{aligned}$
             \EndFor
             %\State \textbf{Sensitivity ODE}: Save the Compututed Sensitivities $\bm{S}_{\theta}$ \Comment{Sensitivity}
-            \State Integration Backwards $\bm{p}^{(j)}(t_f) = 0$
-            \State %Integrate: 
+            \State Integrate:
+            %\State Integrate: 
             $\begin{aligned}
                 \frac{\mathsf{d}\bm{p}^{(j)}(t)}{\dt}
                 = 
                 -2 \cdot (\bm{x}^{(j)}(t) - \bm{x}^{(j)}_{\text{data}}(t)) 
                 - \left(
-                    \frac{\partial \bm{f}}{\partial \bm{x}}(\bm{x}^{(j)}(t); \bm{\theta}) 
+                    \frac{\partial \bm{f}}{\partial \bm{x}}(\bm{x}^{(j)}(t), \bm{u}^{(j)}(t); \bm{\theta}) 
                 \right)^T 
                 \cdot 
                 \bm{p}^{(j)}(t)
+                \quad
+                \bm{p}^{(j)}(t_f) = \bm{0}
             \end{aligned}$
             %\State \textbf{Gradient Computation}: For each $\theta$ a unique Gradient will be computed
             \State 
@@ -5437,7 +5471,7 @@ mit $\bm{\delta} := \left(W^{(N)}\right)^T \cdot \bm{p}$
 
 \newpage
 
-\subsection{PMP Controller}
+\subsection{Application on Control Problems}
 
 Wir betrachten die Dynamik aus dem Beispiel \ref{eq:OCP_Toy_Problem} 
 %

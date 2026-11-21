@@ -21,25 +21,25 @@
 \contentsline {subsection}{\numberline {3.5}Experimente}{28}{subsection.3.5}%
 \contentsline {section}{\numberline {4}Learning of Dynamics}{31}{section.4}%
 \contentsline {subsection}{\numberline {4.1}Sensitivity Approach}{31}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Adjoint Approach}{34}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}PMP Controller}{35}{subsection.4.3}%
-\contentsline {section}{\numberline {5}Physics-Inspired Neural Networks}{37}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Parametrisierung des Neural Networks}{37}{subsection.5.1}%
-\contentsline {subsubsection}{\numberline {5.1.1}Arbitrary Lagrangian Network (A-LNN)}{37}{subsubsection.5.1.1}%
-\contentsline {subsubsection}{\numberline {5.1.2}Deep Lagrangian Networks (DeLaN)}{38}{subsubsection.5.1.2}%
-\contentsline {subsection}{\numberline {5.2}Herleitung im eindimensionalen Fall}{39}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Strukturierte Lagrange Funktion}{41}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Experimente}{45}{subsection.5.4}%
-\contentsline {section}{\numberline {6}Maximum Principle Model-based Learning}{48}{section.6}%
-\contentsline {section}{\numberline {7}Stochastische Steuerungsprobleme}{49}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Policy-Gradient Methoden}{53}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Actor-Critic Methoden}{56}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3}Deterministic Policy Gradient}{58}{subsection.7.3}%
-\contentsline {section}{\numberline {A}Policy Gradient THeorem}{62}{appendix.A}%
-\contentsline {section}{\numberline {B}Herleitung MLP}{65}{appendix.B}%
-\contentsline {section}{\numberline {C}Algorithmen}{70}{appendix.C}%
-\contentsline {section}{\numberline {D}Herleitungen}{70}{appendix.D}%
-\contentsline {subsection}{\numberline {D.1}Neural ODEs}{70}{subsection.D.1}%
-\contentsline {subsection}{\numberline {D.2}LNN Herleitung}{75}{subsection.D.2}%
-\contentsline {subsection}{\numberline {D.3}Exponentialansatz im strukturierten Fall}{78}{subsection.D.3}%
+\contentsline {subsection}{\numberline {4.2}Adjoint Approach}{33}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Application on Control Problems}{35}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Physics-Inspired Neural Networks}{36}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Parametrisierung des Neural Networks}{36}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}Arbitrary Lagrangian Network (A-LNN)}{36}{subsubsection.5.1.1}%
+\contentsline {subsubsection}{\numberline {5.1.2}Deep Lagrangian Networks (DeLaN)}{37}{subsubsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.2}Herleitung im eindimensionalen Fall}{38}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Strukturierte Lagrange Funktion}{40}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Experimente}{44}{subsection.5.4}%
+\contentsline {section}{\numberline {6}Maximum Principle Model-based Learning}{47}{section.6}%
+\contentsline {section}{\numberline {7}Stochastische Steuerungsprobleme}{48}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Policy-Gradient Methoden}{52}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Actor-Critic Methoden}{55}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Deterministic Policy Gradient}{57}{subsection.7.3}%
+\contentsline {section}{\numberline {A}Policy Gradient THeorem}{61}{appendix.A}%
+\contentsline {section}{\numberline {B}Herleitung MLP}{64}{appendix.B}%
+\contentsline {section}{\numberline {C}Algorithmen}{69}{appendix.C}%
+\contentsline {section}{\numberline {D}Herleitungen}{69}{appendix.D}%
+\contentsline {subsection}{\numberline {D.1}Neural ODEs}{69}{subsection.D.1}%
+\contentsline {subsection}{\numberline {D.2}LNN Herleitung}{74}{subsection.D.2}%
+\contentsline {subsection}{\numberline {D.3}Exponentialansatz im strukturierten Fall}{77}{subsection.D.3}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

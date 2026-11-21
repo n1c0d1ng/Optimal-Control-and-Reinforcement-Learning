@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.9.26)  14 NOV 2026 18:37
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.5) (preloaded format=pdflatex 2026.9.26)  21 NOV 2026 02:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1112,77 +1112,77 @@ File: tikzlibrarypositioning.code.tex 2026-08-01 v3.1.12 (3.1.12)
 ) [17] [18] [19] [20] [21] [22] [23]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 3665.
  [24] [25] [26] [27]
-<Reinforce_Cost_Episodes.png, id=329, 1003.8303pt x 281.1303pt>
+<Reinforce_Cost_Episodes.png, id=335, 1003.8303pt x 281.1303pt>
 File: Reinforce_Cost_Episodes.png Graphic file (type png)
 <use Reinforce_Cost_Episodes.png>
-Package pdftex.def Info: Reinforce_Cost_Episodes.png  used on input line 4412.
+Package pdftex.def Info: Reinforce_Cost_Episodes.png  used on input line 4414.
 (pdftex.def)             Requested size: 513.5706pt x 143.82925pt.
  [28 <./Reinforce_Cost_Episodes.png>]
-<NeuralODE_Cost_Ep.png, id=344, 1003.8303pt x 281.853pt>
+<NeuralODE_Cost_Ep.png, id=350, 1003.8303pt x 281.853pt>
 File: NeuralODE_Cost_Ep.png Graphic file (type png)
 <use NeuralODE_Cost_Ep.png>
-Package pdftex.def Info: NeuralODE_Cost_Ep.png  used on input line 4529.
+Package pdftex.def Info: NeuralODE_Cost_Ep.png  used on input line 4531.
 (pdftex.def)             Requested size: 513.5706pt x 144.199pt.
-<NeuralODE_State_Control.png, id=345, 859.2903pt x 354.123pt>
+<NeuralODE_State_Control.png, id=351, 859.2903pt x 354.123pt>
 File: NeuralODE_State_Control.png Graphic file (type png)
 <use NeuralODE_State_Control.png>
-Package pdftex.def Info: NeuralODE_State_Control.png  used on input line 4554.
+Package pdftex.def Info: NeuralODE_State_Control.png  used on input line 4556.
 (pdftex.def)             Requested size: 486.53883pt x 200.50673pt.
  [29 <./NeuralODE_Cost_Ep.png> <./NeuralODE_State_Control.png>]
-<Comparison_Policy_Simulation.png, id=357, 859.2903pt x 354.123pt>
+<Comparison_Policy_Simulation.png, id=363, 859.2903pt x 354.123pt>
 File: Comparison_Policy_Simulation.png Graphic file (type png)
 <use Comparison_Policy_Simulation.png>
-Package pdftex.def Info: Comparison_Policy_Simulation.png  used on input line 4575.
+Package pdftex.def Info: Comparison_Policy_Simulation.png  used on input line 4577.
 (pdftex.def)             Requested size: 513.5706pt x 211.6541pt.
  [30 <./Comparison_Policy_Simulation.png>] [31] [32] [33] [34]
-<Logistics_ODE_Loss_Learning_rate.png, id=390, 857.1222pt x 317.2653pt>
+<Logistics_ODE_Loss_Learning_rate.png, id=409, 857.1222pt x 317.2653pt>
 File: Logistics_ODE_Loss_Learning_rate.png Graphic file (type png)
 <use Logistics_ODE_Loss_Learning_rate.png>
-Package pdftex.def Info: Logistics_ODE_Loss_Learning_rate.png  used on input line 5494.
+Package pdftex.def Info: Logistics_ODE_Loss_Learning_rate.png  used on input line 5528.
 (pdftex.def)             Requested size: 459.51532pt x 170.09108pt.
-<Logistics_ODE_Plot.png, id=391, 859.2903pt x 317.988pt>
+<Logistics_ODE_Plot.png, id=410, 859.2903pt x 317.988pt>
 File: Logistics_ODE_Plot.png Graphic file (type png)
 <use Logistics_ODE_Plot.png>
-Package pdftex.def Info: Logistics_ODE_Plot.png  used on input line 5504.
+Package pdftex.def Info: Logistics_ODE_Plot.png  used on input line 5538.
 (pdftex.def)             Requested size: 459.51532pt x 170.04668pt.
- [35] [36 <./Logistics_ODE_Loss_Learning_rate.png> <./Logistics_ODE_Plot.png>]
+ [35 <./Logistics_ODE_Loss_Learning_rate.png>]
 
-LaTeX Warning: Reference `eq:ELE' on page 37 undefined on input line 5622.
+LaTeX Warning: Reference `eq:ELE' on page 36 undefined on input line 5656.
 
-[37]
+[36 <./Logistics_ODE_Plot.png>]
 
-LaTeX Warning: Reference `eq:Lagrangian' on page 38 undefined on input line 5858.
+LaTeX Warning: Reference `eq:Lagrangian' on page 37 undefined on input line 5892.
 
-[38] [39] [40] [41] [42] [43] [44] [45] [46] [47] [48] [49] [50] [51]
+[37] [38] [39] [40] [41] [42] [43] [44] [45] [46] [47] [48] [49] [50]
 
-LaTeX Warning: Reference `Martingaleigenschaft_Ito_Integral' on page 52 undefined on input line 8409.
+LaTeX Warning: Reference `Martingaleigenschaft_Ito_Integral' on page 51 undefined on input line 8443.
 
-[52]
-Overfull \hbox (5.17314pt too wide) detected at line 8526
+[51]
+Overfull \hbox (5.17314pt too wide) detected at line 8560
 []
  []
 
-[53] [54]
-Overfull \hbox (8.36206pt too wide) detected at line 8909
+[52] [53]
+Overfull \hbox (8.36206pt too wide) detected at line 8943
 []
  []
 
-[55] [56] [57] [58] [59] [60]
-Overfull \hbox (16.07727pt too wide) in paragraph at lines 9615--9615
+[54] [55] [56] [57] [58] [59]
+Overfull \hbox (16.07727pt too wide) in paragraph at lines 9649--9649
 []\OT1/cmr/m/n/12 Ian Good-fel-low, Yos-hua Ben-gio und Aaron Cour-ville. \OT1/cmr/m/it/12 De-ep Lear-ning\OT1/cmr/m/n/12 . [][]$\OT1/cmtt/m/n/12 https : / / www . deeplearningbook .
  []
 
+[60]
+Overfull \hbox (8.44397pt too wide) detected at line 9887
+[]
+ []
+
 [61]
-Overfull \hbox (8.44397pt too wide) detected at line 9853
+Overfull \hbox (8.52869pt too wide) detected at line 10103
 []
  []
 
-[62]
-Overfull \hbox (8.52869pt too wide) detected at line 10069
-[]
- []
-
-[63] [64] [65] [66] [67] [68] [69] [70] [71] [72] [73] [74] [75] [76] [77] [78] (Roboter.aux)
+[62] [63] [64] [65] [66] [67] [68] [69] [70] [71] [72] [73] [74] [75] [76] [77] (Roboter.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-08-10>
@@ -1196,17 +1196,17 @@ Package logreq Info: Writing requests to 'Roboter.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 42487 strings out of 467441
- 861122 string characters out of 5407591
- 1887837 words of memory out of 5000000
- 71022 multiletter control sequences out of 15000+600000
+ 42502 strings out of 467441
+ 861334 string characters out of 5407591
+ 1888199 words of memory out of 5000000
+ 71030 multiletter control sequences out of 15000+600000
  645539 words of font info for 102 fonts, out of 8000000 for 9000
  1143 hyphenation exceptions out of 8191
  108i,28n,107p,11290b,2371s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\nicol\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx7.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx8.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmex8.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi5.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib6.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib7.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss12.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmss8.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy5.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy6.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti7.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti8.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt12.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/nicol/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Roboter.pdf (81 pages, 1461860 bytes).
+Output written on Roboter.pdf (80 pages, 1464249 bytes).
 PDF statistics:
- 987 PDF objects out of 1000 (max. 8388607)
- 208 named destinations out of 1000 (max. 500000)
+ 1001 PDF objects out of 1200 (max. 8388607)
+ 215 named destinations out of 1000 (max. 500000)
  387 words of extra memory for PDF output out of 10000 (max. 10000000)
 
